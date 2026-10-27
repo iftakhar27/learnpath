@@ -28,7 +28,10 @@ export function CatalogList() {
   const create = useAction((body: CourseUpsert) => unwrap(api.POST("/api/v1/admin/courses", { body })), {
     invalidate: [["admin", "courses"]],
     success: "Course created as a draft",
-    onSuccess: (r) => router.push(`/admin/catalog/${r.id}`),
+    onSuccess: (r) => {
+      setCreating(false);
+      router.push(`/admin/catalog/${r.id}`);
+    },
   });
 
   const examName = (id: string) => exams.data?.find((e) => e.id === id)?.nameEn ?? "—";

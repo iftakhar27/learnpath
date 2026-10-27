@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { Button } from "./button";
 
 /** Accessible modal built on the native <dialog> element (focus trap, Esc to close, backdrop). */
@@ -20,11 +20,16 @@ export function Modal({
   wide?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const d = ref.current;
     if (!d) return;
     if (open && !d.open) d.showModal();
     if (!open && d.open) d.close();
+    // Next.js hides (rather than unmounts) pages after navigation. A modal <dialog> left open in a hidden
+    // page would keep the rest of the document inert, so close it whenever this effect is cleaned up.
+    return () => {
+      if (d.open) d.close();
+    };
   }, [open]);
 
   return (

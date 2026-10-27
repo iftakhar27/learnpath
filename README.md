@@ -3,8 +3,8 @@
 Backend and product docs for a NEET / JEE / Board learning app: recorded lessons, notes, practice, timed tests,
 analytics, study planner and paid courses, in English and Hindi. The brand name is configurable (`Branding__ProductName`).
 
-**Status:** Phase 0 (planning) and Phase 1 backend are done and tested. The Flutter app and Next.js web/admin clients
-are **not built yet**. See [`docs/09-phase-report-and-roadmap.md`](docs/09-phase-report-and-roadmap.md).
+**Status:** planning docs, the backend API and the **admin portal** are built and tested. The student website and the
+Flutter mobile app are **not built yet**. See [`docs/09-phase-report-and-roadmap.md`](docs/09-phase-report-and-roadmap.md).
 
 ## Docs
 
@@ -30,6 +30,8 @@ src/LearnPath.Api/
   Modules/           Identity, Catalog, Learning, Practice, Exams, Analytics, Planner, Commerce,
                      Notifications, Search, Admin
 tests/LearnPath.Tests/  unit + integration tests (real PostgreSQL)
+web/                    Next.js admin portal (student web next) — see web/README.md
+scripts/                export-openapi.sh
 docs/
 ```
 
@@ -50,7 +52,12 @@ dotnet run --project src/LearnPath.Api --urls http://localhost:5080
 # Seeded admin: admin@example.com / ChangeMe!2026  (from appsettings.Development.json; change it)
 ```
 
-Or run everything in containers: `cp .env.example .env && docker compose up --build`. API on http://localhost:8080.
+Admin portal (in another terminal):
+```bash
+cd web && npm install && npm run build && npm start     # http://localhost:3000/admin
+```
+
+Or run the API and database in containers: `cp .env.example .env && docker compose up --build`. API on http://localhost:8080.
 
 Migrations are applied automatically on start. To add one:
 ```bash
@@ -61,7 +68,8 @@ dotnet ef migrations add <Name> -p src/LearnPath.Api -o Data/Migrations
 ## Tests
 
 ```bash
-dotnet test
+dotnet test                               # backend unit + integration
+cd web && npm run build && npm run test:e2e   # admin portal end-to-end (starts its own API + web servers)
 ```
 Integration tests create and drop a temporary database `learnpath_test_*`. Point them at another server with
 `TEST_PG="Host=...;Port=5432;Username=...;Password=..."`.

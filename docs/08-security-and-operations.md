@@ -31,6 +31,9 @@ Legend: ✅ implemented and covered by tests · 🟡 implemented, not yet verifi
 | Dependency scanning (`dotnet list package --vulnerable`, Dependabot) | ⬜ | Add to CI |
 | Error monitoring (Sentry) | ⬜ | |
 | Legal review: privacy policy (DPDP Act 2023), terms, refunds, children's data | ⬜ | Owner |
+| Web session tokens in httpOnly, SameSite=Lax cookies; same-origin check on state-changing proxy calls; token endpoints blocked in proxy | ✅ | `web/src/lib/server/session.ts`, `web/e2e/auth.spec.ts` |
+| Admin cannot remove own SuperAdmin role or suspend self | ✅ | `AdminPortalApiTests` |
+| Content-Security-Policy headers on the web app | ⬜ | Add before production |
 
 Never log: passwords, OTP codes (only the dev sender does, refused in Production), tokens, Razorpay secrets, answer keys.
 

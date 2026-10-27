@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import { DIFFICULTIES, PUBLISH_STATUSES, QUESTION_TYPES, type Difficulty, type PublishStatus, type QuestionType } from "@/lib/api/types";
 import { formatDateTime, humanize, truncate } from "@/lib/format";
 import { LinkButton } from "@/components/ui/button";
 import { Badge, EmptyState, ErrorState, SkeletonRows, StatusBadge } from "@/components/ui/feedback";
-import { Field, Input, Select } from "@/components/ui/field";
+import { Field, Select } from "@/components/ui/field";
+import { SearchInput } from "@/components/ui/search-input";
 import { Card, PageHeader, Pagination, Table, Td, Th } from "@/components/ui/layout";
 import { TopicPicker } from "../shared";
 
@@ -30,8 +30,6 @@ export function QuestionList() {
     q: get("q"),
     page: Number(get("page")) || 1,
   };
-  const [search, setSearch] = useState(filters.q);
-  useEffect(() => setSearch(filters.q), [filters.q]);
 
   /** Filters live in the URL so links from the syllabus work and the back button restores the view. */
   const update = (patch: Partial<Record<keyof typeof filters, string | number>>) => {
@@ -116,16 +114,7 @@ export function QuestionList() {
               ))}
             </Select>
           </Field>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              update({ q: search.trim() });
-            }}
-          >
-            <Field label="Search" htmlFor="qf-q">
-              <Input id="qf-q" type="search" placeholder="Text or exact reference" value={search} onChange={(e) => setSearch(e.target.value)} onBlur={() => search.trim() !== filters.q && update({ q: search.trim() })} />
-            </Field>
-          </form>
+          <SearchInput key={filters.q} id="qf-q" label="Search" placeholder="Text or exact reference" value={filters.q} onSearch={(q) => update({ q })} />
         </div>
       </Card>
 

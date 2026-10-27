@@ -20,10 +20,11 @@ Status reflects *this repository*, verified by automated tests where noted. "Pla
 | M. Payments | Razorpay orders, signature verify, idempotent webhook, entitlements | Coupons, subscriptions renewal, refunds UI, invoices (P1) | **Implemented + tested** (HMAC verified; live keys not configured) |
 | N. Search | Simple ILIKE search over courses/topics | Postgres FTS → Meilisearch (P2) | **Implemented** |
 | O. Profile & settings | Profile, language, study target, logout, delete | Export (P1) | **Implemented** |
-| P. Content management | CRUD for exams/courses/subjects/chapters/topics/resources/questions/tests, publish | CSV import UI, scheduling, audit diff (P1) | **API implemented**; admin UI planned |
-| Q. Admin dashboard | Counts, attempts, payments, reported issues | Role dashboards (P1) | **API implemented** |
-| R. Support | Tickets + question reports | Helpdesk integration (P2) | **Implemented** |
+| P. Content management | CRUD for exams/courses/subjects/chapters/topics/resources/questions/tests, publish, CSV import | Media upload to provider, scheduling, audit diff (P1) | **API + admin UI implemented, e2e tested** |
+| Q. Admin dashboard | Counts, attempts, payments, reported issues, students, orders, audit log | Role dashboards, charts (P1) | **API + admin UI implemented, e2e tested** |
+| R. Support | Tickets + question reports | Helpdesk integration (P2) | **API + admin UI implemented, e2e tested** |
 | S. Gamification | Streak | Badges, leaderboards (P2) | Streak implemented |
 | T. Localization & a11y | `en`/`hi` content variants on title fields, `Accept-Language` | Full translation tooling (P1) | Data model ready |
 | Mobile app (Flutter) | All P0 student screens | — | **Planned** (next phase) |
-| Web app (Next.js) | Student portal + admin portal | — | **Planned** (next phase) |
+| Web app (Next.js) | Admin portal | — | **Implemented + e2e tested** |
+| Web app (Next.js) | Student portal | — | **Planned** (next phase) |

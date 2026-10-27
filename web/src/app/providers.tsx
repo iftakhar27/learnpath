@@ -9,6 +9,7 @@ import { ToastProvider } from "@/components/ui/toast";
 function onAuthError(error: unknown) {
   if (error instanceof ApiError && error.status === 401 && !window.location.pathname.startsWith("/admin/login")) {
     const next = encodeURIComponent(window.location.pathname + window.location.search);
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload clears every cached query after a session change
     window.location.assign(`/admin/login?next=${next}&expired=1`);
   }
 }

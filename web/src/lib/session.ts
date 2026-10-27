@@ -19,6 +19,7 @@ export function useLogout() {
   return async () => {
     await fetch("/api/session/logout", { method: "POST" }).catch(() => undefined);
     qc.clear();
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload clears every cached query after a session change
     window.location.assign("/admin/login");
   };
 }
@@ -31,6 +32,8 @@ export const can = {
   editContent: (r?: readonly string[]) => has(r, "Teacher", "ContentAdmin", "SuperAdmin"),
   publishContent: (r?: readonly string[]) => has(r, "ContentAdmin", "SuperAdmin"),
   support: (r?: readonly string[]) => has(r, "Support", "SuperAdmin"),
+  /** Tickets (support staff) or question reports (content staff). */
+  supportPage: (r?: readonly string[]) => has(r, "Support", "Teacher", "ContentAdmin", "SuperAdmin"),
   finance: (r?: readonly string[]) => has(r, "Finance", "SuperAdmin"),
   superAdmin: (r?: readonly string[]) => has(r, "SuperAdmin"),
 };

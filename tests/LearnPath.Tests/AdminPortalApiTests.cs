@@ -124,4 +124,27 @@ public class AdminPortalApiTests(ApiFactory api)
         var logs = await a.GetAsync("/api/v1/admin/audit-logs?action=course").Ok();
         Assert.All(logs.GetProperty("items").EnumerateArray(), l => Assert.StartsWith("course", l.Str("action")));
     }
+
+    [Fact]
+    public async Task User_detail_and_order_filters_include_purchases()
+    {
+        var s = await api.StudentAsync();
+        var userId = (await s.GetAsync("/api/v1/student/profile").Ok()).Str("userId");
+        var course = await api.CourseIdAsync(free: false);
+        var gwOrder = (await s.PostAsJsonAsync("/api/v1/payments/orders", new { courseId = course }).Ok()).Str("gatewayOrderId");
+        var payId = "pay_" + Guid.NewGuid().ToString("N")[..12];
+        var sig = LearnPath.Api.Infrastructure.Hashing.HmacSha256Hex(ApiFactory.KeySecret, $"{gwOrder}|{payId}");
+        await s.PostAsJsonAsync("/api/v1/payments/verify", new { gatewayOrderId = gwOrder, gatewayPaymentId = payId, signature = sig }).Ok();
+
+        var a = await api.AdminAsync();
+        var detail = await a.GetAsync($"/api/v1/admin/users/{userId}").Ok();
+        Assert.Equal("Test Student", detail.GetProperty("user").Str("fullName"));
+        Assert.Equal("Paid", detail.GetProperty("orders")[0].Str("status"));
+        Assert.Equal("Purchase", detail.GetProperty("enrollments")[0].Str("source"));
+
+        var paid = await a.GetAsync("/api/v1/admin/orders?status=Paid").Ok();
+        Assert.Contains(paid.GetProperty("items").EnumerateArray(), o => o.Str("gatewayOrderId") == gwOrder && o.Str("userName") == "Test Student");
+        var failed = await a.GetAsync("/api/v1/admin/orders?status=Failed").Ok();
+        Assert.DoesNotContain(failed.GetProperty("items").EnumerateArray(), o => o.Str("gatewayOrderId") == gwOrder);
+    }
 }

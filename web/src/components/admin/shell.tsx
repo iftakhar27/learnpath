@@ -15,7 +15,7 @@ const NAV: NavItem[] = [
   { href: "/admin/questions", label: "Question bank", allowed: can.editContent },
   { href: "/admin/tests", label: "Tests", allowed: can.editContent },
   { href: "/admin/students", label: "Students", allowed: can.support },
-  { href: "/admin/support", label: "Support", allowed: (r) => can.support(r) || can.editContent(r) },
+  { href: "/admin/support", label: "Support", allowed: can.supportPage },
   { href: "/admin/orders", label: "Orders", allowed: can.finance },
   { href: "/admin/announcements", label: "Announcements", allowed: can.publishContent },
   { href: "/admin/audit", label: "Audit log", allowed: can.superAdmin },

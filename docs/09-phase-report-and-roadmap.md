@@ -30,11 +30,39 @@
 ### Database changes
 - Migration `InitialCreate` (38 tables plus the EF migrations history table). See `docs/schema.sql`.
 
+## Phase 1b (admin portal) — report, 27 Oct 2026
+
+### Completed
+- Next.js 16 admin portal in `web/` (17 routes): sign-in, dashboard, courses & syllabus tree editor (subjects,
+  chapters, topics, videos/notes with reorder, publish, guarded delete), exams, question bank with URL-synced filters,
+  question editor (all five types, bilingual fields, live student preview, versioning notice), CSV import with
+  template/topic-ID downloads and row-level errors, test list and builder (sections, question-bank picker, per-question
+  marks, reorder, lock + duplicate once attempted), students & staff (search, detail, status, roles, grant access),
+  orders, support tickets and question reports, announcements, audit log. Role-aware navigation and page gates.
+- Backend-for-frontend session: httpOnly cookies, same-origin proxy, server-side de-duplicated token refresh.
+- Backend: typed admin DTOs so the OpenAPI contract generates exact TypeScript types; test detail/duplicate;
+  guarded deletes; self-lockout guards; fixed an untranslatable EF query on the student-detail and filtered-orders
+  endpoints (found by the e2e tests).
+
+### Verified
+- `dotnet test`: **59 passed, 0 failed** (adds 6 admin-portal API tests).
+- `npm run test:e2e` (Playwright, real API + PostgreSQL + production Next.js build): **11 passed, 0 failed**, run twice
+  in a row. Covers sign-in/redirect/refusal of students, httpOnly cookies, transparent token refresh, sign-out, the
+  full course → syllabus → video → question → test → publish flow with a student then taking the test via the API,
+  CSV import errors, teacher permissions, ticket reply + course grant + audit entry, and announcements.
+- `tsc --noEmit` and `eslint`: no errors (5 informational React Compiler notices about react-hook-form's `watch()`).
+
+### Known gaps
+- Videos and PDFs are referenced by provider ID / storage key; there is no upload-to-provider flow yet.
+- Admin UI text is English only (content fields support Hindi). Student-facing apps will use translation keys.
+- No Content-Security-Policy headers yet; no visual regression or screen-reader audit beyond semantic markup.
+- Token-refresh de-duplication is per Next.js process: run a single instance or sticky sessions.
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |
 |---|---|---|---|
-| 1b | Next.js admin portal (catalog tree editor, question editor + CSV upload, test builder, tickets, orders, dashboard) | 2–3 weeks | ₹25–45k |
+| 1b | ~~Next.js admin portal~~ **done** (see report above) | — | — |
 | 1c | Next.js student web (onboarding, learn, video player, practice, exam UI, results, plan, checkout) | 3 weeks | ₹25–45k |
 | 1d | Flutter app (same journeys; Riverpod + Dio + go_router; generated API client; ARB en/hi) | 4–5 weeks | ₹40–80k |
 | 1e | Integrations: MSG91, Razorpay live test mode, Bunny Stream signed playback, FCM, Sentry; staging deploy | 1–2 weeks | ₹10–20k |

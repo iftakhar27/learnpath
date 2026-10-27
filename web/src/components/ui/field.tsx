@@ -5,12 +5,16 @@ const width = (className: string) => (/(^|\s)w-/.test(className) ? "" : "w-full"
 const control =
   "rounded-lg border border-border bg-surface px-3 text-sm text-fg placeholder:text-fg-muted/70 disabled:opacity-60 aria-[invalid=true]:border-danger";
 
+/**
+ * Label + control + hint/error. The label wraps the control instead of using `for`/`id`: Next.js keeps
+ * previously visited pages in the DOM (hidden), so the same ids can exist twice and an id-based label could
+ * point at the hidden copy. `htmlFor` is accepted for the control's id but not used for labelling.
+ */
 export function Field({
   label,
   hint,
   error,
   children,
-  htmlFor,
   required,
 }: {
   label: string;
@@ -22,11 +26,13 @@ export function Field({
 }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={htmlFor} className="block text-sm font-medium">
-        {label}
-        {required && <span className="text-danger"> *</span>}
+      <label className="block space-y-1">
+        <span className="block text-sm font-medium">
+          {label}
+          {required && <span className="text-danger"> *</span>}
+        </span>
+        {children}
       </label>
-      {children}
       {error ? (
         <p className="text-xs text-danger" role="alert">
           {error}

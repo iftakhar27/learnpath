@@ -83,7 +83,7 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
             new AdminUserListItem(u.Id, u.FullName, u.Email, u.Phone, u.Status, u.CreatedAt, u.LastLoginAt, u.Roles.Select(r => r.Role).ToList()),
             await db.Enrollments.Where(e => e.UserId == id).OrderByDescending(e => e.StartsAt)
                 .Select(e => new AdminEnrollmentDto(e.CourseId, e.Course!.TitleEn, e.Source, e.StartsAt, e.ExpiresAt)).ToListAsync(ct),
-            await OrdersQuery().Where(o => o.UserId == id).Take(100).ToListAsync(ct),
+            await OrdersQuery(userId: id, status: null).Take(100).ToListAsync(ct),
             await db.SupportTickets.Where(t => t.UserId == id).OrderByDescending(t => t.CreatedAt)
                 .Select(t => new AdminTicketSummaryDto(t.Id, t.Subject, t.Status, t.CreatedAt)).ToListAsync(ct));
     }
@@ -143,15 +143,17 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
     public async Task<PagedResult<AdminOrderDto>> Orders([FromQuery] OrderStatus? status, [FromQuery] int? page, CancellationToken ct)
     {
         var (p, size) = Paging.Normalize(page, 50);
-        var q = OrdersQuery().Where(o => status == null || o.Status == status);
+        var q = OrdersQuery(userId: null, status);
         var total = await q.CountAsync(ct);
         return new(await q.Skip((p - 1) * size).Take(size).ToListAsync(ct), p, size, total);
     }
 
-    private IQueryable<AdminOrderDto> OrdersQuery() =>
+    /// <summary>Filters are applied before projecting, since EF cannot translate predicates on a constructed DTO.</summary>
+    private IQueryable<AdminOrderDto> OrdersQuery(Guid? userId, OrderStatus? status) =>
         from o in db.Orders.AsNoTracking()
         join u in db.Users on o.UserId equals u.Id
         join c in db.Courses on o.CourseId equals c.Id
+        where (userId == null || o.UserId == userId) && (status == null || o.Status == status)
         orderby o.CreatedAt descending
         select new AdminOrderDto(o.Id, o.UserId, u.FullName, o.CourseId, c.TitleEn, o.AmountInPaise, o.Status, o.GatewayOrderId, o.Receipt, o.CreatedAt, o.PaidAt);
 

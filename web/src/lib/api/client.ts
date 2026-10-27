@@ -52,6 +52,8 @@ export async function rawFetch<T>(input: string, init?: RequestInit): Promise<T>
   return body as T;
 }
 
+/** Human-readable message for an ApiError, any Error, or a plain validation string. */
 export function errorMessage(e: unknown): string {
+  if (typeof e === "string") return e;
   return e instanceof Error ? e.message : "Something went wrong.";
 }

@@ -28,7 +28,7 @@ export function LoginForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ...values, staffOnly: true }),
       });
-      // Full navigation so every cached query starts fresh for the new user.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload clears every cached query after a session change
       window.location.assign(safeNext(params.get("next")));
     } catch (e) {
       setError(e);
