@@ -25,26 +25,39 @@ public record ImportErrorDto(int Row, string Message);
 public class AdminQuestionsController(AppDbContext db, AuditService audit, TimeProvider clock) : ControllerBase
 {
     [HttpGet]
-    public async Task<PagedResult<object>> List([FromQuery] Guid? topicId, [FromQuery] Guid? chapterId, [FromQuery] PublishStatus? status,
-        [FromQuery] Difficulty? difficulty, [FromQuery] string? q, [FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken ct)
+    public async Task<PagedResult<AdminQuestionListItem>> List([FromQuery] Guid? courseId, [FromQuery] Guid? chapterId, [FromQuery] Guid? topicId,
+        [FromQuery] PublishStatus? status, [FromQuery] Difficulty? difficulty, [FromQuery] QuestionType? type, [FromQuery] string? q,
+        [FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken ct)
     {
         var (p, size) = Paging.Normalize(page, pageSize);
         var query = db.Questions.AsNoTracking();
-        if (topicId is not null) query = query.Where(x => x.TopicId == topicId);
+        if (courseId is not null) query = query.Where(x => x.Topic!.Chapter!.Subject!.CourseId == courseId);
         if (chapterId is not null) query = query.Where(x => x.Topic!.ChapterId == chapterId);
+        if (topicId is not null) query = query.Where(x => x.TopicId == topicId);
         if (status is not null) query = query.Where(x => x.Status == status);
         if (difficulty is not null) query = query.Where(x => x.Difficulty == difficulty);
-        if (!string.IsNullOrWhiteSpace(q)) query = query.Where(x => EF.Functions.ILike(x.StemEn, $"%{q}%") || x.ExternalRef == q);
+        if (type is not null) query = query.Where(x => x.Type == type);
+        if (!string.IsNullOrWhiteSpace(q)) query = query.Where(x => EF.Functions.ILike(x.StemEn, $"%{q}%") || x.ExternalRef == q.Trim());
         var total = await query.CountAsync(ct);
-        var items = await query.OrderByDescending(x => x.UpdatedAt).Skip((p - 1) * size).Take(size)
-            .Select(x => (object)new { x.Id, x.ExternalRef, x.TopicId, Type = x.Type.ToString(), Difficulty = x.Difficulty.ToString(), x.StemEn, Status = x.Status.ToString(), x.Version, x.UpdatedAt })
+        var items = await query.OrderByDescending(x => x.UpdatedAt).ThenBy(x => x.Id).Skip((p - 1) * size).Take(size)
+            .Select(x => new AdminQuestionListItem(x.Id, x.ExternalRef, x.TopicId, x.Topic!.TitleEn, x.Topic.Chapter!.TitleEn, x.Type, x.Difficulty,
+                x.StemEn, x.Status, x.Version, x.UpdatedAt, db.QuestionReports.Count(r => r.QuestionId == x.Id && r.Status == "Open")))
             .ToListAsync(ct);
         return new(items, p, size, total);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<Question> Get(Guid id, CancellationToken ct) =>
-        await db.Questions.AsNoTracking().Include(q => q.Options.OrderBy(o => o.SortOrder)).FirstOrDefaultAsync(q => q.Id == id, ct) ?? throw AppException.NotFound("Question");
+    public async Task<AdminQuestionDto> Get(Guid id, CancellationToken ct)
+    {
+        var q = await db.Questions.AsNoTracking().Include(x => x.Options).Include(x => x.Topic!).ThenInclude(t => t.Chapter!).ThenInclude(c => c.Subject)
+            .FirstOrDefaultAsync(x => x.Id == id, ct) ?? throw AppException.NotFound("Question");
+        var used = await db.TestQuestions.CountAsync(t => t.QuestionId == id, ct);
+        var ch = q.Topic!.Chapter!;
+        return new AdminQuestionDto(q.Id, q.ExternalRef, q.TopicId, ch.Id, ch.SubjectId, ch.Subject!.CourseId, q.Type, q.Difficulty, q.StemEn, q.StemHi, q.ImageUrl,
+            q.ExplanationEn, q.ExplanationHi, q.HintEn, q.VideoSolutionId, q.NumericAnswer, q.NumericTolerance, q.DefaultMarks, q.DefaultNegativeMarks,
+            q.AllowPartialMarking, q.PreviousYear, q.Status, q.Version, used,
+            q.Options.OrderBy(o => o.SortOrder).Select(o => new AdminOptionDto(o.Id, o.TextEn, o.TextHi, o.IsCorrect, o.SortOrder)).ToList());
+    }
 
     [HttpPost]
     public async Task<IdDto> Create(QuestionUpsert req, CancellationToken ct)

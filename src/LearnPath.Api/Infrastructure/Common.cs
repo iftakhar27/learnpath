@@ -121,3 +121,19 @@ public class AppExceptionFilter : Microsoft.AspNetCore.Mvc.Filters.IExceptionFil
         context.ExceptionHandled = true;
     }
 }
+
+/// <summary>
+/// Marks non-nullable properties as required in the OpenAPI schema so generated clients get exact types.
+/// Record parameters with default values stay optional.
+/// </summary>
+public class RequiredNonNullableSchemaFilter : Swashbuckle.AspNetCore.SwaggerGen.ISchemaFilter
+{
+    public void Apply(Microsoft.OpenApi.Models.OpenApiSchema schema, Swashbuckle.AspNetCore.SwaggerGen.SchemaFilterContext context)
+    {
+        if (schema.Properties is not { Count: > 0 } || !context.Type.IsClass) return;
+        var optional = context.Type.GetConstructors().SelectMany(c => c.GetParameters())
+            .Where(p => p.HasDefaultValue).Select(p => p.Name!).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var (name, prop) in schema.Properties)
+            if (!prop.Nullable && !optional.Contains(name)) schema.Required.Add(name);
+    }
+}

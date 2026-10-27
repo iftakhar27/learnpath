@@ -57,37 +57,42 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
     /// <summary>Support lookup. Returns only the fields needed to help a student.</summary>
     [HttpGet("users")]
     [Authorize(Policy = Policies.SupportOps)]
-    public async Task<PagedResult<object>> Users([FromQuery] string? q, [FromQuery] int? page, CancellationToken ct)
+    public async Task<PagedResult<AdminUserListItem>> Users([FromQuery] string? q, [FromQuery] string? role, [FromQuery] int? page, CancellationToken ct)
     {
         var (p, size) = Paging.Normalize(page, 25);
         var query = db.Users.AsNoTracking();
         if (!string.IsNullOrWhiteSpace(q))
-            query = query.Where(u => (u.Email != null && EF.Functions.ILike(u.Email, $"%{q}%")) || (u.Phone != null && u.Phone.Contains(q)) || EF.Functions.ILike(u.FullName, $"%{q}%"));
+        {
+            var term = q.Trim();
+            query = query.Where(u => (u.Email != null && EF.Functions.ILike(u.Email, $"%{term}%")) || (u.Phone != null && u.Phone.Contains(term)) || EF.Functions.ILike(u.FullName, $"%{term}%"));
+        }
+        if (!string.IsNullOrWhiteSpace(role)) query = query.Where(u => u.Roles.Any(r => r.Role == role));
         var total = await query.CountAsync(ct);
-        var items = await query.OrderByDescending(u => u.CreatedAt).Skip((p - 1) * size).Take(size)
-            .Select(u => (object)new { u.Id, u.FullName, u.Email, u.Phone, Status = u.Status.ToString(), u.CreatedAt, u.LastLoginAt, Roles = u.Roles.Select(r => r.Role) })
+        var items = await query.OrderByDescending(u => u.CreatedAt).ThenBy(u => u.Id).Skip((p - 1) * size).Take(size)
+            .Select(u => new AdminUserListItem(u.Id, u.FullName, u.Email, u.Phone, u.Status, u.CreatedAt, u.LastLoginAt, u.Roles.Select(r => r.Role).ToList()))
             .ToListAsync(ct);
         return new(items, p, size, total);
     }
 
     [HttpGet("users/{id:guid}")]
     [Authorize(Policy = Policies.SupportOps)]
-    public async Task<object> UserDetail(Guid id, CancellationToken ct)
+    public async Task<AdminUserDetailDto> UserDetail(Guid id, CancellationToken ct)
     {
         var u = await db.Users.AsNoTracking().Include(x => x.Roles).FirstOrDefaultAsync(x => x.Id == id, ct) ?? throw AppException.NotFound("User");
-        return new
-        {
-            u.Id, u.FullName, u.Email, u.Phone, Status = u.Status.ToString(), u.CreatedAt, u.LastLoginAt, Roles = u.Roles.Select(r => r.Role),
-            Enrollments = await db.Enrollments.Where(e => e.UserId == id).Select(e => new { e.CourseId, CourseTitle = e.Course!.TitleEn, Source = e.Source.ToString(), e.StartsAt, e.ExpiresAt }).ToListAsync(ct),
-            Orders = await db.Orders.Where(o => o.UserId == id).OrderByDescending(o => o.CreatedAt).Select(o => new { o.Id, o.CourseId, o.AmountInPaise, Status = o.Status.ToString(), o.GatewayOrderId, o.CreatedAt, o.PaidAt }).ToListAsync(ct),
-            Tickets = await db.SupportTickets.Where(t => t.UserId == id).OrderByDescending(t => t.CreatedAt).Select(t => new { t.Id, t.Subject, t.Status, t.CreatedAt }).ToListAsync(ct),
-        };
+        return new AdminUserDetailDto(
+            new AdminUserListItem(u.Id, u.FullName, u.Email, u.Phone, u.Status, u.CreatedAt, u.LastLoginAt, u.Roles.Select(r => r.Role).ToList()),
+            await db.Enrollments.Where(e => e.UserId == id).OrderByDescending(e => e.StartsAt)
+                .Select(e => new AdminEnrollmentDto(e.CourseId, e.Course!.TitleEn, e.Source, e.StartsAt, e.ExpiresAt)).ToListAsync(ct),
+            await OrdersQuery().Where(o => o.UserId == id).Take(100).ToListAsync(ct),
+            await db.SupportTickets.Where(t => t.UserId == id).OrderByDescending(t => t.CreatedAt)
+                .Select(t => new AdminTicketSummaryDto(t.Id, t.Subject, t.Status, t.CreatedAt)).ToListAsync(ct));
     }
 
     [HttpPost("users/{id:guid}/status")]
     [Authorize(Policy = Policies.SupportOps)]
     public async Task<IActionResult> SetStatus(Guid id, UserStatusRequest req, CancellationToken ct)
     {
+        if (id == User.UserId()) throw AppException.BadRequest("self_change", "You cannot change the status of your own account.");
         var u = await db.Users.FindAsync([id], ct) ?? throw AppException.NotFound("User");
         u.Status = req.Status;
         if (req.Status != UserStatus.Active)
@@ -113,6 +118,8 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
     [Authorize(Policy = Policies.SuperAdmin)]
     public async Task<IActionResult> RemoveRole(Guid id, string role, CancellationToken ct)
     {
+        if (id == User.UserId() && role == Roles.SuperAdmin)
+            throw AppException.BadRequest("self_change", "You cannot remove your own SuperAdmin role.");
         await db.UserRoles.Where(r => r.UserId == id && r.Role == role).ExecuteDeleteAsync(ct);
         audit.Record(User.UserId(), "user.role.remove", "User", id, new { role });
         await db.SaveChangesAsync(ct);
@@ -133,21 +140,30 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
 
     [HttpGet("orders")]
     [Authorize(Policy = Policies.Finance)]
-    public async Task<PagedResult<object>> Orders([FromQuery] OrderStatus? status, [FromQuery] int? page, CancellationToken ct)
+    public async Task<PagedResult<AdminOrderDto>> Orders([FromQuery] OrderStatus? status, [FromQuery] int? page, CancellationToken ct)
     {
         var (p, size) = Paging.Normalize(page, 50);
-        var q = db.Orders.AsNoTracking().Where(o => status == null || o.Status == status);
+        var q = OrdersQuery().Where(o => status == null || o.Status == status);
         var total = await q.CountAsync(ct);
-        var items = await q.OrderByDescending(o => o.CreatedAt).Skip((p - 1) * size).Take(size)
-            .Select(o => (object)new { o.Id, o.UserId, o.CourseId, o.AmountInPaise, Status = o.Status.ToString(), o.GatewayOrderId, o.Receipt, o.CreatedAt, o.PaidAt }).ToListAsync(ct);
-        return new(items, p, size, total);
+        return new(await q.Skip((p - 1) * size).Take(size).ToListAsync(ct), p, size, total);
     }
+
+    private IQueryable<AdminOrderDto> OrdersQuery() =>
+        from o in db.Orders.AsNoTracking()
+        join u in db.Users on o.UserId equals u.Id
+        join c in db.Courses on o.CourseId equals c.Id
+        orderby o.CreatedAt descending
+        select new AdminOrderDto(o.Id, o.UserId, u.FullName, o.CourseId, c.TitleEn, o.AmountInPaise, o.Status, o.GatewayOrderId, o.Receipt, o.CreatedAt, o.PaidAt);
 
     [HttpGet("tickets")]
     [Authorize(Policy = Policies.SupportOps)]
-    public async Task<List<TicketDto>> Tickets([FromQuery] string? status, CancellationToken ct) =>
-        (await db.SupportTickets.AsNoTracking().Where(t => status == null || t.Status == status).OrderByDescending(t => t.CreatedAt).Take(200).ToListAsync(ct))
-        .Select(NotificationsController.ToDto).ToList();
+    public Task<List<AdminTicketDto>> Tickets([FromQuery] string? status, CancellationToken ct) =>
+        (from t in db.SupportTickets.AsNoTracking()
+         join u in db.Users on t.UserId equals u.Id
+         where status == null || t.Status == status
+         orderby t.Priority == "High" descending, t.CreatedAt descending
+         select new AdminTicketDto(t.Id, t.UserId, u.FullName, u.Email, u.Phone, t.Category, t.Priority, t.Subject, t.Message, t.Status, t.StaffResponse, t.CreatedAt, t.UpdatedAt))
+        .Take(200).ToListAsync(ct);
 
     [HttpPost("tickets/{id:guid}/respond")]
     [Authorize(Policy = Policies.SupportOps)]
@@ -164,9 +180,13 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
 
     [HttpGet("question-reports")]
     [Authorize(Policy = Policies.ContentEdit)]
-    public async Task<object> Reports([FromQuery] string status = "Open", CancellationToken ct = default) =>
-        await db.QuestionReports.AsNoTracking().Where(r => r.Status == status).OrderBy(r => r.CreatedAt).Take(200)
-            .Select(r => new { r.Id, r.QuestionId, r.Reason, r.Details, r.Status, r.CreatedAt }).ToListAsync(ct);
+    public Task<List<AdminQuestionReportDto>> Reports([FromQuery] string status = "Open", CancellationToken ct = default) =>
+        (from r in db.QuestionReports.AsNoTracking()
+         join q in db.Questions on r.QuestionId equals q.Id
+         where r.Status == status
+         orderby r.CreatedAt
+         select new AdminQuestionReportDto(r.Id, r.QuestionId, q.StemEn, q.ExternalRef, r.Reason, r.Details, r.Status, r.CreatedAt))
+        .Take(200).ToListAsync(ct);
 
     [HttpPost("question-reports/{id:guid}/resolve")]
     [Authorize(Policy = Policies.ContentEdit)]
@@ -181,7 +201,7 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
 
     [HttpPost("announcements")]
     [Authorize(Policy = Policies.ContentPublish)]
-    public async Task<object> Announce(AnnouncementRequest req, CancellationToken ct)
+    public async Task<AnnouncementResultDto> Announce(AnnouncementRequest req, CancellationToken ct)
     {
         var now = clock.GetUtcNow();
         var users = req.CourseId is { } cid
@@ -191,22 +211,28 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
         db.Notifications.AddRange(ids.Select(id => new Notification { UserId = id, Type = "announcement", Title = req.Title, Body = req.Body, CreatedAt = now }));
         audit.Record(User.UserId(), "announcement.send", "Notification", null, new { req.Title, req.CourseId, Recipients = ids.Count });
         await db.SaveChangesAsync(ct);
-        return new { recipients = ids.Count };
+        return new AnnouncementResultDto(ids.Count);
     }
 
     [HttpGet("imports")]
     [Authorize(Policy = Policies.ContentEdit)]
-    public async Task<object> Imports(CancellationToken ct) =>
-        await db.ContentImportJobs.AsNoTracking().OrderByDescending(j => j.CreatedAt).Take(50)
-            .Select(j => new { j.Id, j.FileName, j.TotalRows, j.ImportedRows, j.FailedRows, j.CreatedAt, Errors = j.Errors.OrderBy(e => e.RowNumber).Select(e => new { e.RowNumber, e.Message }) }).ToListAsync(ct);
+    public async Task<List<AdminImportJobDto>> Imports(CancellationToken ct) =>
+        (await db.ContentImportJobs.AsNoTracking().Include(j => j.Errors).OrderByDescending(j => j.CreatedAt).Take(50).ToListAsync(ct))
+        .Select(j => new AdminImportJobDto(j.Id, j.FileName, j.TotalRows, j.ImportedRows, j.FailedRows, j.CreatedAt,
+            j.Errors.OrderBy(e => e.RowNumber).Select(e => new ImportErrorDto(e.RowNumber, e.Message)).ToList())).ToList();
 
     [HttpGet("audit-logs")]
     [Authorize(Policy = Policies.SuperAdmin)]
-    public async Task<PagedResult<AuditLog>> AuditLogs([FromQuery] string? entityType, [FromQuery] int? page, CancellationToken ct)
+    public async Task<PagedResult<AdminAuditLogDto>> AuditLogs([FromQuery] string? entityType, [FromQuery] string? action, [FromQuery] int? page, CancellationToken ct)
     {
         var (p, size) = Paging.Normalize(page, 50);
-        var q = db.AuditLogs.AsNoTracking().Where(a => entityType == null || a.EntityType == entityType);
+        var q = from a in db.AuditLogs.AsNoTracking()
+                join u in db.Users on a.ActorUserId equals u.Id into actors
+                from u in actors.DefaultIfEmpty()
+                where (entityType == null || a.EntityType == entityType) && (action == null || a.Action.StartsWith(action))
+                orderby a.Id descending
+                select new AdminAuditLogDto(a.Id, a.ActorUserId, u == null ? null : u.FullName, a.Action, a.EntityType, a.EntityId, a.DataJson, a.CreatedAt);
         var total = await q.CountAsync(ct);
-        return new(await q.OrderByDescending(a => a.Id).Skip((p - 1) * size).Take(size).ToListAsync(ct), p, size, total);
+        return new(await q.Skip((p - 1) * size).Take(size).ToListAsync(ct), p, size, total);
     }
 }

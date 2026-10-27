@@ -21,10 +21,41 @@ public record TestUpsert(Guid? CourseId, Guid? ExamId, [Required] TestType Type,
 public class AdminTestsController(AppDbContext db, AuditService audit, TimeProvider clock) : ControllerBase
 {
     [HttpGet]
-    public async Task<object> List(CancellationToken ct) =>
-        await db.Tests.AsNoTracking().OrderByDescending(t => t.CreatedAt)
-            .Select(t => new { t.Id, t.TitleEn, Type = t.Type.ToString(), t.CourseId, t.DurationMinutes, Status = t.Status.ToString(), Questions = t.Questions.Count, Attempts = db.TestAttempts.Count(a => a.TestId == t.Id) })
+    public Task<List<AdminTestListItem>> List([FromQuery] Guid? courseId, [FromQuery] PublishStatus? status, CancellationToken ct) =>
+        db.Tests.AsNoTracking().Where(t => (courseId == null || t.CourseId == courseId) && (status == null || t.Status == status))
+            .OrderByDescending(t => t.CreatedAt)
+            .Select(t => new AdminTestListItem(t.Id, t.TitleEn, t.Type, t.CourseId, db.Courses.Where(c => c.Id == t.CourseId).Select(c => c.TitleEn).FirstOrDefault(),
+                t.DurationMinutes, t.IsFree, t.Status, t.Questions.Count, t.Questions.Sum(q => (decimal?)q.Marks) ?? 0, db.TestAttempts.Count(a => a.TestId == t.Id), t.CreatedAt))
             .ToListAsync(ct);
+
+    [HttpGet("{id:guid}")]
+    public async Task<AdminTestDto> Get(Guid id, CancellationToken ct)
+    {
+        var t = await db.Tests.AsNoTracking().Include(x => x.Sections).Include(x => x.Questions).ThenInclude(q => q.Question!).ThenInclude(q => q.Topic)
+            .AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id, ct) ?? throw AppException.NotFound("Test");
+        var sections = t.Sections.OrderBy(s => s.SortOrder).ToList();
+        return new AdminTestDto(t.Id, t.CourseId, t.ExamId, t.Type, t.TitleEn, t.TitleHi, t.InstructionsEn, t.InstructionsHi, t.DurationMinutes,
+            t.ShuffleQuestions, t.ShuffleOptions, t.IsFree, t.MaxAttempts, t.AvailableFrom, t.AvailableUntil, t.Status,
+            await db.TestAttempts.CountAsync(a => a.TestId == id, ct),
+            sections.Select(s => new SectionUpsert(s.TitleEn, s.TitleHi)).ToList(),
+            t.Questions.OrderBy(q => q.SortOrder).Select(q =>
+            {
+                var idx = q.SectionId is { } sid ? sections.FindIndex(s => s.Id == sid) : -1;
+                return new AdminTestQuestionDto(q.QuestionId, idx >= 0 ? idx : null, q.Marks, q.NegativeMarks, q.Question!.StemEn, q.Question.ExternalRef,
+                    q.Question.Type, q.Question.Difficulty, q.Question.Status, q.Question.Topic!.TitleEn);
+            }).ToList());
+    }
+
+    /// <summary>Copies a test (structure, marks, settings) into a new draft — the way to change a test that already has attempts.</summary>
+    [HttpPost("{id:guid}/duplicate")]
+    public async Task<IdDto> Duplicate(Guid id, CancellationToken ct)
+    {
+        var src = await Get(id, ct);
+        var copy = new TestUpsert(src.CourseId, src.ExamId, src.Type, src.TitleEn + " (copy)", src.TitleHi, src.InstructionsEn, src.InstructionsHi,
+            src.DurationMinutes, src.ShuffleQuestions, src.ShuffleOptions, src.IsFree, src.MaxAttempts, src.AvailableFrom, src.AvailableUntil, src.Sections,
+            src.Questions.Select(q => new TestQuestionUpsert(q.QuestionId, q.SectionIndex, q.Marks, q.NegativeMarks)).ToList());
+        return await Create(copy, ct);
+    }
 
     [HttpPost]
     public async Task<IdDto> Create(TestUpsert req, CancellationToken ct)

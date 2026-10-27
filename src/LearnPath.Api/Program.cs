@@ -93,7 +93,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = $"{config["Branding:ProductName"] ?? "LearnPath"} API", Version = "v1" });
-    c.CustomSchemaIds(t => t.FullName!.Replace("+", "."));
+    c.CustomSchemaIds(t => t.IsGenericType ? $"{t.Name[..t.Name.IndexOf('`')]}Of{string.Join("And", t.GetGenericArguments().Select(a => a.Name))}" : t.Name);
+    c.SupportNonNullableReferenceTypes();
+    c.UseAllOfToExtendReferenceSchemas();
+    c.SchemaFilter<RequiredNonNullableSchemaFilter>();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { Type = SecuritySchemeType.Http, Scheme = "bearer", BearerFormat = "JWT" });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement { [new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }] = [] });
 });
@@ -117,7 +120,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
-app.MapGet("/api/v1/config", (IConfiguration c) => new { productName = c["Branding:ProductName"] ?? "LearnPath", currency = "INR", timeZone = "Asia/Kolkata", languages = new[] { "en", "hi" } });
+app.MapGet("/api/v1/config", (IConfiguration c) => new PublicConfigDto(c["Branding:ProductName"] ?? "LearnPath", "INR", "Asia/Kolkata", ["en", "hi"]));
 
 if (config.GetValue("Database:MigrateOnStartup", true))
 {
@@ -130,3 +133,5 @@ if (config.GetValue("Database:MigrateOnStartup", true))
 app.Run();
 
 public partial class Program;
+
+public record PublicConfigDto(string ProductName, string Currency, string TimeZone, string[] Languages);

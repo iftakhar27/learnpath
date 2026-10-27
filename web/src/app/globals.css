@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/* Design tokens (see docs/06-screen-map.md). Components use the semantic names, never raw colours. */
+:root {
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --surface-muted: #f1f2f7;
+  --fg: #1a1b26;
+  --fg-muted: #5b5f73;
+  --border: #e2e4ee;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-soft: #eef0ff;
+  --primary-fg: #ffffff;
+  --accent: #f59e0b;
+  --success: #15803d;
+  --success-soft: #e8f6ee;
+  --danger: #dc2626;
+  --danger-soft: #fdecec;
+  --warning: #b45309;
+  --warning-soft: #fdf3e2;
+  --focus: #6366f1;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1018;
+    --surface: #1a1b26;
+    --surface-muted: #232433;
+    --fg: #ecedf3;
+    --fg-muted: #a3a6b8;
+    --border: #2f3142;
+    --primary: #818cf8;
+    --primary-hover: #a5b4fc;
+    --primary-soft: #262a4d;
+    --primary-fg: #0f1018;
+    --success: #4ade80;
+    --success-soft: #16301f;
+    --danger: #f87171;
+    --danger-soft: #3a1c1c;
+    --warning: #fbbf24;
+    --warning-soft: #372a12;
+    --focus: #a5b4fc;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-fg: var(--primary-fg);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-focus: var(--focus);
+  --font-sans: "Noto Sans", "Noto Sans Devanagari", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+dialog::backdrop {
+  background: rgb(15 16 24 / 0.5);
+}

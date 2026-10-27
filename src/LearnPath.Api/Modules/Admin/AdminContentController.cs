@@ -37,7 +37,8 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
 {
     // ----- Exams -----
     [HttpGet("exams")]
-    public Task<List<Exam>> Exams(CancellationToken ct) => db.Exams.AsNoTracking().OrderBy(e => e.SortOrder).ToListAsync(ct);
+    public Task<List<AdminExamDto>> Exams(CancellationToken ct) => db.Exams.AsNoTracking().OrderBy(e => e.SortOrder)
+        .Select(e => new AdminExamDto(e.Id, e.Code, e.NameEn, e.NameHi, e.NextExamDate, e.IsActive, e.SortOrder)).ToListAsync(ct);
 
     [HttpPost("exams")]
     [Authorize(Policy = Policies.ContentPublish)]
@@ -60,15 +61,35 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
 
     // ----- Courses -----
     [HttpGet("courses")]
-    public async Task<object> Courses(CancellationToken ct) =>
-        await db.Courses.AsNoTracking().OrderByDescending(c => c.UpdatedAt)
-            .Select(c => new { c.Id, c.Slug, c.TitleEn, c.ExamId, c.IsFree, c.PriceInPaise, c.AccessDays, Status = c.Status.ToString(), c.PublishAt, c.UpdatedAt }).ToListAsync(ct);
+    public Task<List<AdminCourseDto>> Courses([FromQuery] Guid? examId, CancellationToken ct) =>
+        db.Courses.AsNoTracking().Where(c => examId == null || c.ExamId == examId).OrderByDescending(c => c.UpdatedAt)
+            .Select(c => new AdminCourseDto(c.Id, c.ExamId, c.Slug, c.TitleEn, c.TitleHi, c.DescriptionEn, c.DescriptionHi, c.ClassLevel, c.Board,
+                c.IsFree, c.PriceInPaise, c.AccessDays, c.Status, c.PublishAt, c.UpdatedAt, db.Enrollments.Count(e => e.CourseId == c.Id)))
+            .ToListAsync(ct);
 
     [HttpGet("courses/{id:guid}/tree")]
-    public async Task<Course> CourseTree(Guid id, CancellationToken ct) =>
-        await db.Courses.AsNoTracking().Include(c => c.Subjects.OrderBy(s => s.SortOrder)).ThenInclude(s => s.Chapters.OrderBy(x => x.SortOrder))
-            .ThenInclude(ch => ch.Topics.OrderBy(t => t.SortOrder)).ThenInclude(t => t.Resources.OrderBy(r => r.SortOrder))
+    public async Task<AdminCourseTreeDto> CourseTree(Guid id, CancellationToken ct)
+    {
+        var c = await db.Courses.AsNoTracking().Include(c => c.Subjects).ThenInclude(s => s.Chapters)
+            .ThenInclude(ch => ch.Topics).ThenInclude(t => t.Resources)
             .AsSplitQuery().FirstOrDefaultAsync(c => c.Id == id, ct) ?? throw AppException.NotFound("Course");
+        var topicIds = c.Subjects.SelectMany(s => s.Chapters).SelectMany(ch => ch.Topics).Select(t => t.Id).ToList();
+        var questionCounts = await db.Questions.Where(q => topicIds.Contains(q.TopicId)).GroupBy(q => q.TopicId)
+            .Select(g => new { g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Key, x => x.Count, ct);
+        var enrollments = await db.Enrollments.CountAsync(e => e.CourseId == id, ct);
+
+        return new AdminCourseTreeDto(ToDto(c, enrollments), c.Subjects.OrderBy(s => s.SortOrder).ThenBy(s => s.TitleEn).Select(s =>
+            new AdminSubjectDto(s.Id, s.CourseId, s.TitleEn, s.TitleHi, s.SortOrder, s.Chapters.OrderBy(ch => ch.SortOrder).ThenBy(ch => ch.TitleEn).Select(ch =>
+                new AdminChapterDto(ch.Id, ch.SubjectId, ch.UnitTitleEn, ch.TitleEn, ch.TitleHi, ch.SortOrder, ch.Topics.OrderBy(t => t.SortOrder).ThenBy(t => t.TitleEn).Select(t =>
+                    new AdminTopicDto(t.Id, t.ChapterId, t.TitleEn, t.TitleHi, t.ObjectivesEn, t.ObjectivesHi, t.EstimatedMinutes, t.SortOrder,
+                        questionCounts.GetValueOrDefault(t.Id), t.Resources.OrderBy(r => r.SortOrder).Select(ToDto).ToList())).ToList())).ToList())).ToList());
+    }
+
+    internal static AdminCourseDto ToDto(Course c, int enrollments) => new(c.Id, c.ExamId, c.Slug, c.TitleEn, c.TitleHi, c.DescriptionEn, c.DescriptionHi,
+        c.ClassLevel, c.Board, c.IsFree, c.PriceInPaise, c.AccessDays, c.Status, c.PublishAt, c.UpdatedAt, enrollments);
+
+    internal static AdminResourceDto ToDto(LearningResource r) => new(r.Id, r.TopicId, r.Type, r.TitleEn, r.TitleHi, r.Language, r.SortOrder,
+        r.IsFreePreview, r.Status, r.VideoProviderId, r.DurationSeconds, r.DocumentStorageKey, r.AllowDownload, r.Version);
 
     [HttpPost("courses")]
     public async Task<IdDto> CreateCourse(CourseUpsert req, CancellationToken ct)
@@ -182,6 +203,49 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
         r.Status = req.Status;
         r.UpdatedAt = clock.GetUtcNow();
         return await Save("resource.status", "LearningResource", id, req, ct);
+    }
+
+    // ----- Deletes: only empty nodes and draft resources; anything students may have used is archived instead -----
+    [HttpDelete("subjects/{id:guid}")]
+    public async Task<IActionResult> DeleteSubject(Guid id, CancellationToken ct)
+    {
+        var s = await db.Subjects.FindAsync([id], ct) ?? throw AppException.NotFound("Subject");
+        if (await db.Chapters.AnyAsync(c => c.SubjectId == id, ct)) throw AppException.Conflict("not_empty", "Delete or move its chapters first.");
+        db.Subjects.Remove(s);
+        await Save("subject.delete", "Subject", id, new { s.TitleEn }, ct);
+        return NoContent();
+    }
+
+    [HttpDelete("chapters/{id:guid}")]
+    public async Task<IActionResult> DeleteChapter(Guid id, CancellationToken ct)
+    {
+        var c = await db.Chapters.FindAsync([id], ct) ?? throw AppException.NotFound("Chapter");
+        if (await db.Topics.AnyAsync(t => t.ChapterId == id, ct)) throw AppException.Conflict("not_empty", "Delete or move its topics first.");
+        db.Chapters.Remove(c);
+        await Save("chapter.delete", "Chapter", id, new { c.TitleEn }, ct);
+        return NoContent();
+    }
+
+    [HttpDelete("topics/{id:guid}")]
+    public async Task<IActionResult> DeleteTopic(Guid id, CancellationToken ct)
+    {
+        var t = await db.Topics.FindAsync([id], ct) ?? throw AppException.NotFound("Topic");
+        if (await db.LearningResources.AnyAsync(r => r.TopicId == id, ct)) throw AppException.Conflict("not_empty", "Delete its resources first.");
+        if (await db.Questions.AnyAsync(q => q.TopicId == id, ct)) throw AppException.Conflict("has_questions", "Questions are tagged to this topic. Re-tag or archive them first.");
+        db.Topics.Remove(t);
+        await Save("topic.delete", "Topic", id, new { t.TitleEn }, ct);
+        return NoContent();
+    }
+
+    [HttpDelete("resources/{id:guid}")]
+    public async Task<IActionResult> DeleteResource(Guid id, CancellationToken ct)
+    {
+        var r = await db.LearningResources.FindAsync([id], ct) ?? throw AppException.NotFound("Resource");
+        if (r.Status != PublishStatus.Draft || await db.ResourceProgress.AnyAsync(p => p.ResourceId == id, ct))
+            throw AppException.Conflict("in_use", "Only unused draft resources can be deleted. Archive it instead.");
+        db.LearningResources.Remove(r);
+        await Save("resource.delete", "LearningResource", id, new { r.TitleEn }, ct);
+        return NoContent();
     }
 
     private async Task<IdDto> Save(string action, string entity, Guid id, object data, CancellationToken ct)
