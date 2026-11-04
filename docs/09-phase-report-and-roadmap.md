@@ -105,8 +105,17 @@ with no port, generated JWT key, forwarded headers): migrations ran on an empty 
 were seeded, `/health` and `/swagger` returned 200. Sign-in rate limiting was per client: the same forwarded IP got
 429 after 20 attempts, 22 different IPs were never limited. 69 backend tests pass (5 new for deployment config).
 
-**Not verified:** the Docker image itself (no Docker daemon here; Render builds it), and the live Render service,
-which the account owner creates from the dashboard.
+**Live staging (verified 4 Nov 2026):** the account owner created the Blueprint; Render built the Docker image and the
+service came up healthy. A scripted student journey against the live URL passed 26/26 checks: config, exams,
+register, profile, dashboard, study plan, catalog, syllabus, free enrolment, topic, practice with explanation, test
+attempt, autosave, submit (and idempotent resubmit), results, analytics, notifications, orders, OTP request, refresh
+rotation with reuse rejected, and 401 without a token. After enrolling, the study plan filled with next lessons.
+Swagger is served (Staging). Sign-up took ~8 s on the free instance (bcrypt on a shared CPU); other calls 0.3–3 s.
+The APK was rebuilt against the live API, and the app's response timeout was raised to 60 s so the first request
+after the free instance sleeps can wait for it to wake.
+
+**Not verified:** the app on a physical phone against the live server (to be done by the owner), Razorpay and video
+playback (simulated gateway, no Bunny Stream configured).
 
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 

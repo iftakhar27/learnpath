@@ -61,7 +61,8 @@ class ApiClient {
         BaseOptions(
           baseUrl: '$baseUrl/api/v1',
           connectTimeout: const Duration(seconds: 15),
-          receiveTimeout: const Duration(seconds: 30),
+          // Long enough for a sleeping server (e.g. a free hosting plan) to wake up on the first request.
+          receiveTimeout: const Duration(seconds: 60),
           contentType: Headers.jsonContentType,
         ),
       ) {
