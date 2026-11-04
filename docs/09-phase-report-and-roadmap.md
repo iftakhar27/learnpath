@@ -58,13 +58,43 @@
 - No Content-Security-Policy headers yet; no visual regression or screen-reader audit beyond semantic markup.
 - Token-refresh de-duplication is per Next.js process: run a single instance or sticky sessions.
 
+## Phase 1d (Flutter student app) — report, 4 Nov 2026
+
+### Completed
+- `mobile/`: Flutter 3.47 app for Android and iOS (plus a web build used for demos), on the decoupled `material_ui`
+  library, Riverpod 3, go_router 18 and Dio. Screens: welcome with language choice, email sign-in, registration,
+  mobile OTP, three-step onboarding (exam/year, class/board, study time/language/guardian consent), home dashboard
+  (countdown, streak, weekly stats, today's plan, continue learning, courses, weak topics, recent results), catalog
+  with search and price filters, course syllabus with free enrolment or Razorpay purchase, topic page, HLS video
+  player (resume, progress saving, speed, full screen), notes, practice (topic, mistakes, bookmarked, previous-year)
+  with instant solutions, bookmarks and question reports, tests list, instructions, timed exam player (server-derived
+  timer, palette, mark for review, clear, autosave with offline retry, auto-submit, leave/resume), results with
+  breakdowns and recommendations, answer review with filters, study plan, progress, notifications, purchases, support
+  tickets, search, profile and account-deletion request.
+- All UI text in English and Hindi via ARB translation keys (261 strings).
+- Typed Dart models generated from `docs/openapi.json` by `mobile/tool/gen_models.dart` (125 schemas).
+- Backend: HLS `streamUrl` for native players (Bunny CDN token auth), typed learning-history response,
+  `AnswerResponse.isEmpty` removed from the contract, Flutter web origin in development CORS.
+
+### Verified
+- `dotnet test`: **63 passed, 0 failed** (adds video URL signing tests).
+- `flutter analyze`: no issues. `flutter test`: **19 passed, 0 failed** (token refresh single-flight, exam session
+  logic, generated models, full-app widget flows with a fake API).
+- Android release APK: first build in progress at the time of this commit (not yet verified).
+- Browser-driven demo of the app against the live API: not yet run.
+
+### Known gaps
+- iOS build not produced (needs macOS/Xcode). Razorpay checkout and video playback need device testing with real keys.
+- Hindi strings need native-speaker review. Push notifications (FCM) and offline downloads are not implemented.
+- Release APK is signed with the debug key; create an upload key before publishing.
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |
 |---|---|---|---|
 | 1b | ~~Next.js admin portal~~ **done** (see report above) | — | — |
 | 1c | Next.js student web (onboarding, learn, video player, practice, exam UI, results, plan, checkout) | 3 weeks | ₹25–45k |
-| 1d | Flutter app (same journeys; Riverpod + Dio + go_router; generated API client; ARB en/hi) | 4–5 weeks | ₹40–80k |
+| 1d | ~~Flutter app~~ **done** (see report above); device QA and store setup remain under 1f | — | — |
 | 1e | Integrations: MSG91, Razorpay live test mode, Bunny Stream signed playback, FCM, Sentry; staging deploy | 1–2 weeks | ₹10–20k |
 | 1f | QA on devices, accessibility pass, store submission | 1–2 weeks | ₹10–25k |
 | 2 | PYQ papers, coupons & subscriptions, revision scheduling, richer analytics, bulk import UI, erasure/export jobs | 6–8 weeks | ₹1–1.5 lakh |

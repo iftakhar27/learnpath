@@ -22,6 +22,7 @@ public record QuestionSnapshot(
 /// <summary>Student response. Option-based questions use <see cref="SelectedOptionIds"/>; numeric/integer use <see cref="NumericValue"/>.</summary>
 public record AnswerResponse(List<Guid>? SelectedOptionIds, decimal? NumericValue)
 {
+    [System.Text.Json.Serialization.JsonIgnore]
     public bool IsEmpty => (SelectedOptionIds is null || SelectedOptionIds.Count == 0) && NumericValue is null;
 }
 

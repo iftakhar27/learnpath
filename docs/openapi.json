@@ -3321,7 +3321,24 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfHistoryItemDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfHistoryItemDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfHistoryItemDto"
+                }
+              }
+            }
           }
         }
       }
@@ -6206,9 +6223,6 @@
         "additionalProperties": false
       },
       "AnswerResponse": {
-        "required": [
-          "isEmpty"
-        ],
         "type": "object",
         "properties": {
           "selectedOptionIds": {
@@ -6223,10 +6237,6 @@
             "type": "number",
             "format": "double",
             "nullable": true
-          },
-          "isEmpty": {
-            "type": "boolean",
-            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -7050,6 +7060,55 @@
         },
         "additionalProperties": false
       },
+      "HistoryItemDto": {
+        "required": [
+          "completed",
+          "positionSeconds",
+          "resourceId",
+          "title",
+          "topic",
+          "topicId",
+          "type",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "positionSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "durationSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
       "IdDto": {
         "required": [
           "id"
@@ -7470,6 +7529,36 @@
         },
         "additionalProperties": false
       },
+      "PagedResultOfHistoryItemDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryItemDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedResultOfNotificationDto": {
         "required": [
           "items",
@@ -7603,6 +7692,10 @@
           },
           "url": {
             "type": "string"
+          },
+          "streamUrl": {
+            "type": "string",
+            "nullable": true
           },
           "expiresAt": {
             "type": "string",

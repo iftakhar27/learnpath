@@ -29,8 +29,11 @@ public class LoggingOtpSender(ILogger<LoggingOtpSender> logger) : IOtpSender
 
 public interface IVideoUrlSigner
 {
-    /// <summary>Returns a short-lived playback URL for a provider video ID.</summary>
+    /// <summary>Returns a short-lived URL for the provider's embeddable web player.</summary>
     string GetPlaybackUrl(string providerVideoId, Guid userId, TimeSpan validFor);
+
+    /// <summary>Returns a short-lived HLS stream URL for native players (mobile apps), or null when not configured.</summary>
+    string? GetStreamUrl(string providerVideoId, TimeSpan validFor);
 }
 
 /// <summary>
@@ -48,6 +51,25 @@ public class BunnyVideoUrlSigner(IConfiguration config, TimeProvider clock) : IV
         var expires = clock.GetUtcNow().Add(validFor).ToUnixTimeSeconds();
         var token = Hashing.Sha256(key + providerVideoId + expires);
         return $"{baseUrl}?token={token}&expires={expires}";
+    }
+
+    /// <summary>
+    /// Bunny CDN token authentication for the library's pull zone (Video:CdnHost, Video:CdnTokenKey):
+    /// token = base64url(SHA256_raw(key + path + expires)). A provider ID that is already an absolute
+    /// https URL is returned unchanged, which lets development content point at public sample videos.
+    /// </summary>
+    public string? GetStreamUrl(string providerVideoId, TimeSpan validFor)
+    {
+        if (Uri.TryCreate(providerVideoId, UriKind.Absolute, out var direct) && direct.Scheme == Uri.UriSchemeHttps) return providerVideoId;
+        var host = config["Video:CdnHost"];
+        if (string.IsNullOrEmpty(host)) return null;
+        var path = $"/{Uri.EscapeDataString(providerVideoId)}/playlist.m3u8";
+        var key = config["Video:CdnTokenKey"];
+        if (string.IsNullOrEmpty(key)) return $"https://{host}{path}";
+        var expires = clock.GetUtcNow().Add(validFor).ToUnixTimeSeconds();
+        var hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(key + path + expires));
+        var token = Convert.ToBase64String(hash).Replace('+', '-').Replace('/', '_').TrimEnd('=');
+        return $"https://{host}{path}?token={token}&expires={expires}";
     }
 }
 

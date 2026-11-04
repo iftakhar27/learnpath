@@ -1,0 +1,431 @@
+{
+  "@@locale": "en",
+  "appTagline": "Prepare for NEET, JEE and Board exams",
+  "continueWithOtp": "Continue with mobile number",
+  "continueWithEmail": "Sign in with email",
+  "createAccount": "Create account",
+  "language": "Language",
+  "english": "English",
+  "hindi": "हिंदी",
+  "email": "Email",
+  "password": "Password",
+  "fullName": "Full name",
+  "signIn": "Sign in",
+  "signOut": "Sign out",
+  "newHereCreateAccount": "New here? Create an account",
+  "haveAccountSignIn": "Already have an account? Sign in",
+  "acceptTerms": "I agree to the Terms of Service and Privacy Policy",
+  "viewTerms": "Read terms and privacy policy",
+  "mobileNumber": "Mobile number",
+  "sendOtp": "Send OTP",
+  "enterOtp": "Enter the 6-digit OTP",
+  "otpSentTo": "OTP sent to {phone}",
+  "@otpSentTo": {
+    "placeholders": {
+      "phone": {}
+    }
+  },
+  "verify": "Verify",
+  "resendIn": "Resend in {seconds}s",
+  "@resendIn": {
+    "placeholders": {
+      "seconds": {}
+    }
+  },
+  "resendOtp": "Resend OTP",
+  "yourNameNewAccounts": "Your name (for new accounts)",
+  "changeNumber": "Change number",
+  "fieldRequired": "This field is required",
+  "invalidEmail": "Enter a valid email",
+  "passwordTooShort": "Use at least 8 characters",
+  "invalidPhone": "Enter a 10-digit mobile number",
+  "mustAcceptTerms": "Please accept the terms to continue",
+  "errorNetwork": "No internet connection. Check your network and try again.",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "retry": "Try again",
+  "serverUnreachable": "Can't reach the server",
+  "sessionExpired": "Your session ended. Please sign in again.",
+  "onboardingTitle": "Set up your preparation",
+  "chooseExam": "Which exam are you preparing for?",
+  "targetYear": "Target year",
+  "yourClass": "Your class",
+  "classDropper": "Dropper",
+  "classLabel": "Class {level}",
+  "@classLabel": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "board": "Board",
+  "stateBoard": "State board",
+  "dailyStudyTime": "Daily study time",
+  "minutesPerDay": "{minutes} minutes a day",
+  "@minutesPerDay": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "under18": "I am under 18",
+  "guardianName": "Parent or guardian's name",
+  "guardianConsent": "My parent or guardian agrees to my use of this app",
+  "next": "Next",
+  "back": "Back",
+  "getStarted": "Get started",
+  "selectExamError": "Choose an exam to continue",
+  "tabHome": "Home",
+  "tabLearn": "Learn",
+  "tabPractice": "Practice",
+  "tabTests": "Tests",
+  "tabProfile": "Profile",
+  "greeting": "Hi, {name}",
+  "@greeting": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "daysToExam": "{days, plural, =0{{exam} is today} =1{1 day to {exam}} other{{days} days to {exam}}}",
+  "@daysToExam": {
+    "placeholders": {
+      "days": {},
+      "exam": {}
+    }
+  },
+  "streakDays": "{days, plural, =0{Start your streak today} =1{1-day streak} other{{days}-day streak}}",
+  "@streakDays": {
+    "placeholders": {
+      "days": {}
+    }
+  },
+  "thisWeek": "This week",
+  "questionsAnswered": "Questions answered",
+  "lessonsCompleted": "Lessons completed",
+  "todaysPlan": "Today's plan",
+  "planBasis": "Suggested from your syllabus progress, recent accuracy and daily study time.",
+  "viewFullPlan": "View full plan",
+  "planEmpty": "Nothing planned yet. Enroll in a course to get a daily plan.",
+  "continueLearning": "Continue learning",
+  "myCourses": "My courses",
+  "recentResults": "Recent results",
+  "weakTopics": "Topics to strengthen",
+  "accuracyOn": "{accuracy}% accuracy on {count} questions",
+  "@accuracyOn": {
+    "placeholders": {
+      "accuracy": {},
+      "count": {}
+    }
+  },
+  "practise": "Practise",
+  "browseCourses": "Browse courses",
+  "noCoursesYet": "You haven't enrolled in a course yet.",
+  "minutesShort": "{minutes} min",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "percentComplete": "{percent}% complete",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "searchHint": "Search courses, topics, tests",
+  "search": "Search",
+  "noResults": "No results",
+  "allCourses": "All",
+  "free": "Free",
+  "paid": "Paid",
+  "enrolled": "Enrolled",
+  "coursesEmpty": "No courses match.",
+  "enrollFree": "Enroll for free",
+  "buyFor": "Buy for {price}",
+  "@buyFor": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "accessDays": "{days} days access",
+  "@accessDays": {
+    "placeholders": {
+      "days": {}
+    }
+  },
+  "lifetimeAccess": "Lifetime access",
+  "youHaveAccess": "You have access to this course",
+  "enrolledToast": "You're enrolled",
+  "syllabus": "Syllabus",
+  "topicsCount": "{count, plural, =1{1 topic} other{{count} topics}}",
+  "@topicsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "objectives": "What you'll learn",
+  "video": "Video",
+  "notes": "Notes",
+  "freePreview": "Free preview",
+  "locked": "Locked",
+  "completed": "Completed",
+  "practiseTopic": "Practise this topic ({count} questions)",
+  "@practiseTopic": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "noPracticeQuestions": "No practice questions for this topic yet.",
+  "previousTopic": "Previous topic",
+  "nextTopic": "Next topic",
+  "unlockToContinue": "Buy the course to unlock this lesson.",
+  "viewCourse": "View course",
+  "videoUnavailable": "This video can't be played right now.",
+  "playbackSpeed": "Playback speed",
+  "resumedAt": "Resumed from {time}",
+  "@resumedAt": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "openNotes": "Open notes",
+  "markAsRead": "Mark as read",
+  "markedDone": "Marked as done",
+  "practiceTitle": "Practice",
+  "practiceMistakes": "Practise your mistakes",
+  "practiceMistakesHint": "Questions you got wrong in practice and tests",
+  "practiceBookmarked": "Bookmarked questions",
+  "practiceBookmarkedHint": "Questions you saved for revision",
+  "practicePyq": "Previous-year questions",
+  "practicePyqHint": "From past papers, where licensed",
+  "practiceByTopic": "Practise by topic",
+  "practiceByTopicHint": "Open any topic in Learn and tap Practise",
+  "questionOf": "Question {current} of {total}",
+  "@questionOf": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "checkAnswer": "Check answer",
+  "correct": "Correct",
+  "incorrect": "Incorrect",
+  "partiallyCorrect": "Partially correct",
+  "skipped": "Skipped",
+  "explanation": "Explanation",
+  "correctAnswer": "Correct answer: {answer}",
+  "@correctAnswer": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "yourAnswer": "Your answer: {answer}",
+  "@yourAnswer": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "notAnswered": "Not answered",
+  "finish": "Finish",
+  "practiceSummary": "Practice summary",
+  "accuracy": "Accuracy",
+  "done": "Done",
+  "enterNumber": "Enter your answer",
+  "selectAllThatApply": "Select all that apply",
+  "hint": "Hint",
+  "bookmark": "Save for revision",
+  "bookmarked": "Saved for revision",
+  "reportQuestion": "Report a problem",
+  "reportReasonWrong": "The answer key is wrong",
+  "reportReasonTypo": "Typo or formatting",
+  "reportReasonUnclear": "The question is unclear",
+  "reportReasonOther": "Something else",
+  "reportDetails": "Details (optional)",
+  "send": "Send",
+  "cancel": "Cancel",
+  "reportThanks": "Thanks, our team will review it.",
+  "noQuestionsForSelection": "No questions available here yet.",
+  "testsTitle": "Tests",
+  "testsEmpty": "No tests available yet.",
+  "questionsCount": "{count, plural, =1{1 question} other{{count} questions}}",
+  "@questionsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "marksCount": "{marks} marks",
+  "@marksCount": {
+    "placeholders": {
+      "marks": {}
+    }
+  },
+  "minutesCount": "{minutes} min",
+  "@minutesCount": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "attemptsUsed": "Attempts: {used} of {max}",
+  "@attemptsUsed": {
+    "placeholders": {
+      "used": {},
+      "max": {}
+    }
+  },
+  "startTest": "Start test",
+  "resumeTest": "Resume test",
+  "retakeTest": "Retake",
+  "viewResult": "View result",
+  "instructions": "Instructions",
+  "sections": "Sections",
+  "negativeMarking": "−{marks} for each wrong answer",
+  "@negativeMarking": {
+    "placeholders": {
+      "marks": {}
+    }
+  },
+  "noNegativeMarking": "No negative marking",
+  "testRules": "The timer keeps running if you leave. Answers are saved as you go, and the test submits automatically when time runs out.",
+  "timeLeft": "Time left",
+  "markForReview": "Mark for review",
+  "unmarkReview": "Unmark review",
+  "clearResponse": "Clear",
+  "previous": "Previous",
+  "saveAndNext": "Save & next",
+  "submitTest": "Submit test",
+  "questionPalette": "Questions",
+  "paletteAnswered": "Answered",
+  "paletteNotAnswered": "Not answered",
+  "paletteMarked": "Marked for review",
+  "paletteNotVisited": "Not visited",
+  "submitConfirmTitle": "Submit the test?",
+  "submitConfirmBody": "Answered: {answered}\nMarked for review: {marked}\nNot answered: {unanswered}\n\nYou can't change answers after submitting.",
+  "@submitConfirmBody": {
+    "placeholders": {
+      "answered": {},
+      "marked": {},
+      "unanswered": {}
+    }
+  },
+  "submit": "Submit",
+  "keepWorking": "Keep working",
+  "leaveTestTitle": "Leave the test?",
+  "leaveTestBody": "Your answers are saved, but the timer keeps running. You can resume from the Tests tab.",
+  "leave": "Leave",
+  "stay": "Stay",
+  "saving": "Saving…",
+  "saved": "Saved",
+  "offlineWillRetry": "Offline. Answers will be saved when you're back online.",
+  "timeUp": "Time's up. Submitting your test…",
+  "resultTitle": "Result",
+  "score": "Score",
+  "scoreOf": "{score} / {max}",
+  "@scoreOf": {
+    "placeholders": {
+      "score": {},
+      "max": {}
+    }
+  },
+  "timeTaken": "Time taken",
+  "percentileLine": "Better than {percent}% of first attempts on this platform",
+  "@percentileLine": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "notOfficialRank": "Not an official rank.",
+  "subjectWise": "Subject-wise",
+  "chapterWise": "Chapter-wise",
+  "recommendations": "What to do next",
+  "reviewAnswers": "Review answers",
+  "backToTests": "Back to tests",
+  "filterAll": "All",
+  "filterIncorrect": "Incorrect",
+  "filterSkipped": "Skipped",
+  "marksAwarded": "{marks} marks",
+  "@marksAwarded": {
+    "placeholders": {
+      "marks": {}
+    }
+  },
+  "autoSubmitted": "Submitted automatically when time ran out",
+  "attemptNumber": "Attempt {number}",
+  "@attemptNumber": {
+    "placeholders": {
+      "number": {}
+    }
+  },
+  "planTitle": "Study plan",
+  "regeneratePlan": "Refresh plan",
+  "skip": "Skip",
+  "plannedMinutes": "{planned} of {daily} min planned",
+  "@plannedMinutes": {
+    "placeholders": {
+      "planned": {},
+      "daily": {}
+    }
+  },
+  "lastSevenDays": "Last 7 days",
+  "tasksDone": "{done}/{total} done",
+  "@tasksDone": {
+    "placeholders": {
+      "done": {},
+      "total": {}
+    }
+  },
+  "profileTitle": "Profile",
+  "preparingFor": "Preparing for {exam} {year}",
+  "@preparingFor": {
+    "placeholders": {
+      "exam": {},
+      "year": {}
+    }
+  },
+  "editPreferences": "Study preferences",
+  "myProgress": "My progress",
+  "myPurchases": "My purchases",
+  "bookmarksTitle": "Saved for revision",
+  "notificationsTitle": "Notifications",
+  "helpSupport": "Help & support",
+  "privacyPolicy": "Privacy policy",
+  "deleteAccount": "Delete my account",
+  "deleteAccountBody": "We'll delete your account and personal data after any open orders or refunds are settled. You'll be signed out now.",
+  "delete": "Delete",
+  "save": "Save",
+  "savedToast": "Saved",
+  "notificationsEmpty": "No notifications yet.",
+  "markAllRead": "Mark all as read",
+  "bookmarksEmpty": "Nothing saved yet. Tap the bookmark on a question to save it.",
+  "remove": "Remove",
+  "ordersEmpty": "No purchases yet.",
+  "orderPaid": "Paid",
+  "orderPending": "Pending",
+  "orderFailed": "Failed",
+  "orderRefunded": "Refunded",
+  "ticketsEmpty": "You haven't contacted support yet.",
+  "newTicket": "Contact support",
+  "ticketCategory": "Topic",
+  "categoryPayment": "Payment",
+  "categoryContent": "Course content",
+  "categoryTechnical": "App problem",
+  "categoryAccount": "Account",
+  "categoryOther": "Other",
+  "ticketSubject": "Subject",
+  "ticketMessage": "How can we help?",
+  "ticketSent": "Message sent. We'll reply here and notify you.",
+  "supportReply": "Reply from support",
+  "progressTitle": "My progress",
+  "testsTaken": "Tests taken",
+  "averageScore": "Average score",
+  "practiceAccuracy": "Practice accuracy",
+  "scoreTrend": "Score trend",
+  "noTestsYet": "Take a test to see your progress here.",
+  "purchaseOnMobileOnly": "Purchases are available in the Android and iOS app.",
+  "paymentSuccess": "Payment successful. The course is unlocked.",
+  "paymentFailed": "Payment didn't complete. No money was taken, or it will be refunded automatically.",
+  "paymentVerifying": "Confirming your payment…",
+  "purchaseRequired": "Buy this course to unlock it.",
+  "loading": "Loading…",
+  "emptyGeneric": "Nothing here yet.",
+  "play": "Play",
+  "pause": "Pause",
+  "fullScreen": "Full screen",
+  "exitFullScreen": "Exit full screen"
+}

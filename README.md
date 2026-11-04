@@ -3,8 +3,8 @@
 Backend and product docs for a NEET / JEE / Board learning app: recorded lessons, notes, practice, timed tests,
 analytics, study planner and paid courses, in English and Hindi. The brand name is configurable (`Branding__ProductName`).
 
-**Status:** planning docs, the backend API and the **admin portal** are built and tested. The student website and the
-Flutter mobile app are **not built yet**. See [`docs/09-phase-report-and-roadmap.md`](docs/09-phase-report-and-roadmap.md).
+**Status:** planning docs, the backend API, the **admin portal** and the **Flutter student app** (Android/iOS) are
+built and tested. The student website is **not built yet**. See [`docs/09-phase-report-and-roadmap.md`](docs/09-phase-report-and-roadmap.md).
 
 ## Docs
 
@@ -31,6 +31,7 @@ src/LearnPath.Api/
                      Notifications, Search, Admin
 tests/LearnPath.Tests/  unit + integration tests (real PostgreSQL)
 web/                    Next.js admin portal (student web next) — see web/README.md
+mobile/                 Flutter student app (Android + iOS) — see mobile/README.md
 scripts/                export-openapi.sh
 docs/
 ```

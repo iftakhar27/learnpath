@@ -12,6 +12,7 @@ namespace LearnPath.Api.Modules.Learning;
 public record ProgressRequest([Required] Guid ResourceId, [Range(0, 86400)] int PositionSeconds, bool MarkCompleted = false);
 public record ProgressDto(Guid ResourceId, int PositionSeconds, bool Completed);
 public record BookmarkRequest([Required] BookmarkType EntityType, [Required] Guid EntityId, [MaxLength(1000)] string? Note);
+public record HistoryItemDto(Guid ResourceId, string Title, Guid TopicId, string Topic, string Type, int PositionSeconds, int? DurationSeconds, bool Completed, DateTimeOffset UpdatedAt);
 public record BookmarkDto(Guid Id, string EntityType, Guid EntityId, string Title, string? Note, DateTimeOffset CreatedAt);
 
 [ApiController]
@@ -56,7 +57,7 @@ public class LearningController(AppDbContext db, EntitlementService entitlements
     }
 
     [HttpGet("history")]
-    public async Task<object> History([FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken ct)
+    public async Task<PagedResult<HistoryItemDto>> History([FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken ct)
     {
         var (pg, size) = Paging.Normalize(page, pageSize);
         var userId = User.UserId();
@@ -68,11 +69,8 @@ public class LearningController(AppDbContext db, EntitlementService entitlements
                 select new { p.ResourceId, r.TitleEn, r.TitleHi, TopicId = t.Id, TopicEn = t.TitleEn, TopicHi = t.TitleHi, Type = r.Type, p.PositionSeconds, r.DurationSeconds, p.Completed, p.UpdatedAt };
         var total = await q.CountAsync(ct);
         var rows = await q.Skip((pg - 1) * size).Take(size).ToListAsync(ct);
-        return new PagedResult<object>(rows.Select(x => (object)new
-        {
-            x.ResourceId, Title = lang.Pick(x.TitleEn, x.TitleHi), x.TopicId, Topic = lang.Pick(x.TopicEn, x.TopicHi),
-            Type = x.Type.ToString(), x.PositionSeconds, x.DurationSeconds, x.Completed, x.UpdatedAt,
-        }).ToList(), pg, size, total);
+        return new PagedResult<HistoryItemDto>(rows.Select(x => new HistoryItemDto(x.ResourceId, lang.Pick(x.TitleEn, x.TitleHi), x.TopicId,
+            lang.Pick(x.TopicEn, x.TopicHi), x.Type.ToString(), x.PositionSeconds, x.DurationSeconds, x.Completed, x.UpdatedAt)).ToList(), pg, size, total);
     }
 
     [HttpGet("bookmarks")]

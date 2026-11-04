@@ -24,7 +24,7 @@ Status reflects *this repository*, verified by automated tests where noted. "Pla
 | Q. Admin dashboard | Counts, attempts, payments, reported issues, students, orders, audit log | Role dashboards, charts (P1) | **API + admin UI implemented, e2e tested** |
 | R. Support | Tickets + question reports | Helpdesk integration (P2) | **API + admin UI implemented, e2e tested** |
 | S. Gamification | Streak | Badges, leaderboards (P2) | Streak implemented |
-| T. Localization & a11y | `en`/`hi` content variants on title fields, `Accept-Language` | Full translation tooling (P1) | Data model ready |
-| Mobile app (Flutter) | All P0 student screens | — | **Planned** (next phase) |
+| T. Localization & a11y | `en`/`hi` content variants, `Accept-Language`; mobile UI fully translated via ARB files | Native-speaker review of Hindi, more languages (P1) | **Implemented** (mobile); admin UI English only |
+| Mobile app (Flutter) | All P0 student screens (Android + iOS), English + Hindi | Push (FCM), offline downloads (P1/P2) | **Implemented + tested** (unit/widget tests; Android APK built; iOS not built — needs macOS) |
 | Web app (Next.js) | Admin portal | — | **Implemented + e2e tested** |
 | Web app (Next.js) | Student portal | — | **Planned** (next phase) |

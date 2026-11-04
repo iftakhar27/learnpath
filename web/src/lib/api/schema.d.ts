@@ -2421,7 +2421,11 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "text/plain": components["schemas"]["PagedResultOfHistoryItemDto"];
+                        "application/json": components["schemas"]["PagedResultOfHistoryItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfHistoryItemDto"];
+                    };
                 };
             };
         };
@@ -4199,7 +4203,6 @@ export interface components {
             selectedOptionIds?: string[] | null;
             /** Format: double */
             numericValue?: number | null;
-            readonly isEmpty: boolean;
         };
         AttemptDto: {
             /** Format: uuid */
@@ -4446,6 +4449,22 @@ export interface components {
             courseId: string;
             reason?: string | null;
         };
+        HistoryItemDto: {
+            /** Format: uuid */
+            resourceId: string;
+            title: string;
+            /** Format: uuid */
+            topicId: string;
+            topic: string;
+            type: string;
+            /** Format: int32 */
+            positionSeconds: number;
+            /** Format: int32 */
+            durationSeconds?: number | null;
+            completed: boolean;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         IdDto: {
             /** Format: uuid */
             id: string;
@@ -4570,6 +4589,15 @@ export interface components {
             /** Format: int32 */
             total: number;
         };
+        PagedResultOfHistoryItemDto: {
+            items: components["schemas"]["HistoryItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
         PagedResultOfNotificationDto: {
             items: components["schemas"]["NotificationDto"][];
             /** Format: int32 */
@@ -4611,6 +4639,7 @@ export interface components {
             resourceId: string;
             type: string;
             url: string;
+            streamUrl?: string | null;
             /** Format: date-time */
             expiresAt: string;
             /** Format: int32 */
