@@ -17,13 +17,13 @@ Legend: ✅ implemented and covered by tests · 🟡 implemented, not yet verifi
 | Entitlement checks on paid video, notes, practice and tests | ✅ | `EntitlementService`, `LearningTests` |
 | Signed, expiring media URLs | 🟡 | `BunnyVideoUrlSigner`, `HmacDocumentUrlSigner` — confirm token format with chosen provider |
 | OTP: hashed at rest, 5-min expiry, single use, 5 wrong tries, 30 s resend gap, 5 per 15 min | ✅ | `AuthController`, `AuthTests` |
-| Auth rate limiting per IP | 🟡 | `RateLimit:AuthPerMinute`; behind a proxy, configure forwarded headers |
+| Auth rate limiting per IP | ✅ | `RateLimit:AuthPerMinute`; behind a proxy set `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` (verified per-client limiting) |
 | Parameterised SQL only (EF Core / interpolated raw SQL) | ✅ | |
 | Input validation (DataAnnotations + domain checks) | ✅ | |
 | Audit log for admin mutations | ✅ | `AuditService` |
 | Minimal PII to staff (Analyst sees aggregates only) | ✅ | `AdminOpsController` policies |
 | Guardian consent recorded for minors | ✅ | `ProfileController` |
-| Fake gateway / log OTP refused in Production | ✅ | `Program.cs` startup guard |
+| Fake gateway / log OTP refused in Production; unimplemented OTP providers refused everywhere | ✅ | `Program.cs` startup guard |
 | Secrets only from environment | ✅ | `appsettings.json` has empty secrets |
 | HTTPS + HSTS in Production | 🟡 | Terminate TLS at proxy/load balancer |
 | Real OTP provider (MSG91, DLT template) | ⬜ | Implement `IOtpSender` |

@@ -137,3 +137,42 @@ public class RequiredNonNullableSchemaFilter : Swashbuckle.AspNetCore.SwaggerGen
             if (!prop.Nullable && !optional.Contains(name)) schema.Required.Add(name);
     }
 }
+
+public static class DatabaseUrl
+{
+    /// <summary>
+    /// Accepts either an Npgsql connection string or a <c>postgres://user:pass@host[:port]/db</c> URL (the form hosting
+    /// platforms such as Render and Heroku provide) and returns an Npgsql connection string.
+    /// </summary>
+    public static string? ToNpgsql(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return value;
+        if (!value.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) && !value.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+            return value;
+        var uri = new Uri(value);
+        var userInfo = uri.UserInfo.Split(':', 2);
+        var builder = new Npgsql.NpgsqlConnectionStringBuilder
+        {
+            Host = uri.Host,
+            Port = uri.IsDefaultPort || uri.Port <= 0 ? 5432 : uri.Port,
+            Database = Uri.UnescapeDataString(uri.AbsolutePath.TrimStart('/')),
+            Username = Uri.UnescapeDataString(userInfo[0]),
+            Password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : null,
+        };
+        // Honour ?sslmode=require and similar query options when present.
+        foreach (var pair in uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var kv = pair.Split('=', 2);
+            if (kv.Length == 2 && kv[0].Equals("sslmode", StringComparison.OrdinalIgnoreCase) && Enum.TryParse<Npgsql.SslMode>(kv[1], true, out var mode))
+                builder.SslMode = mode;
+        }
+        return builder.ConnectionString;
+    }
+}
+
+/// <summary>Used when <c>Otp:Provider</c> is <c>disabled</c>: mobile-number sign-in is turned off and email sign-in still works.</summary>
+public class DisabledOtpSender : IOtpSender
+{
+    public Task SendAsync(string phone, string code, CancellationToken ct) =>
+        throw new AppException(503, "otp_unavailable", "Sign-in with a mobile number isn't available yet. Please use email.");
+}

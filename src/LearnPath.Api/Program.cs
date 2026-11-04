@@ -29,16 +29,21 @@ builder.Services.AddSingleton(config.GetSection("Analytics").Get<AnalyticsOption
 builder.Services.AddSingleton(TimeProvider.System);
 
 // ---------- Data ----------
-builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(config.GetConnectionString("Default")));
+builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(DatabaseUrl.ToNpgsql(config.GetConnectionString("Default"))));
 
 // ---------- Integrations ----------
 var useFakePayments = config.GetValue<bool>("Razorpay:UseFakeGateway");
-var useDevOtp = config.GetValue("Otp:Provider", "log") == "log";
-if (builder.Environment.IsProduction() && (useFakePayments || useDevOtp))
+// OTP: "log" writes codes to the log (development/staging only); "disabled" turns mobile sign-in off.
+// No SMS provider (e.g. MSG91) is implemented yet, so Production must use "disabled" until one is added.
+var otpProvider = config.GetValue("Otp:Provider", "log")!.ToLowerInvariant();
+if (otpProvider is not ("log" or "disabled"))
+    throw new InvalidOperationException($"Otp:Provider '{otpProvider}' is not implemented. Use 'disabled' (or 'log' outside Production).");
+if (builder.Environment.IsProduction() && (useFakePayments || otpProvider == "log"))
     throw new InvalidOperationException("Fake payment gateway / logging OTP sender are not allowed in Production.");
 if (useFakePayments) builder.Services.AddSingleton<IPaymentGateway, FakePaymentGateway>();
 else builder.Services.AddHttpClient<IPaymentGateway, RazorpayGateway>(c => c.Timeout = TimeSpan.FromSeconds(15));
-builder.Services.AddSingleton<IOtpSender, LoggingOtpSender>();
+if (otpProvider == "disabled") builder.Services.AddSingleton<IOtpSender, DisabledOtpSender>();
+else builder.Services.AddSingleton<IOtpSender, LoggingOtpSender>();
 builder.Services.AddSingleton<IVideoUrlSigner, BunnyVideoUrlSigner>();
 builder.Services.AddSingleton<IDocumentUrlSigner, HmacDocumentUrlSigner>();
 

@@ -93,6 +93,21 @@
   (to be localized server-side). Push notifications (FCM) and offline downloads are not implemented.
 - Release APK is signed with the debug key; create an upload key before publishing.
 
+## Phase 1e (part): staging deployment on Render — report, 4 Nov 2026
+
+**Built:** `render.yaml` Blueprint (API web service from the `Dockerfile` + PostgreSQL 16, Singapore region, free plans),
+`.dockerignore`, guide in `10-deploy-render.md`. The API now accepts Render's `postgres://` connection URLs, honours
+`ASPNETCORE_FORWARDEDHEADERS_ENABLED` for real client IPs, and refuses OTP providers that aren't implemented
+(`Otp:Provider` defaults to `disabled`, which returns a clear 503 instead of failing silently).
+
+**Verified locally:** the Release build started with the Staging settings Render uses (URL-style connection string
+with no port, generated JWT key, forwarded headers): migrations ran on an empty database, admin and sample content
+were seeded, `/health` and `/swagger` returned 200. Sign-in rate limiting was per client: the same forwarded IP got
+429 after 20 attempts, 22 different IPs were never limited. 69 backend tests pass (5 new for deployment config).
+
+**Not verified:** the Docker image itself (no Docker daemon here; Render builds it), and the live Render service,
+which the account owner creates from the dashboard.
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |
@@ -100,7 +115,7 @@
 | 1b | ~~Next.js admin portal~~ **done** (see report above) | — | — |
 | 1c | Next.js student web (onboarding, learn, video player, practice, exam UI, results, plan, checkout) | 3 weeks | ₹25–45k |
 | 1d | ~~Flutter app~~ **done** (see report above); device QA and store setup remain under 1f | — | — |
-| 1e | Integrations: MSG91, Razorpay live test mode, Bunny Stream signed playback, FCM, Sentry; staging deploy | 1–2 weeks | ₹10–20k |
+| 1e | Integrations: MSG91, Razorpay live test mode, Bunny Stream signed playback, FCM, Sentry (staging deploy config **done**) | 1–2 weeks | ₹10–20k |
 | 1f | QA on devices, accessibility pass, store submission | 1–2 weeks | ₹10–25k |
 | 2 | PYQ papers, coupons & subscriptions, revision scheduling, richer analytics, bulk import UI, erasure/export jobs | 6–8 weeks | ₹1–1.5 lakh |
 | 3 | Adaptive practice, AI-assisted explanations (SME-reviewed), offline/DRM, live classes, cohort percentiles, leaderboards | scoped later | — |

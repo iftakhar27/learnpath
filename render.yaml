@@ -1,0 +1,54 @@
+# Render Blueprint: a staging deployment of the LearnPath API with a PostgreSQL database.
+# In the Render dashboard choose New > Blueprint, pick this repository and the branch below.
+# Step-by-step guide: docs/10-deploy-render.md
+#
+# Staging uses the sample content, a simulated payment gateway and OTP codes written to the logs.
+# Do NOT use it for real students or payments; production needs Razorpay keys, an SMS provider and Otp__Provider.
+databases:
+  - name: learnpath-db
+    plan: free                # free databases expire after 30 days; switch to basic-256mb to keep data
+    region: singapore
+    databaseName: learnpath
+    user: learnpath
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: learnpath-api
+    runtime: docker
+    plan: free                # free instances sleep after ~15 idle minutes; 'starter' stays on
+    region: singapore
+    branch: mobile-app        # change to main after merging
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Staging
+      - key: PORT                                   # the container listens on 8080
+        value: "8080"
+      - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED    # trust Render's proxy for client IPs (rate limits) and https
+        value: "true"
+      - key: ConnectionStrings__Default
+        fromDatabase:
+          name: learnpath-db
+          property: connectionString
+      - key: Jwt__SigningKey
+        generateValue: true
+      - key: Seed__AdminEmail                       # you are asked for this when creating the Blueprint
+        sync: false
+      - key: Seed__AdminPassword                    # generated; read it under the service's Environment tab
+        generateValue: true
+      - key: Seed__SampleContent
+        value: "true"
+      - key: Razorpay__UseFakeGateway
+        value: "true"
+      - key: Razorpay__KeySecret
+        generateValue: true
+      - key: Razorpay__WebhookSecret
+        generateValue: true
+      - key: Otp__Provider
+        value: log
+      - key: Branding__ProductName
+        value: LearnPath

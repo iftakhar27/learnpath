@@ -85,15 +85,20 @@ Integration tests create and drop a temporary database `learnpath_test_*`. Point
 | `Seed__SampleContent` | `true` to load demo content (never in production) |
 | `Razorpay__KeyId`, `Razorpay__KeySecret`, `Razorpay__WebhookSecret` | Payment gateway |
 | `Razorpay__UseFakeGateway` | Offline gateway for dev/tests (refused in Production) |
-| `Otp__Provider` | `log` (dev only, refused in Production). Production needs an MSG91 sender |
+| `Otp__Provider` | `log` (codes in the log; refused in Production) or `disabled` (default). No SMS sender is implemented yet |
 | `Video__LibraryId`, `Video__TokenKey` | Bunny Stream signed playback |
 | `Storage__CdnBaseUrl`, `Storage__SigningKey` | Signed PDF URLs |
 | `Cors__Origins__0..n` | Allowed web origins |
 | `Exams__SubmissionGraceSeconds` | Late-save grace (default 30) |
 | `Analytics__MinCohortForPercentile` | Hide percentile below this cohort size (default 100) |
 | `Database__MigrateOnStartup` | Set `false` in production and run reviewed scripts |
+| `ASPNETCORE_FORWARDEDHEADERS_ENABLED` | `true` behind a load balancer, so rate limits see real client IPs |
 
-## Deployment (lean)
+## Deployment
+
+**Staging on Render:** `render.yaml` defines the API and database. Follow [`docs/10-deploy-render.md`](docs/10-deploy-render.md).
+
+### Any container host (lean)
 
 1. Build the image: `docker build -t learnpath-api .`
 2. Provision managed PostgreSQL (Mumbai/Bangalore region) and a small VM or container service.

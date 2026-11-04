@@ -1,0 +1,11 @@
+# Only the API is built into the image; keep the build context small.
+**/bin/
+**/obj/
+.git/
+web/
+mobile/
+docs/
+tests/
+scripts/
+*.md
+.env
