@@ -125,6 +125,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
+// Someone opening the bare API address in a browser should see that it is running, not a 404.
+app.MapGet("/", (IConfiguration c, IWebHostEnvironment env) => Results.Ok(new
+{
+    name = $"{c["Branding:ProductName"] ?? "LearnPath"} API",
+    status = "running",
+    message = "This address serves the mobile app and the admin portal; it has no web pages of its own.",
+    health = "/health",
+    docs = env.IsProduction() ? null : "/swagger",
+})).ExcludeFromDescription();
 app.MapGet("/api/v1/config", (IConfiguration c) => new PublicConfigDto(c["Branding:ProductName"] ?? "LearnPath", "INR", "Asia/Kolkata", ["en", "hi"]));
 
 if (config.GetValue("Database:MigrateOnStartup", true))
