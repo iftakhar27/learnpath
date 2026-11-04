@@ -77,7 +77,8 @@ lib/
 tool/gen_models.dart        model generator
 ```
 
-When the API contract changes: `../scripts/export-openapi.sh`, then `dart run tool/gen_models.dart`.
+When the API contract changes: `../scripts/export-openapi.sh`, then `dart run tool/gen_models.dart` and
+`dart format -l 160 lib/core/api/models.g.dart` (the width the generated file is kept at).
 After editing ARB files: `flutter gen-l10n` (also runs on build).
 
 ## Notes and known gaps

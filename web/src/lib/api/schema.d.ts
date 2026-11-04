@@ -3492,6 +3492,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/test-otp-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TestOtpCodeDto"][];
+                        "application/json": components["schemas"]["TestOtpCodeDto"][];
+                        "text/json": components["schemas"]["TestOtpCodeDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tests": {
         parameters: {
             query?: never;
@@ -5031,6 +5068,14 @@ export interface components {
             sections: string[];
             /** Format: double */
             negativeMarksPerWrong?: number | null;
+        };
+        TestOtpCodeDto: {
+            phone: string;
+            code: string;
+            /** Format: date-time */
+            sentAt: string;
+            /** Format: date-time */
+            expiresAt: string;
         };
         TestQuestionUpsert: {
             /** Format: uuid */

@@ -7,6 +7,7 @@ import { formatNumber, formatPaise } from "@/lib/format";
 import { can, useSession } from "@/lib/session";
 import { Card, PageHeader, StatTile, Table, Td, Th } from "@/components/ui/layout";
 import { EmptyState, ErrorState, PageLoading } from "@/components/ui/feedback";
+import { TestSignInCodes } from "@/features/admin/test-sign-in-codes";
 
 export function Dashboard() {
   const { data: user } = useSession();
@@ -19,6 +20,8 @@ export function Dashboard() {
   return (
     <>
       <PageHeader title="Dashboard" description="Figures come straight from recorded activity. Revenue is GST-inclusive." />
+
+      {can.support(user?.roles) && <TestSignInCodes />}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label="Registered students" value={formatNumber(d.totalStudents)} />

@@ -24,6 +24,7 @@ Legend: ✅ implemented and covered by tests · 🟡 implemented, not yet verifi
 | Minimal PII to staff (Analyst sees aggregates only) | ✅ | `AdminOpsController` policies |
 | Guardian consent recorded for minors | ✅ | `ProfileController` |
 | Fake gateway / log OTP refused in Production; unimplemented OTP providers refused everywhere | ✅ | `Program.cs` startup guard |
+| Test sign-in codes visible to staff only on test servers | ✅ | `GET /admin/test-otp-codes` (Support/SuperAdmin) exists only with `Otp:Provider=log`; numbers masked to last 4 digits; codes kept in memory for 1 hour |
 | Secrets only from environment | ✅ | `appsettings.json` has empty secrets |
 | HTTPS + HSTS in Production | 🟡 | Terminate TLS at proxy/load balancer |
 | Real OTP provider (MSG91, DLT template) | ⬜ | Implement `IOtpSender` |

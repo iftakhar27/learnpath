@@ -43,7 +43,11 @@ if (builder.Environment.IsProduction() && (useFakePayments || otpProvider == "lo
 if (useFakePayments) builder.Services.AddSingleton<IPaymentGateway, FakePaymentGateway>();
 else builder.Services.AddHttpClient<IPaymentGateway, RazorpayGateway>(c => c.Timeout = TimeSpan.FromSeconds(15));
 if (otpProvider == "disabled") builder.Services.AddSingleton<IOtpSender, DisabledOtpSender>();
-else builder.Services.AddSingleton<IOtpSender, LoggingOtpSender>();
+else
+{
+    builder.Services.AddSingleton<TestOtpOutbox>(); // read by GET /api/v1/admin/test-otp-codes
+    builder.Services.AddSingleton<IOtpSender, LoggingOtpSender>();
+}
 builder.Services.AddSingleton<IVideoUrlSigner, BunnyVideoUrlSigner>();
 builder.Services.AddSingleton<IDocumentUrlSigner, HmacDocumentUrlSigner>();
 

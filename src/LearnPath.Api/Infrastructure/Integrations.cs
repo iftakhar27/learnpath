@@ -12,17 +12,55 @@ public interface IOtpSender
     Task SendAsync(string phone, string code, CancellationToken ct);
 }
 
+public static class OtpPolicy
+{
+    public static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
+}
+
 /// <summary>
-/// Development-only sender: writes the OTP to the log. Program.cs refuses to start in Production with this sender.
-/// Replace with an MSG91 (DLT-registered template) implementation before launch.
+/// Test-server sender: writes the OTP to the log and keeps the latest codes in <see cref="TestOtpOutbox"/> so staff can
+/// read them in the admin portal. Program.cs refuses to start in Production with this sender.
+/// Replace with an SMS provider (e.g. MSG91 with a DLT-registered template) before launch.
 /// </summary>
-public class LoggingOtpSender(ILogger<LoggingOtpSender> logger) : IOtpSender
+public class LoggingOtpSender(ILogger<LoggingOtpSender> logger, TestOtpOutbox outbox, TimeProvider clock) : IOtpSender
 {
     public Task SendAsync(string phone, string code, CancellationToken ct)
     {
         logger.LogWarning("DEV OTP for {PhoneSuffix}: {Code}", phone[^4..], code);
+        outbox.Add(phone, code, clock.GetUtcNow());
         return Task.CompletedTask;
     }
+}
+
+public record TestOtpCodeDto(string Phone, string Code, DateTimeOffset SentAt, DateTimeOffset ExpiresAt);
+
+/// <summary>
+/// The latest codes sent by <see cref="LoggingOtpSender"/>, newest first, kept in memory for an hour. Registered only
+/// when no real SMS provider is used, so the admin endpoint that reads it doesn't exist on a production server.
+/// </summary>
+public class TestOtpOutbox
+{
+    public const int Capacity = 20;
+    private static readonly TimeSpan KeepFor = TimeSpan.FromHours(1);
+    private readonly LinkedList<TestOtpCodeDto> _items = new();
+    private readonly object _gate = new();
+
+    public void Add(string phone, string code, DateTimeOffset sentAt)
+    {
+        lock (_gate)
+        {
+            _items.AddFirst(new TestOtpCodeDto(Mask(phone), code, sentAt, sentAt + OtpPolicy.Lifetime));
+            while (_items.Count > Capacity) _items.RemoveLast();
+        }
+    }
+
+    public List<TestOtpCodeDto> Recent(DateTimeOffset now)
+    {
+        lock (_gate) return _items.Where(i => i.SentAt > now - KeepFor).ToList();
+    }
+
+    /// <summary>Last four digits are enough for a tester to find their own code.</summary>
+    public static string Mask(string phone) => phone.Length <= 4 ? phone : new string('•', phone.Length - 4) + phone[^4..];
 }
 
 // ---------- Video ----------

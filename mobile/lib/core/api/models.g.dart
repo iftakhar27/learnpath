@@ -3634,6 +3634,25 @@ class TestDetailDto {
 }
 
 @immutable
+class TestOtpCodeDto {
+  const TestOtpCodeDto({required this.phone, required this.code, required this.sentAt, required this.expiresAt});
+
+  factory TestOtpCodeDto.fromJson(Map<String, dynamic> json) => TestOtpCodeDto(
+    phone: json['phone'] as String,
+    code: json['code'] as String,
+    sentAt: DateTime.parse(json['sentAt'] as String),
+    expiresAt: DateTime.parse(json['expiresAt'] as String),
+  );
+
+  final String phone;
+  final String code;
+  final DateTime sentAt;
+  final DateTime expiresAt;
+
+  Map<String, dynamic> toJson() => {'phone': phone, 'code': code, 'sentAt': sentAt.toIso8601String(), 'expiresAt': expiresAt.toIso8601String()};
+}
+
+@immutable
 class TestQuestionUpsert {
   const TestQuestionUpsert({required this.questionId, this.sectionIndex, this.marks, this.negativeMarks});
 

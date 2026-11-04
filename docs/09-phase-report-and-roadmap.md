@@ -133,6 +133,16 @@ unconfigured copy returns 503. Typecheck clean; all 11 Playwright end-to-end tes
 **Not verified:** the portal running on Render itself and a staff sign-in to the live API (the admin password exists
 only in the owner's Render dashboard).
 
+### Test sign-in codes in the admin portal (4 Nov 2026)
+
+**Why:** no SMS provider is integrated yet, so on staging a code requested with "Continue with mobile number" only
+reached the server log, which testers couldn't see. **Built:** codes sent by the logging sender are kept in memory
+(last 20, one hour) and shown on the admin Dashboard to Support/SuperAdmin with a live expiry countdown. The endpoint
+returns 404 unless `Otp:Provider=log` (refused in Production), and phone numbers show only their last 4 digits.
+**Verified:** 73 backend tests (4 new: masking/ordering/capacity, role check, absent with a real provider) and 12
+Playwright tests (new: a code requested through the API appears on the dashboard and signs the tester in; teachers
+don't see the panel). **Still needed for real users:** an SMS provider (see roadmap 1e).
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |

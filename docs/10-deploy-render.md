@@ -1,7 +1,8 @@
 # Deploying to Render (staging)
 
 This creates a **staging** setup: the API, a PostgreSQL database and the admin portal, in Render's Singapore region, loaded with the
-sample content. Payments are simulated and OTP codes go to the server log, so it is for testing the apps, not for real
+sample content. Payments are simulated and sign-in codes for mobile numbers aren't sent by SMS (staff see them in the
+admin portal), so it is for testing the apps, not for real
 students. Everything is defined in [`render.yaml`](../render.yaml).
 
 ## One-time setup (about 10 minutes)
@@ -46,7 +47,7 @@ to a minute (longer if the API is asleep too).
 | API docs (staging only) | `https://<service>.onrender.com/swagger` |
 | Admin portal | `https://<admin-service>.onrender.com/admin` |
 | Admin account | `Seed__AdminEmail` / `Seed__AdminPassword` |
-| Students | register in the app with email; mobile OTP codes appear in the service **Logs** |
+| Students | register in the app with email, or with a mobile number: no SMS is sent on staging, so the code appears on the admin portal's **Dashboard → Test sign-in codes** (and in the API service's **Logs**) |
 | Payments | simulated: checkout cannot complete. Grant course access from the admin portal (Students → Grant course access) or the API |
 
 ## Costs and limits on the free plans
@@ -71,7 +72,8 @@ simulated gateway or logged OTPs, so you will need:
 
 - Razorpay live keys: `Razorpay__UseFakeGateway=false`, `Razorpay__KeyId`, `Razorpay__KeySecret`,
   `Razorpay__WebhookSecret`, and the webhook URL `https://<api>/api/v1/payments/webhooks` registered in Razorpay.
-- `Otp__Provider=disabled` until an SMS provider (MSG91 with a DLT-approved template) is implemented.
+- `Otp__Provider=disabled` until an SMS provider (MSG91 with a DLT-approved template) is implemented. The admin
+  portal's test sign-in codes panel exists only while `Otp__Provider=log`, which Production refuses.
 - `Seed__SampleContent=false`, a paid database plan with backups, and the Bunny Stream settings for video
   (`Video__LibraryId`, `Video__TokenKey`, `Video__CdnHost`, `Video__CdnTokenKey`).
 - `Database__MigrateOnStartup=false` with migrations run as a release step, and a custom domain.

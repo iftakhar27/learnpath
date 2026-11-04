@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { API_URL } from "../playwright.config";
 import { apiGet, apiLogin, apiPost, ADMIN, expectToast, registerStudent, signIn, unique } from "./helpers";
 
 test("teachers edit content but cannot publish or reach admin-only areas", async ({ page, request }) => {
@@ -11,6 +12,7 @@ test("teachers edit content but cannot publish or reach admin-only areas", async
   const nav = page.getByRole("navigation", { name: "Admin" });
   await expect(nav.getByRole("link", { name: "Question bank" })).toBeVisible();
   for (const hidden of ["Students", "Orders", "Announcements", "Audit log"]) await expect(nav.getByRole("link", { name: hidden })).toHaveCount(0);
+  await expect(page.getByText("Test sign-in codes")).toHaveCount(0);
 
   await page.goto("/admin/audit");
   await expect(page.getByText("You don't have access to this section.")).toBeVisible();
@@ -81,4 +83,22 @@ test("announcements reach enrolled students", async ({ page, request }) => {
 
   const inbox = await apiGet(request, "/api/v1/notifications", student.token);
   expect(inbox.items.some((n: { title: string }) => n.title === title)).toBe(true);
+});
+
+test("sign-in codes requested in the app appear on the dashboard and work", async ({ page, request }) => {
+  const phone = `9${String(Date.now()).slice(-9)}`;
+  const requested = await request.post(`${API_URL}/api/v1/auth/otp/request`, { data: { phone } });
+  expect(requested.status()).toBe(202);
+
+  await signIn(page);
+  await expect(page.getByText("Test sign-in codes")).toBeVisible();
+  const row = page.getByRole("row").filter({ hasText: `•${phone.slice(-4)}` });
+  await expect(row).toContainText("Valid for");
+  const code = (await row.getByRole("cell").nth(1).innerText()).trim();
+  expect(code).toMatch(/^\d{6}$/);
+
+  // The code shown is the real one: the app's verify call signs the tester in with it.
+  const verified = await request.post(`${API_URL}/api/v1/auth/otp/verify`, { data: { phone, code, fullName: "E2E Phone Tester", acceptTerms: true } });
+  expect(verified.ok(), `verify -> ${verified.status()}`).toBeTruthy();
+  expect((await verified.json()).accessToken).toBeTruthy();
 });
