@@ -752,21 +752,25 @@ class _ReviewCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Text(l.questionOf(q.number, total), style: Theme.of(context).textTheme.labelLarge),
-                const SizedBox(width: 8),
-                Pill(label, color: color),
-                const Spacer(),
-                Text(l.marksAwarded(formatNumber(q.marksAwarded))),
-                IconButton(
-                  tooltip: l.reportQuestion,
-                  icon: const Icon(Icons.flag_outlined, size: 20),
-                  onPressed: () => showReportSheet(context, ref, q.questionId),
-                ),
-              ],
+            // Separate semantics nodes so screen readers announce the header, question and explanation in turn.
+            Semantics(
+              container: true,
+              child: Row(
+                children: [
+                  Text(l.questionOf(q.number, total), style: Theme.of(context).textTheme.labelLarge),
+                  const SizedBox(width: 8),
+                  Pill(label, color: color),
+                  const Spacer(),
+                  Text(l.marksAwarded(formatNumber(q.marksAwarded))),
+                  IconButton(
+                    tooltip: l.reportQuestion,
+                    icon: const Icon(Icons.flag_outlined, size: 20),
+                    onPressed: () => showReportSheet(context, ref, q.questionId),
+                  ),
+                ],
+              ),
             ),
-            Text('${q.subject} · ${q.topic}', style: Theme.of(context).textTheme.bodySmall),
+            Semantics(container: true, child: Text('${q.subject} · ${q.topic}', style: Theme.of(context).textTheme.bodySmall)),
             const SizedBox(height: 8),
             QuestionView(
               type: q.type,
@@ -791,7 +795,16 @@ class _ReviewCard extends ConsumerWidget {
               Text(l.yourAnswer(q.yourNumericAnswer == null ? l.notAnswered : formatNumber(q.yourNumericAnswer!))),
               if (q.correctNumericAnswer != null) Text(l.correctAnswer(formatNumber(q.correctNumericAnswer!)), style: TextStyle(color: scheme.success)),
             ],
-            if (q.explanation != null) ...[const SizedBox(height: 8), Text(l.explanation, style: Theme.of(context).textTheme.titleSmall), Text(q.explanation!)],
+            if (q.explanation != null) ...[
+              const SizedBox(height: 8),
+              Semantics(
+                container: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [Text(l.explanation, style: Theme.of(context).textTheme.titleSmall), Text(q.explanation!)],
+                ),
+              ),
+            ],
           ],
         ),
       ),

@@ -56,6 +56,9 @@ flutter test
 - `test/models_test.dart` — generated models against real API JSON.
 - `test/app_flow_test.dart` — the whole app against a fake API: Hindi switch, form validation, server errors, sign-in →
   onboarding → home redirects, option selection rules.
+- `test/exam_flow_test.dart` — exam player: autosave payloads, mark for review, palette navigation, submit counts, result.
+- `tool/browser_demo.js` — optional smoke test that drives the web build against a real development API with
+  Playwright and saves screenshots to `build/demo/` (instructions at the top of the file).
 
 ## Code map
 
@@ -79,7 +82,8 @@ After editing ARB files: `flutter gen-l10n` (also runs on build).
 
 ## Notes and known gaps
 
-- Hindi translations were written by the developer and need review by a native speaker before launch.
+- Hindi translations were written by the developer and need review by a native speaker before launch. Study-plan
+  reasons come from the API in English for now.
 - Video plays through an HLS stream URL from the API (`Video:CdnHost` / `Video:CdnTokenKey` on the backend). Without
   that configured, the video screen shows "This video can't be played right now". DRM and offline downloads are out
   of MVP scope.

@@ -88,7 +88,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: _rootKey,
         path: '/practice/session',
-        builder: (_, s) => PracticeSessionScreen(request: s.extra as CreatePracticeRequest? ?? const CreatePracticeRequest(mode: 'incorrect')),
+        // `extra` is in-memory only: after a browser back/forward or a restart it can be null or a different type.
+        builder: (_, s) => PracticeSessionScreen(
+          request: s.extra is CreatePracticeRequest ? s.extra! as CreatePracticeRequest : const CreatePracticeRequest(mode: 'incorrect'),
+        ),
       ),
       GoRoute(
         parentNavigatorKey: _rootKey,
@@ -98,7 +101,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: _rootKey,
         path: '/exam/:id',
-        builder: (_, s) => ExamScreen(attemptId: s.pathParameters['id']!, initial: s.extra as AttemptDto?),
+        builder: (_, s) => ExamScreen(attemptId: s.pathParameters['id']!, initial: s.extra is AttemptDto ? s.extra! as AttemptDto : null),
       ),
       GoRoute(
         parentNavigatorKey: _rootKey,

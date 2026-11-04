@@ -78,14 +78,19 @@
 
 ### Verified
 - `dotnet test`: **63 passed, 0 failed** (adds video URL signing tests).
-- `flutter analyze`: no issues. `flutter test`: **19 passed, 0 failed** (token refresh single-flight, exam session
-  logic, generated models, full-app widget flows with a fake API).
-- Android release APK: first build in progress at the time of this commit (not yet verified).
-- Browser-driven demo of the app against the live API: not yet run.
+- `flutter analyze`: no issues. `flutter test`: **20 passed, 0 failed** (token refresh single-flight, exam session
+  logic, generated models, full-app widget flows with a fake API, exam player end to end).
+- Android release APK built (`com.learnpath.app`, Android 7.0+, 58 MB, arm64/armv7/x86_64, debug-signed for testing).
+  Not yet installed on a physical device.
+- `mobile/tool/browser_demo.js` drove the web build against the live API through 21 screens (welcome in both
+  languages, sign-in, onboarding, home, catalog, course, topic, practice with feedback, tests, instructions, exam,
+  palette, submit, result, review, profile, Hindi home) with no page errors. It found and fixed: an unsafe route
+  `extra` cast that crashed after browser back/forward, and question text exposed to screen readers as a disabled text box.
 
 ### Known gaps
 - iOS build not produced (needs macOS/Xcode). Razorpay checkout and video playback need device testing with real keys.
-- Hindi strings need native-speaker review. Push notifications (FCM) and offline downloads are not implemented.
+- Hindi strings need native-speaker review. Study-plan task titles and reasons are generated in English by the API
+  (to be localized server-side). Push notifications (FCM) and offline downloads are not implemented.
 - Release APK is signed with the debug key; create an upload key before publishing.
 
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)

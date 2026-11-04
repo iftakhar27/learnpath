@@ -84,7 +84,7 @@ class _QuestionViewState extends State<QuestionView> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ?widget.header,
-        SelectableText(widget.stem, style: Theme.of(context).textTheme.titleMedium?.copyWith(height: 1.4)),
+        Text(widget.stem, style: Theme.of(context).textTheme.titleMedium?.copyWith(height: 1.4)),
         if (widget.imageUrl != null)
           Padding(
             padding: const EdgeInsets.only(top: 12),
