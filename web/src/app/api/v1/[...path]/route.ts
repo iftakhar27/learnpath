@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { API_BASE_URL, applyAccessResult, isSameOrigin, problem, resolveAccess } from "@/lib/server/session";
+import { API_BASE_URL, apiNotConfigured, applyAccessResult, isSameOrigin, problem, resolveAccess } from "@/lib/server/session";
 
 /**
  * Forwards /api/v1/* from the browser to the backend API with the session's bearer token.
@@ -17,6 +17,9 @@ async function forward(req: NextRequest, ctx: RouteContext<"/api/v1/[...path]">)
   if (req.method !== "GET" && req.method !== "HEAD" && !isSameOrigin(req)) {
     return problem(403, "cross_origin", "Cross-origin request rejected.");
   }
+
+  const notConfigured = apiNotConfigured();
+  if (notConfigured) return notConfigured;
 
   const url = `${API_BASE_URL}/api/v1/${path.map(encodeURIComponent).join("/")}${req.nextUrl.search}`;
   const body = req.method === "GET" || req.method === "HEAD" ? undefined : await req.arrayBuffer();

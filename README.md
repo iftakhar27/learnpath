@@ -96,7 +96,7 @@ Integration tests create and drop a temporary database `learnpath_test_*`. Point
 
 ## Deployment
 
-**Staging on Render:** `render.yaml` defines the API and database. Follow [`docs/10-deploy-render.md`](docs/10-deploy-render.md).
+**Staging on Render:** `render.yaml` defines the API, the database and the admin portal. Follow [`docs/10-deploy-render.md`](docs/10-deploy-render.md).
 
 ### Any container host (lean)
 

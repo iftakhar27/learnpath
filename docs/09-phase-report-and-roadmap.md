@@ -117,6 +117,22 @@ after the free instance sleeps can wait for it to wake.
 **Not verified:** the app on a physical phone against the live server (to be done by the owner), Razorpay and video
 playback (simulated gateway, no Bunny Stream configured).
 
+### Admin portal deployment (4 Nov 2026)
+
+**Built:** `learnpath-admin` service in `render.yaml` (Node 22, `web/` root, `npm ci && npm run build`, `npm start`),
+`API_BASE_URL` entered once in Render, secure cookies on. Without `API_BASE_URL` in production the portal now answers
+503 `api_not_configured` with a plain message instead of trying localhost. Build filters: API changes redeploy only the
+API, `web/` changes only the portal.
+
+**Verified here:** a clean `npm ci` + production build of `web/` (as Render runs it), started with `npm start` and
+pointed at the live staging API: home 200, admin pages redirect signed-out visitors to login with a relative
+`Location`, the catalog loads through the server-side proxy, a student account is refused (`not_staff`, no cookies
+set), a wrong password returns the API's 401, cross-site POSTs get 403, `/api/v1/auth/*` isn't exposed, and the
+unconfigured copy returns 503. Typecheck clean; all 11 Playwright end-to-end tests pass against a local API.
+
+**Not verified:** the portal running on Render itself and a staff sign-in to the live API (the admin password exists
+only in the owner's Render dashboard).
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |

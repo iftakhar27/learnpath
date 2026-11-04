@@ -21,6 +21,11 @@ services:
     branch: mobile-app        # change to main after merging
     dockerfilePath: ./Dockerfile
     dockerContext: .
+    buildFilter:                # only API changes redeploy it (web/, mobile/ and docs/ don't)
+      paths:
+        - src/**
+        - Dockerfile
+        - .dockerignore
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -52,3 +57,27 @@ services:
         value: log
       - key: Branding__ProductName
         value: LearnPath
+
+  # Admin web portal (Next.js). Its server calls the API, so tokens stay in httpOnly cookies and no CORS is needed.
+  - type: web
+    name: learnpath-admin
+    runtime: node
+    plan: free
+    region: singapore
+    branch: mobile-app        # change to main after merging
+    rootDir: web              # only changes under web/ redeploy it
+    buildCommand: npm ci --no-audit --no-fund && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: API_BASE_URL                           # the API service's URL, e.g. https://learnpath-api-xxxx.onrender.com
+        sync: false
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: NEXT_PUBLIC_BRAND_NAME
+        value: LearnPath
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"

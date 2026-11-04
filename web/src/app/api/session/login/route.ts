@@ -1,9 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { API_BASE_URL, STAFF_ROLES, isSameOrigin, problem, setSessionCookies, type AuthTokens } from "@/lib/server/session";
+import { API_BASE_URL, STAFF_ROLES, apiNotConfigured, isSameOrigin, problem, setSessionCookies, type AuthTokens } from "@/lib/server/session";
 
 /** Email/password login. With `staffOnly`, accounts without a staff role are refused and no session is created. */
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) return problem(403, "cross_origin", "Cross-origin request rejected.");
+  const notConfigured = apiNotConfigured();
+  if (notConfigured) return notConfigured;
   let input: { email?: string; password?: string; staffOnly?: boolean };
   try {
     input = await req.json();

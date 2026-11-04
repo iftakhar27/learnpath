@@ -9,7 +9,8 @@ import type { NextRequest, NextResponse } from "next/server";
  * /api/v1/* (see app/api/v1/[...path]/route.ts), which attaches the access token and refreshes it when needed.
  */
 
-export const API_BASE_URL = (process.env.API_BASE_URL ?? "http://localhost:5080").replace(/\/$/, "");
+const configuredApiUrl = process.env.API_BASE_URL?.trim();
+export const API_BASE_URL = (configuredApiUrl || "http://localhost:5080").replace(/\/$/, "");
 export const ACCESS_COOKIE = "lp_at";
 export const REFRESH_COOKIE = "lp_rt";
 const REFRESH_COOKIE_DAYS = 30;
@@ -113,6 +114,15 @@ export function isSameOrigin(req: NextRequest): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * In production the API address must be set explicitly. Falling back to localhost there would only ever produce a
+ * vague "unreachable" error, so routes answer with this instead.
+ */
+export function apiNotConfigured(): Response | null {
+  if (configuredApiUrl || process.env.NODE_ENV !== "production") return null;
+  return problem(503, "api_not_configured", "The admin portal isn't connected to the API yet: set API_BASE_URL on the web server.");
 }
 
 export function problem(status: number, code: string, title: string) {
