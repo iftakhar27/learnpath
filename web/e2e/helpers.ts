@@ -50,3 +50,23 @@ export async function apiPost(request: APIRequestContext, path: string, token: s
 export async function expectToast(page: Page, text: string | RegExp) {
   await expect(page.getByRole("status").filter({ hasText: text }).first()).toBeVisible();
 }
+
+/** Finishes onboarding through the API so a test can start on the student home page. */
+export async function onboardStudent(request: APIRequestContext, token: string, language: "en" | "hi" = "en") {
+  const exams = await apiGet(request, "/api/v1/exams", token);
+  const neet = exams.find((e: { code: string }) => e.code.startsWith("NEET")) ?? exams[0];
+  const res = await request.put(`${API_URL}/api/v1/student/profile`, {
+    headers: { authorization: `Bearer ${token}` },
+    data: { targetExamId: neet.id, targetYear: new Date().getFullYear() + 1, classLevel: "12", board: "CBSE", dailyStudyMinutes: 120, language, completeOnboarding: true },
+  });
+  expect(res.ok(), `onboarding -> ${res.status()}`).toBeTruthy();
+}
+
+/** Signs a student in on the website with email and password. */
+export async function studentSignIn(page: Page, email: string, password: string, path = "/login") {
+  await page.goto(path);
+  await page.getByRole("tab", { name: "Email" }).click();
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(password);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+}

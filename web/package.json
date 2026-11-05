@@ -9,10 +9,12 @@
     "lint": "eslint",
     "gen:api": "openapi-typescript ../docs/openapi.json -o src/lib/api/schema.d.ts",
     "typecheck": "tsc --noEmit",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "gen:messages": "node scripts/gen-messages.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.105.0",
+    "intl-messageformat": "^10.7.18",
     "next": "16.4.3",
     "openapi-fetch": "^0.17.0",
     "react": "19.3.0",

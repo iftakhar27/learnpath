@@ -5,12 +5,15 @@ import { useState, type ReactNode } from "react";
 import { ApiError } from "@/lib/api/client";
 import { ToastProvider } from "@/components/ui/toast";
 
-/** A 401 anywhere means the session ended (expired, revoked, or logged out elsewhere): go back to login. */
+const PUBLIC_PATHS = ["/", "/login", "/register", "/admin/login"];
+
+/** A 401 anywhere means the session ended (expired, revoked, or logged out elsewhere): go back to that area's login. */
 function onAuthError(error: unknown) {
-  if (error instanceof ApiError && error.status === 401 && !window.location.pathname.startsWith("/admin/login")) {
-    const next = encodeURIComponent(window.location.pathname + window.location.search);
+  const { pathname, search } = window.location;
+  if (error instanceof ApiError && error.status === 401 && !PUBLIC_PATHS.includes(pathname)) {
+    const login = pathname.startsWith("/admin") ? "/admin/login" : "/login";
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload clears every cached query after a session change
-    window.location.assign(`/admin/login?next=${next}&expired=1`);
+    window.location.assign(`${login}?next=${encodeURIComponent(pathname + search)}&expired=1`);
   }
 }
 

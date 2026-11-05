@@ -1,0 +1,48 @@
+/**
+ * Strings only the website needs. Everything shared with the mobile app comes from mobile/lib/l10n (see
+ * messages.gen.ts). Hindi text was written by the developer and needs native-speaker review, like the app's.
+ */
+export const webMessages = {
+  en: {
+    landingTitle: "Prepare smarter for NEET, JEE and Boards",
+    landingBody: "Video lessons, practice with instant solutions, full-length tests and a study plan that adapts to you — in English and Hindi.",
+    landingFeatureLearn: "Learn chapter by chapter with short videos and notes",
+    landingFeaturePractice: "Practise questions and see the solution straight away",
+    landingFeatureTests: "Take timed tests and see exactly where to improve",
+    getStarted: "Get started",
+    orDivider: "or",
+    welcomeBack: "Welcome back",
+    signInSubtitle: "Sign in to continue your preparation.",
+    createAccountSubtitle: "Free to start. No card needed.",
+    skipToContent: "Skip to content",
+    primaryNav: "Main",
+    openMenu: "Open menu",
+    unreadCount: "{count, plural, =0{No unread notifications} =1{1 unread notification} other{{count} unread notifications}}",
+    staffPortal: "Staff? Go to the admin portal",
+    stepOf: "Step {current} of {total}",
+    pageNotFound: "This page doesn't exist.",
+    backHome: "Back to home",
+    comingSoon: "This section is coming soon on the website. Use the mobile app for now.",
+  },
+  hi: {
+    landingTitle: "NEET, JEE और बोर्ड की स्मार्ट तैयारी",
+    landingBody: "वीडियो लेसन, तुरंत समाधान के साथ अभ्यास, फुल-लेंथ टेस्ट और आपके हिसाब से बदलने वाला स्टडी प्लान — हिंदी और अंग्रेज़ी में।",
+    landingFeatureLearn: "छोटे वीडियो और नोट्स के साथ अध्याय दर अध्याय सीखें",
+    landingFeaturePractice: "प्रश्नों का अभ्यास करें और तुरंत हल देखें",
+    landingFeatureTests: "समयबद्ध टेस्ट दें और जानें कि कहाँ सुधार करना है",
+    getStarted: "शुरू करें",
+    orDivider: "या",
+    welcomeBack: "फिर से स्वागत है",
+    signInSubtitle: "अपनी तैयारी जारी रखने के लिए साइन इन करें।",
+    createAccountSubtitle: "शुरुआत मुफ़्त है। कार्ड की ज़रूरत नहीं।",
+    skipToContent: "मुख्य सामग्री पर जाएँ",
+    primaryNav: "मुख्य",
+    openMenu: "मेनू खोलें",
+    unreadCount: "{count, plural, =0{कोई नई सूचना नहीं} =1{1 नई सूचना} other{{count} नई सूचनाएँ}}",
+    staffPortal: "स्टाफ़? एडमिन पोर्टल पर जाएँ",
+    stepOf: "चरण {current} / {total}",
+    pageNotFound: "यह पेज मौजूद नहीं है।",
+    backHome: "होम पर वापस जाएँ",
+    comingSoon: "यह सेक्शन जल्द ही वेबसाइट पर आएगा। अभी के लिए मोबाइल ऐप का उपयोग करें।",
+  },
+} as const satisfies Record<"en" | "hi", Record<string, string>>;

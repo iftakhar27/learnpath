@@ -1,8 +1,18 @@
 import createClient from "openapi-fetch";
 import type { paths } from "./schema";
+import { getLanguage } from "@/lib/i18n/current";
 
 /** Typed client for the backend API. Calls go through the same-origin BFF proxy at /api/v1/*. */
 export const api = createClient<paths>({ baseUrl: "" });
+
+// Student pages get API content (titles, explanations, plan reasons) in the chosen language. The admin portal
+// edits both languages side by side, so it keeps the default.
+api.use({
+  onRequest({ request }) {
+    if (typeof window !== "undefined" && !window.location.pathname.startsWith("/admin")) request.headers.set("accept-language", getLanguage());
+    return request;
+  },
+});
 
 /** Problem-details error from the API, with the stable machine-readable `code`. */
 export class ApiError extends Error {
