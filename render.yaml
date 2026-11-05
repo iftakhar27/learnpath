@@ -57,8 +57,12 @@ services:
         generateValue: true
       - key: Razorpay__WebhookSecret
         generateValue: true
-      - key: Otp__Provider
-        value: log
+      - key: Otp__Provider                          # log (codes on the admin Dashboard) or msg91 (real SMS); set in Render
+        sync: false
+      - key: Otp__Msg91__AuthKey                    # MSG91 auth key (only for Otp__Provider=msg91)
+        sync: false
+      - key: Otp__Msg91__TemplateId                 # MSG91 OTP template id (DLT-approved, contains ##OTP##)
+        sync: false
       - key: Branding__ProductName
         value: LearnPath
 

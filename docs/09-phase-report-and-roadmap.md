@@ -181,6 +181,18 @@ cross-site "CDN" (the code path Bunny Stream uses).
 copy review (study-plan reasons are still generated in English), no search page on the web yet, and a full page load
 renders English first for Hindi users.
 
+### SMS sign-in codes via MSG91 (5 Nov 2026)
+
+**Built:** `Otp:Provider=msg91` sends the API's own code through MSG91 SendOTP (template, `mobile` with country code,
+`otp`, `otp_length`, `otp_expiry`=5, `authkey` header), checked against MSG91's published OpenAPI and a live call to its
+endpoint (errors come back as HTTP 200 with `type: "error"`, so the body decides). Startup fails if the key or template
+is missing. A failed send removes the stored code so the student can ask again at once, and returns
+`503 otp_send_failed` (translated on the website). The MSG91 client's request logging is removed because the code is in
+the URL. **Verified:** 8 new backend tests with a fake MSG91 (request shape, error-in-200, 401, HTML 502, network
+failure, full SMS sign-in, immediate retry after a failure, refusal to start without a key) and a check that the
+no-codes-in-logs test fails without the safeguard. **Not verified:** a real SMS (needs the owner's DLT registration and
+MSG91 account).
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |

@@ -53,6 +53,27 @@ to a minute (longer if the API is asleep too).
 | Students | register in the app with email, or with a mobile number: no SMS is sent on staging, so the code appears on the admin portal's **Dashboard → Test sign-in codes** (and in the API service's **Logs**) |
 | Payments | simulated: checkout cannot complete. Grant course access from the admin portal (Students → Grant course access) or the API |
 
+## SMS sign-in codes (MSG91)
+
+Staging starts with `Otp__Provider=log`: no SMS is sent and codes show on the admin **Dashboard → Test sign-in codes**.
+To send real SMS:
+
+1. **DLT registration (India, required by TRAI):** register your business as a Principal Entity on a DLT portal
+   (e.g. Jio, Vodafone Idea, Airtel), register a 6-letter **sender ID** (header) and an OTP **content template**, e.g.
+   `{#var#} is your LearnPath sign-in code. It is valid for 5 minutes. Do not share it with anyone.` Approval usually takes
+   a few days to two weeks.
+2. **MSG91:** create an account, add the DLT entity and sender ID, then in **OTP → Templates** create a template whose
+   text matches the approved DLT template with `##OTP##` in place of the variable, and enter its DLT template ID. Copy the
+   MSG91 **template ID** and, under your account, the **auth key**. Add credit to the account.
+3. **Render → learnpath-api → Environment:** set `Otp__Provider` = `msg91`, `Otp__Msg91__AuthKey` = your auth key,
+   `Otp__Msg91__TemplateId` = the template ID, then **Save and deploy**. The API refuses to start with `msg91` if either
+   value is missing, so a typo shows up in the deploy log rather than as silent failures.
+4. Try it: "Continue with mobile number" in the app or on the website. The code arrives by SMS (valid 5 minutes).
+
+The API still generates, stores (hashed) and checks every code; MSG91 only delivers it. If MSG91 rejects a send (no
+credit, wrong template, outage) the student sees "We couldn't send the code right now" and can ask again at once, and the
+reason is in the API's logs (`MSG91 SendOTP failed`). Codes are never written to the logs.
+
 ## Video lessons
 
 On staging the sample lessons play a **public demo stream** (Big Buck Bunny, an open-licence film, from Mux's public
@@ -95,8 +116,8 @@ simulated gateway or logged OTPs, so you will need:
 
 - Razorpay live keys: `Razorpay__UseFakeGateway=false`, `Razorpay__KeyId`, `Razorpay__KeySecret`,
   `Razorpay__WebhookSecret`, and the webhook URL `https://<api>/api/v1/payments/webhooks` registered in Razorpay.
-- `Otp__Provider=disabled` until an SMS provider (MSG91 with a DLT-approved template) is implemented. The admin
-  portal's test sign-in codes panel exists only while `Otp__Provider=log`, which Production refuses.
+- `Otp__Provider=msg91` with `Otp__Msg91__AuthKey` and `Otp__Msg91__TemplateId` (see above). The admin portal's test
+  sign-in codes panel exists only while `Otp__Provider=log`, which Production refuses.
 - `Seed__SampleContent=false`, a paid database plan with backups, and the Bunny Stream settings for video
   (`Video__LibraryId`, `Video__TokenKey`, `Video__CdnHost`, `Video__CdnTokenKey`).
 - `Database__MigrateOnStartup=false` with migrations run as a release step, and a custom domain.

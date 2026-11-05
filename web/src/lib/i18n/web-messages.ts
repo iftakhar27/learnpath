@@ -48,6 +48,8 @@ export const webMessages = {
     unread: "Unread",
     removed: "Removed",
     serverStarting: "The server is starting up. Please try again in a few seconds.",
+    otpSendFailed: "We couldn't send the code right now. Please try again in a minute, or sign in with email.",
+    otpUnavailable: "Sign-in with a mobile number isn't available yet. Please use email.",
   },
   hi: {
     landingTitle: "NEET, JEE और बोर्ड की स्मार्ट तैयारी",
@@ -94,5 +96,7 @@ export const webMessages = {
     unread: "अपठित",
     removed: "हटा दिया गया",
     serverStarting: "सर्वर शुरू हो रहा है। कुछ सेकंड में फिर से कोशिश करें।",
+    otpSendFailed: "अभी कोड नहीं भेजा जा सका। एक मिनट बाद फिर से कोशिश करें, या ईमेल से साइन इन करें।",
+    otpUnavailable: "मोबाइल नंबर से साइन इन अभी उपलब्ध नहीं है। कृपया ईमेल का उपयोग करें।",
   },
 } as const satisfies Record<"en" | "hi", Record<string, string>>;

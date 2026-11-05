@@ -20,7 +20,7 @@ public static class OtpPolicy
 /// <summary>
 /// Test-server sender: writes the OTP to the log and keeps the latest codes in <see cref="TestOtpOutbox"/> so staff can
 /// read them in the admin portal. Program.cs refuses to start in Production with this sender.
-/// Replace with an SMS provider (e.g. MSG91 with a DLT-registered template) before launch.
+/// Production uses <see cref="Msg91OtpSender"/> (Otp:Provider = msg91).
 /// </summary>
 public class LoggingOtpSender(ILogger<LoggingOtpSender> logger, TestOtpOutbox outbox, TimeProvider clock) : IOtpSender
 {
@@ -61,6 +61,57 @@ public class TestOtpOutbox
 
     /// <summary>Last four digits are enough for a tester to find their own code.</summary>
     public static string Mask(string phone) => phone.Length <= 4 ? phone : new string('•', phone.Length - 4) + phone[^4..];
+}
+
+public sealed class Msg91Options
+{
+    public string AuthKey { get; set; } = "";
+    /// <summary>OTP template from MSG91's OTP section (DLT-approved, contains ##OTP##).</summary>
+    public string TemplateId { get; set; } = "";
+    public string BaseUrl { get; set; } = "https://control.msg91.com";
+}
+
+/// <summary>
+/// Delivers the API's own sign-in code by SMS through MSG91's SendOTP API. The API still generates, stores (hashed) and
+/// verifies every code; MSG91 only sends it. The code travels in the request URL, so this client's request logging is
+/// switched off (Program.cs) and failures are logged without it.
+/// </summary>
+public class Msg91OtpSender(HttpClient http, Microsoft.Extensions.Options.IOptions<Msg91Options> options, ILogger<Msg91OtpSender> logger) : IOtpSender
+{
+    public async Task SendAsync(string phone, string code, CancellationToken ct)
+    {
+        var o = options.Value;
+        var mobile = phone.TrimStart('+'); // international format with country code, e.g. 919876543210
+        var url = $"{o.BaseUrl.TrimEnd('/')}/api/v5/otp?template_id={Uri.EscapeDataString(o.TemplateId)}&mobile={Uri.EscapeDataString(mobile)}"
+                  + $"&otp={Uri.EscapeDataString(code)}&otp_length={code.Length}&otp_expiry={(int)Math.Ceiling(OtpPolicy.Lifetime.TotalMinutes)}";
+        using var req = new HttpRequestMessage(HttpMethod.Post, url) { Content = JsonContent.Create(new { }) };
+        req.Headers.Add("authkey", o.AuthKey);
+
+        HttpResponseMessage res;
+        try
+        {
+            res = await http.SendAsync(req, ct);
+        }
+        catch (Exception e) when (e is HttpRequestException || (e is TaskCanceledException && !ct.IsCancellationRequested))
+        {
+            logger.LogWarning("MSG91 unreachable sending a code to ...{Suffix}: {Error}", phone[^4..], e.Message);
+            throw SendFailed();
+        }
+        using (res)
+        {
+            Msg91Response? body = null;
+            try { body = await res.Content.ReadFromJsonAsync<Msg91Response>(ct); }
+            catch (System.Text.Json.JsonException) { /* not JSON: treated as a failure below */ }
+            // MSG91 reports most errors with HTTP 200 and type "error", so the body decides.
+            if (res.IsSuccessStatusCode && string.Equals(body?.Type, "success", StringComparison.OrdinalIgnoreCase)) return;
+            logger.LogError("MSG91 SendOTP failed ({Status}) for ...{Suffix}: {Message}", (int)res.StatusCode, phone[^4..], body?.Message ?? "no message");
+            throw SendFailed();
+        }
+    }
+
+    private static AppException SendFailed() => new(503, "otp_send_failed", "We couldn't send the code right now. Please try again in a minute.");
+
+    private sealed record Msg91Response(string? Type, string? Message, [property: JsonPropertyName("request_id")] string? RequestId);
 }
 
 // ---------- Video ----------

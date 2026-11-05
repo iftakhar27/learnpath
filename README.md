@@ -85,7 +85,8 @@ Integration tests create and drop a temporary database `learnpath_test_*`. Point
 | `Seed__SampleContent` | `true` to load demo content (never in production) |
 | `Razorpay__KeyId`, `Razorpay__KeySecret`, `Razorpay__WebhookSecret` | Payment gateway |
 | `Razorpay__UseFakeGateway` | Offline gateway for dev/tests (refused in Production) |
-| `Otp__Provider` | `log` (codes in the log; refused in Production) or `disabled` (default). No SMS sender is implemented yet |
+| `Otp__Provider` | `msg91` (real SMS), `log` (codes in the log and the admin Dashboard; refused in Production) or `disabled` (default) |
+| `Otp__Msg91__AuthKey`, `Otp__Msg91__TemplateId` | MSG91 auth key and DLT-approved OTP template (with `##OTP##`); required for `msg91` |
 | `Video__LibraryId`, `Video__TokenKey` | Bunny Stream signed playback |
 | `Storage__CdnBaseUrl`, `Storage__SigningKey` | Signed PDF URLs |
 | `Cors__Origins__0..n` | Allowed web origins |

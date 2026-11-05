@@ -36,13 +36,21 @@ var useFakePayments = config.GetValue<bool>("Razorpay:UseFakeGateway");
 // OTP: "log" writes codes to the log (development/staging only); "disabled" turns mobile sign-in off.
 // No SMS provider (e.g. MSG91) is implemented yet, so Production must use "disabled" until one is added.
 var otpProvider = config.GetValue("Otp:Provider", "log")!.ToLowerInvariant();
-if (otpProvider is not ("log" or "disabled"))
-    throw new InvalidOperationException($"Otp:Provider '{otpProvider}' is not implemented. Use 'disabled' (or 'log' outside Production).");
+if (otpProvider is not ("log" or "disabled" or "msg91"))
+    throw new InvalidOperationException($"Otp:Provider '{otpProvider}' is not supported. Use 'msg91', 'disabled', or 'log' outside Production.");
+if (otpProvider == "msg91" && (string.IsNullOrWhiteSpace(config["Otp:Msg91:AuthKey"]) || string.IsNullOrWhiteSpace(config["Otp:Msg91:TemplateId"])))
+    throw new InvalidOperationException("Otp:Provider is 'msg91' but Otp:Msg91:AuthKey or Otp:Msg91:TemplateId is not set.");
 if (builder.Environment.IsProduction() && (useFakePayments || otpProvider == "log"))
     throw new InvalidOperationException("Fake payment gateway / logging OTP sender are not allowed in Production.");
 if (useFakePayments) builder.Services.AddSingleton<IPaymentGateway, FakePaymentGateway>();
 else builder.Services.AddHttpClient<IPaymentGateway, RazorpayGateway>(c => c.Timeout = TimeSpan.FromSeconds(15));
 if (otpProvider == "disabled") builder.Services.AddSingleton<IOtpSender, DisabledOtpSender>();
+else if (otpProvider == "msg91")
+{
+    builder.Services.Configure<Msg91Options>(config.GetSection("Otp:Msg91"));
+    // No request logging: the code is part of the request URL and must never reach the logs.
+    builder.Services.AddHttpClient<IOtpSender, Msg91OtpSender>(c => c.Timeout = TimeSpan.FromSeconds(10)).RemoveAllLoggers();
+}
 else
 {
     builder.Services.AddSingleton<TestOtpOutbox>(); // read by GET /api/v1/admin/test-otp-codes

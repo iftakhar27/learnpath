@@ -70,9 +70,20 @@ public partial class AuthController(AppDbContext db, TokenService tokens, IOtpSe
             throw new AppException(429, "otp_limit", "Too many OTP requests. Try again in 15 minutes.");
 
         var code = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
-        db.OtpCodes.Add(new OtpCode { Phone = phone, CodeHash = Hashing.Sha256(phone + ":" + code), CreatedAt = now, ExpiresAt = now + OtpPolicy.Lifetime });
+        var otp = new OtpCode { Phone = phone, CodeHash = Hashing.Sha256(phone + ":" + code), CreatedAt = now, ExpiresAt = now + OtpPolicy.Lifetime };
+        db.OtpCodes.Add(otp);
         await db.SaveChangesAsync(ct);
-        await otpSender.SendAsync(phone, code, ct);
+        try
+        {
+            await otpSender.SendAsync(phone, code, ct);
+        }
+        catch
+        {
+            // Not delivered: forget the code so the student can ask again straight away (not "wait 30 seconds").
+            db.OtpCodes.Remove(otp);
+            await db.SaveChangesAsync(CancellationToken.None);
+            throw;
+        }
         return Accepted(new { expiresInSeconds = (int)OtpPolicy.Lifetime.TotalSeconds });
     }
 
