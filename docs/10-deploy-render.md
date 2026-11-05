@@ -10,7 +10,7 @@ students. Everything is defined in [`render.yaml`](../render.yaml).
 1. Go to <https://dashboard.render.com> and sign up or sign in **with GitHub**.
 2. When asked, allow Render to access the `iftakhar27/learnpath` repository.
 3. Click **New → Blueprint**.
-4. Choose the `learnpath` repository and the branch **`mobile-app`** (switch to `main` once that branch is merged).
+4. Choose the `learnpath` repository and the branch **`main`**.
 5. Render reads `render.yaml` and shows two resources: `learnpath-db` (PostgreSQL) and `learnpath-api` (web service).
    It asks for one value:
    - **`Seed__AdminEmail`**: the email you want for the first admin account.

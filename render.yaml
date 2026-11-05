@@ -18,7 +18,7 @@ services:
     runtime: docker
     plan: free                # free instances sleep after ~15 idle minutes; 'starter' stays on
     region: singapore
-    branch: mobile-app        # change to main after merging
+    branch: main
     dockerfilePath: ./Dockerfile
     dockerContext: .
     buildFilter:                # only API changes redeploy it (web/, mobile/ and docs/ don't)
@@ -68,7 +68,7 @@ services:
     runtime: node
     plan: free
     region: singapore
-    branch: mobile-app        # change to main after merging
+    branch: main
     rootDir: web              # only changes under web/ redeploy it
     buildCommand: npm ci --no-audit --no-fund && npm run build
     startCommand: npm start
