@@ -51,12 +51,14 @@ services:
         generateValue: true
       - key: Seed__SampleContent
         value: "true"
-      - key: Razorpay__UseFakeGateway
-        value: "true"
+      - key: Razorpay__UseFakeGateway               # true = simulated payments; false = Razorpay (set the three below)
+        sync: false
+      - key: Razorpay__KeyId                        # rzp_test_... (test mode) or rzp_live_...
+        sync: false
       - key: Razorpay__KeySecret
-        generateValue: true
-      - key: Razorpay__WebhookSecret
-        generateValue: true
+        sync: false
+      - key: Razorpay__WebhookSecret                # the secret you enter for the webhook in Razorpay's dashboard
+        sync: false
       - key: Otp__Provider                          # log (codes on the admin Dashboard) or msg91 (real SMS); set in Render
         sync: false
       - key: Otp__Msg91__AuthKey                    # MSG91 auth key (only for Otp__Provider=msg91)

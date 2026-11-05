@@ -51,7 +51,33 @@ to a minute (longer if the API is asleep too).
 | Admin portal | `https://<admin-service>.onrender.com/admin` |
 | Admin account | `Seed__AdminEmail` / `Seed__AdminPassword` |
 | Students | register in the app with email, or with a mobile number: no SMS is sent on staging, so the code appears on the admin portal's **Dashboard → Test sign-in codes** (and in the API service's **Logs**) |
-| Payments | simulated: checkout cannot complete. Grant course access from the admin portal (Students → Grant course access) or the API |
+| Payments | simulated until Razorpay test keys are set (see **Payments** below); then real test-mode checkout |
+
+## Payments (Razorpay)
+
+Staging starts with simulated payments (`Razorpay__UseFakeGateway=true`): the Buy button explains that checkout can't
+open, and admins grant access instead. To take **test-mode** payments (no real money):
+
+1. In the [Razorpay dashboard](https://dashboard.razorpay.com), switch to **Test Mode** (toggle at the top).
+2. **Account & Settings → API Keys → Generate Test Key.** Copy the **Key Id** (`rzp_test_...`) and the **Key Secret**
+   (shown once).
+3. **Account & Settings → Webhooks → Add New Webhook:**
+   - URL: `https://<api-service>.onrender.com/api/v1/payments/webhooks`
+   - Secret: make up a long random value and keep it for step 5
+   - Active events: `payment.captured`, `payment.failed`, `order.paid`
+4. **Account & Settings → Payment Capture:** make sure payments are captured **automatically** (an authorised but
+   uncaptured payment is refunded by Razorpay after a few days).
+5. **Render → learnpath-api → Environment:** set `Razorpay__UseFakeGateway` = `false`, `Razorpay__KeyId`,
+   `Razorpay__KeySecret` and `Razorpay__WebhookSecret` (the value from step 3), then **Save and deploy**. The API refuses
+   to start if any of them is missing or the Key Id doesn't start with `rzp_`, so a mistake shows in the deploy log.
+6. Try it as a student: open a paid course → **Buy** → Razorpay's checkout opens with a "Test Mode" label. Pay with
+   UPI ID `success@razorpay`, or card `4111 1111 1111 1111` (any future expiry, any CVV) and choose **Success** on the
+   test bank page. The course unlocks straight away; the payment and the webhook delivery appear in the dashboard.
+
+Access is granted only after the API verifies Razorpay's signature (from the checkout, or from the webhook if the
+browser closed early); both paths are idempotent. If order creation fails, the API logs Razorpay's reason
+(`Razorpay order creation failed (401): Authentication failed` for wrong keys). For real money later, repeat with
+**Live Mode** keys (`rzp_live_...`), a live webhook, and `ASPNETCORE_ENVIRONMENT=Production`.
 
 ## SMS sign-in codes (MSG91)
 

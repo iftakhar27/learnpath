@@ -198,7 +198,7 @@ public interface IPaymentGateway
 /// Razorpay: orders via REST (Basic auth key_id:key_secret); checkout signature = HMAC_SHA256(order_id|payment_id, key_secret);
 /// webhook signature = HMAC_SHA256(raw_body, webhook_secret).
 /// </summary>
-public class RazorpayGateway(HttpClient http, IConfiguration config) : IPaymentGateway
+public class RazorpayGateway(HttpClient http, IConfiguration config, ILogger<RazorpayGateway> logger) : IPaymentGateway
 {
     private string KeySecret => config["Razorpay:KeySecret"] ?? throw new InvalidOperationException("Razorpay:KeySecret not configured");
     private string WebhookSecret => config["Razorpay:WebhookSecret"] ?? throw new InvalidOperationException("Razorpay:WebhookSecret not configured");
@@ -212,9 +212,27 @@ public class RazorpayGateway(HttpClient http, IConfiguration config) : IPaymentG
         };
         req.Headers.Authorization = new AuthenticationHeaderValue("Basic",
             Convert.ToBase64String(Encoding.UTF8.GetBytes($"{PublicKeyId}:{KeySecret}")));
-        using var res = await http.SendAsync(req, ct);
-        if (!res.IsSuccessStatusCode)
+        HttpResponseMessage res;
+        try
+        {
+            res = await http.SendAsync(req, ct);
+        }
+        catch (Exception e) when (e is HttpRequestException || (e is TaskCanceledException && !ct.IsCancellationRequested))
+        {
+            logger.LogWarning("Razorpay unreachable creating an order: {Error}", e.Message);
             throw new AppException(502, "payment_gateway_error", "Payment provider is unavailable. Please try again.");
+        }
+        using var _ = res;
+        if (!res.IsSuccessStatusCode)
+        {
+            // Razorpay explains failures (e.g. "Authentication failed" for wrong keys) in error.description.
+            var detail = await res.Content.ReadAsStringAsync(ct);
+            string? description = null;
+            try { description = System.Text.Json.JsonDocument.Parse(detail).RootElement.GetProperty("error").GetProperty("description").GetString(); }
+            catch (Exception) { /* not Razorpay's error format */ }
+            logger.LogError("Razorpay order creation failed ({Status}): {Description}", (int)res.StatusCode, description ?? "no description");
+            throw new AppException(502, "payment_gateway_error", "Payment provider is unavailable. Please try again.");
+        }
         var body = await res.Content.ReadFromJsonAsync<RazorpayOrderResponse>(ct)
                    ?? throw new AppException(502, "payment_gateway_error", "Invalid response from payment provider.");
         return new GatewayOrder(body.Id, body.Amount, body.Currency);

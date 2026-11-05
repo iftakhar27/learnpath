@@ -83,7 +83,7 @@ Integration tests create and drop a temporary database `learnpath_test_*`. Point
 | `Jwt__SigningKey` | ≥ 32 bytes random. **Required** |
 | `Seed__AdminEmail`, `Seed__AdminPassword` | Creates the first SuperAdmin if missing |
 | `Seed__SampleContent` | `true` to load demo content (never in production) |
-| `Razorpay__KeyId`, `Razorpay__KeySecret`, `Razorpay__WebhookSecret` | Payment gateway |
+| `Razorpay__KeyId`, `Razorpay__KeySecret`, `Razorpay__WebhookSecret` | Razorpay keys (`rzp_test_`/`rzp_live_`) and webhook secret; required unless the simulated gateway is on |
 | `Razorpay__UseFakeGateway` | Offline gateway for dev/tests (refused in Production) |
 | `Otp__Provider` | `msg91` (real SMS), `log` (codes in the log and the admin Dashboard; refused in Production) or `disabled` (default) |
 | `Otp__Msg91__AuthKey`, `Otp__Msg91__TemplateId` | MSG91 auth key and DLT-approved OTP template (with `##OTP##`); required for `msg91` |

@@ -42,6 +42,13 @@ if (otpProvider == "msg91" && (string.IsNullOrWhiteSpace(config["Otp:Msg91:AuthK
     throw new InvalidOperationException("Otp:Provider is 'msg91' but Otp:Msg91:AuthKey or Otp:Msg91:TemplateId is not set.");
 if (builder.Environment.IsProduction() && (useFakePayments || otpProvider == "log"))
     throw new InvalidOperationException("Fake payment gateway / logging OTP sender are not allowed in Production.");
+if (!useFakePayments)
+{
+    var missing = new[] { "Razorpay:KeyId", "Razorpay:KeySecret", "Razorpay:WebhookSecret" }.Where(k => string.IsNullOrWhiteSpace(config[k])).ToList();
+    if (missing.Count > 0) throw new InvalidOperationException($"Razorpay is enabled but {string.Join(", ", missing)} is not set (or set Razorpay:UseFakeGateway=true).");
+    if (!config["Razorpay:KeyId"]!.StartsWith("rzp_", StringComparison.Ordinal))
+        throw new InvalidOperationException("Razorpay:KeyId should be the Key Id from Razorpay (it starts with rzp_test_ or rzp_live_).");
+}
 if (useFakePayments) builder.Services.AddSingleton<IPaymentGateway, FakePaymentGateway>();
 else builder.Services.AddHttpClient<IPaymentGateway, RazorpayGateway>(c => c.Timeout = TimeSpan.FromSeconds(15));
 if (otpProvider == "disabled") builder.Services.AddSingleton<IOtpSender, DisabledOtpSender>();

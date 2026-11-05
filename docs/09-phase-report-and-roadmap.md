@@ -193,6 +193,15 @@ failure, full SMS sign-in, immediate retry after a failure, refusal to start wit
 no-codes-in-logs test fails without the safeguard. **Not verified:** a real SMS (needs the owner's DLT registration and
 MSG91 account).
 
+### Razorpay test mode (5 Nov 2026)
+
+**Changed:** startup now refuses real payments without Key Id / Key Secret / Webhook Secret or with a Key Id not starting
+`rzp_`; Razorpay's error description is logged when order creation fails (never the secret); network failures map to
+`502 payment_gateway_error`; Razorpay settings are managed in Render (`sync: false`). **Verified:** 5 new backend tests
+against a fake Razorpay (order request: Basic auth, amount in paise, receipt; HMAC checkout and webhook signatures
+against independently computed values incl. tampering; "Authentication failed" logged without the secret; startup
+refusals). **Not verified yet:** a payment through Razorpay's real test environment (needs the owner's test keys).
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |

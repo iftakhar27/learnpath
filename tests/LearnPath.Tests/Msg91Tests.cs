@@ -21,10 +21,14 @@ public class FakeMsg91 : HttpMessageHandler
 
     public static HttpResponseMessage Json(HttpStatusCode status, object body) => new(status) { Content = JsonContent.Create(body) };
 
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+    /// <summary>Request bodies, read on arrival (callers dispose their requests afterwards).</summary>
+    public ConcurrentQueue<string> Bodies { get; } = new();
+
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
     {
         Requests.Enqueue(request);
-        return Task.FromResult(Respond(request));
+        Bodies.Enqueue(request.Content is null ? "" : await request.Content.ReadAsStringAsync(ct));
+        return Respond(request);
     }
 
     public string? CodeSentTo(string mobile) =>
