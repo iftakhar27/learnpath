@@ -23,7 +23,8 @@ Send the URL to Claude to rebuild the mobile app against it.
 
 ## Admin portal (second service)
 
-`render.yaml` also defines `learnpath-admin`, the Next.js admin portal (Node 22, built from `web/`). Its server calls
+`render.yaml` also defines `learnpath-admin`, the Next.js web app (Node 22, built from `web/`): the **student website**
+at `/` and the **admin portal** at `/admin`. Its server calls
 the API, so login tokens stay in httpOnly cookies and the API needs no CORS settings.
 
 1. If you created the Blueprint before this service was added: open **Blueprints → learnpath** in Render and click
@@ -35,8 +36,9 @@ the API, so login tokens stay in httpOnly cookies and the API needs no CORS sett
    To give someone else access, have them register (in the app), then open them under **Students** and add a role
    (e.g. Teacher or ContentAdmin) instead of sharing the admin login.
 
-Notes: all portal sign-ins reach the API from the portal server's address, so they share one sign-in rate limit
-(20 a minute by default; fine for a small staff). The free portal also sleeps when idle, so the first page can take up
+Notes: the web server passes each visitor's address to the API (shared key `Bff__SharedKey` → `BFF_SHARED_KEY`, set
+by the Blueprint; **sync the Blueprint once** so both services get it). Without it, every website sign-in would share
+the web server's limit (20 a minute). The free portal also sleeps when idle, so the first page can take up
 to a minute (longer if the API is asleep too).
 
 ## What you get
@@ -45,6 +47,7 @@ to a minute (longer if the API is asleep too).
 |---|---|
 | API base URL | `https://<service>.onrender.com/api/v1` |
 | API docs (staging only) | `https://<service>.onrender.com/swagger` |
+| Student website | `https://<admin-service>.onrender.com/` |
 | Admin portal | `https://<admin-service>.onrender.com/admin` |
 | Admin account | `Seed__AdminEmail` / `Seed__AdminPassword` |
 | Students | register in the app with email, or with a mobile number: no SMS is sent on staging, so the code appears on the admin portal's **Dashboard → Test sign-in codes** (and in the API service's **Logs**) |

@@ -143,17 +143,43 @@ returns 404 unless `Otp:Provider=log` (refused in Production), and phone numbers
 Playwright tests (new: a code requested through the API appears on the dashboard and signs the tester in; teachers
 don't see the panel). **Still needed for real users:** an SMS provider (see roadmap 1e).
 
+## Phase 1c (student website) — report, 5 Nov 2026
+
+**Built** (Next.js, same app as the admin portal; English/Hindi with the app's strings):
+sign-in with mobile OTP or email and account creation, three-step onboarding, home dashboard, course catalog
+(search, exam, free/paid), course + syllabus with free enrolment and Razorpay checkout, topic page (lessons, notes via
+signed links, save for revision, practice, previous/next), HLS video with resume and progress saving, practice with
+feedback/hints/reports and a summary, tests and instructions, a full-screen exam player (port of the app's engine:
+server-derived timer, autosave, offline retry, palette, mark for review, confirm with counts, auto-submit), results with
+breakdowns and answer review, study plan (done/skip/refresh, last 7 days), progress with a score-trend chart, profile
+and study preferences, notifications, saved items, purchases (refund requests) and support tickets.
+
+**Also changed:** the API's playback response includes the lesson title, topic and completion; sign-in rate limits now
+count per real visitor behind Render (True-Client-IP) and behind the web server (shared key); modal dialogs are named
+by their title for screen readers.
+
+**Verified:** 78 backend tests; 27 Playwright tests (16 new for the student site) covering registration and Hindi
+carry-through, OTP sign-in with the test-code panel, redirects and httpOnly cookies, catalog filters, enrolment, notes,
+bookmarks, simulated checkout, real playback of a local video (resume + completion), a practice run, a full exam to
+review, resume after reload and offline recovery, preferences, plan, the progress chart (tooltip + table), notifications,
+support replies, purchases, sign-out and account deletion. Desktop and phone screenshots reviewed, chart in light and
+dark. Live: the API's rate-limit key was confirmed to follow the visitor and ignore forged headers.
+
+**Not verified / known gaps:** Razorpay live checkout (needs keys), video from a real CDN (none configured), Hindi
+copy review, no search page on the web yet, the staging website's per-visitor limit until the Blueprint is synced
+(shared key), and a full page load renders English first for Hindi users.
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |
 |---|---|---|---|
 | 1b | ~~Next.js admin portal~~ **done** (see report above) | — | — |
-| 1c | Next.js student web (onboarding, learn, video player, practice, exam UI, results, plan, checkout) | 3 weeks | ₹25–45k |
+| 1c | ~~Next.js student web~~ **done** (see report above) | — | — |
 | 1d | ~~Flutter app~~ **done** (see report above); device QA and store setup remain under 1f | — | — |
 | 1e | Integrations: MSG91, Razorpay live test mode, Bunny Stream signed playback, FCM, Sentry (staging deploy config **done**) | 1–2 weeks | ₹10–20k |
 | 1f | QA on devices, accessibility pass, store submission | 1–2 weeks | ₹10–25k |
 | 2 | PYQ papers, coupons & subscriptions, revision scheduling, richer analytics, bulk import UI, erasure/export jobs | 6–8 weeks | ₹1–1.5 lakh |
 | 3 | Adaptive practice, AI-assisted explanations (SME-reviewed), offline/DRM, live classes, cohort percentiles, leaderboards | scoped later | — |
 
-Total to a launchable MVP (Phases 1b–1f) ≈ **12–14 weeks, ₹1.1–2.2 lakh** on top of the work already done,
-excluding content production. See `07-cost-estimate.md`.
+Remaining to a launchable MVP (Phases 1e–1f) ≈ **2–4 weeks, ₹20–45k** on top of the work already done, excluding
+content production. See `07-cost-estimate.md`.

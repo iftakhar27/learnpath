@@ -3,8 +3,8 @@
 Backend and product docs for a NEET / JEE / Board learning app: recorded lessons, notes, practice, timed tests,
 analytics, study planner and paid courses, in English and Hindi. The brand name is configurable (`Branding__ProductName`).
 
-**Status:** planning docs, the backend API, the **admin portal** and the **Flutter student app** (Android/iOS) are
-built and tested. The student website is **not built yet**. See [`docs/09-phase-report-and-roadmap.md`](docs/09-phase-report-and-roadmap.md).
+**Status:** planning docs, the backend API, the **student website**, the **admin portal** and the **Flutter student
+app** (Android/iOS) are built and tested. See [`docs/09-phase-report-and-roadmap.md`](docs/09-phase-report-and-roadmap.md).
 
 ## Docs
 
@@ -30,7 +30,7 @@ src/LearnPath.Api/
   Modules/           Identity, Catalog, Learning, Practice, Exams, Analytics, Planner, Commerce,
                      Notifications, Search, Admin
 tests/LearnPath.Tests/  unit + integration tests (real PostgreSQL)
-web/                    Next.js admin portal (student web next) — see web/README.md
+web/                    Next.js student website (/) and admin portal (/admin) — see web/README.md
 mobile/                 Flutter student app (Android + iOS) — see mobile/README.md
 scripts/                export-openapi.sh
 docs/
@@ -70,7 +70,7 @@ dotnet ef migrations add <Name> -p src/LearnPath.Api -o Data/Migrations
 
 ```bash
 dotnet test                               # backend unit + integration
-cd web && npm run build && npm run test:e2e   # admin portal end-to-end (starts its own API + web servers)
+cd web && npm run build && npm run test:e2e   # website + admin end-to-end (starts its own API + web servers)
 ```
 Integration tests create and drop a temporary database `learnpath_test_*`. Point them at another server with
 `TEST_PG="Host=...;Port=5432;Username=...;Password=..."`.
@@ -98,7 +98,7 @@ Integration tests create and drop a temporary database `learnpath_test_*`. Point
 
 ## Deployment
 
-**Staging on Render:** `render.yaml` defines the API, the database and the admin portal. Follow [`docs/10-deploy-render.md`](docs/10-deploy-render.md).
+**Staging on Render:** `render.yaml` defines the API, the database and the web app (student website + admin portal). Follow [`docs/10-deploy-render.md`](docs/10-deploy-render.md).
 
 ### Any container host (lean)
 

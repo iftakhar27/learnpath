@@ -9,6 +9,7 @@ import { useLanguage, useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/feedback";
 import { Field, Input } from "@/components/ui/field";
+import { useToast } from "@/components/ui/toast";
 import { LanguageSwitch } from "./language-switch";
 import { StudentError } from "./errors";
 import { safeNext, useProfile, useUpdateProfile, type Profile } from "./profile";
@@ -51,6 +52,7 @@ function OnboardingSteps({ profile, editing }: { profile: Profile; editing: bool
   const params = useSearchParams();
   const exams = useQuery({ queryKey: ["exams"], queryFn: () => unwrap(api.GET("/api/v1/exams")) });
   const save = useUpdateProfile();
+  const toast = useToast();
   const thisYear = new Date().getFullYear();
 
   const [step, setStep] = useState(0);
@@ -85,6 +87,7 @@ function OnboardingSteps({ profile, editing }: { profile: Profile; editing: bool
       guardianConsent: minor && consent ? true : null,
       completeOnboarding: true,
     });
+    if (editing) toast(t("savedToast"));
     router.replace(editing ? "/profile" : safeNext(params.get("next")));
   };
 
@@ -185,53 +188,69 @@ function OnboardingSteps({ profile, editing }: { profile: Profile; editing: bool
     </div>,
   ];
 
+  const body = (
+    <>
+      <h1 className="text-2xl font-semibold">{editing ? t("editPreferences") : t("onboardingTitle")}</h1>
+      <div className="mt-2 h-1.5 rounded-full bg-surface-muted" aria-hidden>
+        <div className="h-1.5 rounded-full bg-primary transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
+      </div>
+      <div className="mt-6">{steps[step]}</div>
+      <div className="mt-6 space-y-3">
+        {error && (
+          <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
+            {error}
+          </p>
+        )}
+        <StudentError error={save.error} />
+        <div className="flex justify-between gap-3">
+          <Button variant="secondary" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
+            {t("back")}
+          </Button>
+          {step < steps.length - 1 ? (
+            <Button
+              onClick={() => {
+                if (step === 0 && !examId) return setError(t("selectExamError"));
+                setError(null);
+                setStep((s) => s + 1);
+              }}
+            >
+              {t("next")}
+            </Button>
+          ) : (
+            <Button onClick={finish} loading={save.isPending}>
+              {editing ? t("save") : t("getStarted")}
+            </Button>
+          )}
+        </div>
+      </div>
+    </>
+  );
+
+  // Editing from the profile happens inside the site frame.
+  if (editing)
+    return (
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-4 flex items-center justify-between">
+          <Link href="/profile" className="text-sm font-medium text-primary hover:underline">
+            ← {t("profileTitle")}
+          </Link>
+          <span className="text-sm text-fg-muted">{t("stepOf", { current: step + 1, total: steps.length })}</span>
+        </div>
+        {body}
+      </div>
+    );
+
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="mx-auto flex w-full max-w-2xl items-center justify-between px-4 py-4">
-        {editing ? (
-          <Link href="/profile" className="text-sm font-medium text-primary hover:underline">
-            ← {t("back")}
-          </Link>
-        ) : (
-          <span className="text-lg font-semibold">{brand}</span>
-        )}
+        <span className="text-lg font-semibold">{brand}</span>
         <span className="text-sm text-fg-muted">{t("stepOf", { current: step + 1, total: steps.length })}</span>
       </header>
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pb-8">
-        <h1 className="text-2xl font-semibold">{editing ? t("editPreferences") : t("onboardingTitle")}</h1>
-        <div className="mt-2 h-1.5 rounded-full bg-surface-muted" aria-hidden>
-          <div className="h-1.5 rounded-full bg-primary transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
-        </div>
-        <div className="mt-6">{steps[step]}</div>
-        <div className="mt-6 space-y-3">
-          {error && (
-            <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
-              {error}
-            </p>
-          )}
-          <StudentError error={save.error} />
-          <div className="flex justify-between gap-3">
-            <Button variant="secondary" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
-              {t("back")}
-            </Button>
-            {step < steps.length - 1 ? (
-              <Button
-                onClick={() => {
-                  if (step === 0 && !examId) return setError(t("selectExamError"));
-                  setError(null);
-                  setStep((s) => s + 1);
-                }}
-              >
-                {t("next")}
-              </Button>
-            ) : (
-              <Button onClick={finish} loading={save.isPending}>
-                {editing ? t("save") : t("getStarted")}
-              </Button>
-            )}
-          </div>
-        </div>
-      </main>
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pb-8">{body}</main>
     </div>
   );
+}
+
+export function PreferencesPage() {
+  return <Onboarding editing />;
 }

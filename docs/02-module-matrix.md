@@ -27,4 +27,4 @@ Status reflects *this repository*, verified by automated tests where noted. "Pla
 | T. Localization & a11y | `en`/`hi` content variants, `Accept-Language`; mobile UI fully translated via ARB files | Native-speaker review of Hindi, more languages (P1) | **Implemented** (mobile); admin UI English only |
 | Mobile app (Flutter) | All P0 student screens (Android + iOS), English + Hindi | Push (FCM), offline downloads (P1/P2) | **Implemented + tested** (unit/widget tests; Android APK built; iOS not built — needs macOS) |
 | Web app (Next.js) | Admin portal | — | **Implemented + e2e tested** |
-| Web app (Next.js) | Student portal | — | **Planned** (next phase) |
+| Web app (Next.js) | Student portal | — | **Implemented + e2e tested** (sign-in incl. OTP, onboarding, home, learn + video, practice, exam player, results, plan, progress, profile, notifications, saved, purchases, support; en/hi) |

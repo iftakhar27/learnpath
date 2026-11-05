@@ -210,6 +210,11 @@ export function StudentLogin() {
       }
     >
       {params.get("expired") && <p className="mb-4 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">{t("sessionExpired")}</p>}
+      {params.get("deleted") && (
+        <p role="status" className="mb-4 rounded-lg bg-primary-soft px-3 py-2 text-sm">
+          {t("deleteRequested")}
+        </p>
+      )}
       <div role="tablist" aria-label={t("signIn")} className="mb-5 grid grid-cols-2 gap-1 rounded-lg bg-surface-muted p-1 text-sm">
         {(["mobile", "email"] as const).map((m) => (
           <button
