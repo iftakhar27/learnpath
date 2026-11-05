@@ -16,8 +16,8 @@ export const REFRESH_COOKIE = "lp_rt";
 const REFRESH_COOKIE_DAYS = 30;
 
 const BFF_SHARED_KEY = process.env.BFF_SHARED_KEY?.trim();
-/** Request header that carries the visitor's address as set by the hosting edge (e.g. true-client-ip on Render). */
-const CLIENT_IP_HEADER = process.env.CLIENT_IP_HEADER?.trim().toLowerCase();
+/** Request header that carries the visitor's address as set by the hosting edge (true-client-ip on Render by default). */
+const CLIENT_IP_HEADER = (process.env.CLIENT_IP_HEADER?.trim() || (process.env.RENDER === "true" ? "true-client-ip" : "")).toLowerCase();
 
 /**
  * Every API call from this server would otherwise come from one address, so all visitors would share the API's

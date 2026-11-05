@@ -182,8 +182,8 @@ public class DisabledOtpSender : IOtpSender
 /// <list type="bullet">
 /// <item>Calls from the web app's server carry its visitor's address, trusted only with the shared key
 /// (<c>Bff:SharedKey</c>), so website visitors don't all share the web server's limit.</item>
-/// <item>Behind a hosting edge that sets a trustworthy header (<c>ClientIp:Header</c>, e.g. <c>True-Client-IP</c> on
-/// Render, which its edge overwrites), that header.</item>
+/// <item>Behind a hosting edge that sets a trustworthy header (<c>ClientIp:Header</c>; on Render <c>True-Client-IP</c> by
+/// default, which its edge overwrites), that header.</item>
 /// <item>Otherwise the connection's address.</item>
 /// </list>
 /// </summary>
@@ -197,7 +197,10 @@ public sealed class ClientAddress
 
     public ClientAddress(IConfiguration config)
     {
-        _edgeHeader = string.IsNullOrWhiteSpace(config["ClientIp:Header"]) ? null : config["ClientIp:Header"]!.Trim();
+        _edgeHeader = !string.IsNullOrWhiteSpace(config["ClientIp:Header"]) ? config["ClientIp:Header"]!.Trim()
+            // Render sets RENDER=true on every service; its edge overwrites True-Client-IP with the visitor's address.
+            : config["RENDER"] == "true" ? "True-Client-IP"
+            : null;
         var key = config["Bff:SharedKey"];
         if (!string.IsNullOrEmpty(key))
         {

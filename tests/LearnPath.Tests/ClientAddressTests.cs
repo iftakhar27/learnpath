@@ -9,8 +9,12 @@ public class ClientAddressTests
 {
     private const string Key = "0123456789abcdef0123456789abcdef-shared";
 
-    private static ClientAddress Resolver(string? header = null, string? key = null) =>
-        new(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["ClientIp:Header"] = header, ["Bff:SharedKey"] = key }).Build());
+    private static ClientAddress Resolver(string? header = null, string? key = null, string? render = null) =>
+        new(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["ClientIp:Header"] = header, ["Bff:SharedKey"] = key, ["RENDER"] = render }).Build());
+
+    [Fact]
+    public void On_render_the_edge_header_is_used_by_default() =>
+        Assert.Equal("1.2.3.4", Resolver(render: "true").Resolve(Request(("True-Client-IP", "1.2.3.4"))));
 
     private static HttpContext Request(params (string Name, string Value)[] headers)
     {
