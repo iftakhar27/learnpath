@@ -1,5 +1,5 @@
 import "server-only";
-import type { NextRequest, NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * Backend-for-frontend session handling.
@@ -14,6 +14,20 @@ export const API_BASE_URL = (configuredApiUrl || "http://localhost:5080").replac
 export const ACCESS_COOKIE = "lp_at";
 export const REFRESH_COOKIE = "lp_rt";
 const REFRESH_COOKIE_DAYS = 30;
+
+const BFF_SHARED_KEY = process.env.BFF_SHARED_KEY?.trim();
+/** Request header that carries the visitor's address as set by the hosting edge (e.g. true-client-ip on Render). */
+const CLIENT_IP_HEADER = process.env.CLIENT_IP_HEADER?.trim().toLowerCase();
+
+/**
+ * Every API call from this server would otherwise come from one address, so all visitors would share the API's
+ * per-client limits (sign-in attempts). With a shared key configured on both servers, pass the visitor's address on.
+ */
+export function visitorHeaders(req: NextRequest): Record<string, string> {
+  if (!BFF_SHARED_KEY || !CLIENT_IP_HEADER) return {};
+  const ip = req.headers.get(CLIENT_IP_HEADER)?.trim();
+  return ip ? { "x-learnpath-bff-key": BFF_SHARED_KEY, "x-learnpath-client-ip": ip } : {};
+}
 const secureCookies = process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === "true" : process.env.NODE_ENV === "production";
 
 export type AuthTokens = {
@@ -58,7 +72,7 @@ export function clearSessionCookies(res: NextResponse) {
 const refreshes = new Map<string, { promise: Promise<AuthTokens | null>; expires: number }>();
 const REFRESH_REUSE_MS = 60_000;
 
-export function refreshSession(refreshToken: string): Promise<AuthTokens | null> {
+export function refreshSession(refreshToken: string, extraHeaders: Record<string, string> = {}): Promise<AuthTokens | null> {
   const now = Date.now();
   for (const [key, entry] of refreshes) if (entry.expires < now) refreshes.delete(key);
   const existing = refreshes.get(refreshToken);
@@ -66,7 +80,7 @@ export function refreshSession(refreshToken: string): Promise<AuthTokens | null>
 
   const promise = fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...extraHeaders },
     body: JSON.stringify({ refreshToken }),
     cache: "no-store",
   })
@@ -92,7 +106,7 @@ export async function resolveAccess(req: NextRequest, forceRefresh = false): Pro
     return { accessToken: access, refreshed: null, expired: false };
   }
   if (!refresh) return { accessToken: null, refreshed: null, expired: false };
-  const tokens = await refreshSession(refresh);
+  const tokens = await refreshSession(refresh, visitorHeaders(req));
   return tokens
     ? { accessToken: tokens.accessToken, refreshed: tokens, expired: false }
     : { accessToken: null, refreshed: null, expired: true };
@@ -122,9 +136,69 @@ export function isSameOrigin(req: NextRequest): boolean {
  */
 export function apiNotConfigured(): Response | null {
   if (configuredApiUrl || process.env.NODE_ENV !== "production") return null;
-  return problem(503, "api_not_configured", "The admin portal isn't connected to the API yet: set API_BASE_URL on the web server.");
+  return problem(503, "api_not_configured", "This website isn't connected to the API yet: set API_BASE_URL on the web server.");
 }
 
 export function problem(status: number, code: string, title: string) {
   return Response.json({ status, code, title }, { status });
+}
+
+/** Fields of the token response the browser may see (never the tokens themselves). */
+export type SessionStart = { userId: string; roles: string[]; onboardingComplete: boolean };
+
+/**
+ * Calls a token-issuing API endpoint (login, register, OTP verify) on the visitor's behalf. On success the tokens go
+ * into httpOnly cookies and only the session summary reaches the browser; API errors are passed through unchanged.
+ * `accept` can refuse the account (e.g. students on the admin login) after the API has issued tokens.
+ */
+export async function startSession(
+  req: NextRequest,
+  apiPath: string,
+  body: unknown,
+  accept?: (tokens: AuthTokens) => Response | null,
+): Promise<Response> {
+  let upstream: Response;
+  try {
+    upstream = await fetch(`${API_BASE_URL}${apiPath}`, {
+      method: "POST",
+      headers: { "content-type": "application/json", ...visitorHeaders(req) },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+  } catch {
+    return problem(502, "api_unreachable", "The server is unreachable. Please try again.");
+  }
+  if (!upstream.ok) {
+    return new Response(upstream.body, { status: upstream.status, headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" } });
+  }
+  const tokens = (await upstream.json()) as AuthTokens;
+  const refused = accept?.(tokens);
+  if (refused) {
+    // Do not leave a valid session behind: revoke the refresh token we just received.
+    await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ refreshToken: tokens.refreshToken }),
+    }).catch(() => undefined);
+    return refused;
+  }
+  const summary: SessionStart = { userId: tokens.userId, roles: tokens.roles, onboardingComplete: tokens.onboardingComplete };
+  const res = NextResponse.json(summary);
+  setSessionCookies(res, tokens);
+  return res;
+}
+
+/** Parses a JSON request body, or returns a 400 problem. */
+export async function readJson<T>(req: NextRequest): Promise<T | Response> {
+  try {
+    return (await req.json()) as T;
+  } catch {
+    return problem(400, "invalid_request", "Invalid request.");
+  }
+}
+
+/** Common guards for session routes: same-origin and API configured. */
+export function sessionRouteGuard(req: NextRequest): Response | null {
+  if (!isSameOrigin(req)) return problem(403, "cross_origin", "Cross-origin request rejected.");
+  return apiNotConfigured();
 }

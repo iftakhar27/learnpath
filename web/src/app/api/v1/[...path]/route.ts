@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { API_BASE_URL, apiNotConfigured, applyAccessResult, isSameOrigin, problem, resolveAccess } from "@/lib/server/session";
+import { API_BASE_URL, apiNotConfigured, applyAccessResult, isSameOrigin, problem, resolveAccess, visitorHeaders } from "@/lib/server/session";
 
 /**
  * Forwards /api/v1/* from the browser to the backend API with the session's bearer token.
@@ -25,7 +25,7 @@ async function forward(req: NextRequest, ctx: RouteContext<"/api/v1/[...path]">)
   const body = req.method === "GET" || req.method === "HEAD" ? undefined : await req.arrayBuffer();
 
   const send = (token: string | null) => {
-    const headers = new Headers();
+    const headers = new Headers(visitorHeaders(req));
     for (const h of FORWARDED_REQUEST_HEADERS) {
       const v = req.headers.get(h);
       if (v) headers.set(h, v);

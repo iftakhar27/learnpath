@@ -33,8 +33,12 @@ services:
         value: Staging
       - key: PORT                                   # the container listens on 8080
         value: "8080"
-      - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED    # trust Render's proxy for client IPs (rate limits) and https
+      - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED    # trust Render's proxy for the original scheme (https)
         value: "true"
+      - key: ClientIp__Header                       # Render's edge sets (and overwrites) this with the visitor's address
+        value: True-Client-IP
+      - key: Bff__SharedKey                         # lets the web server pass on its visitors' addresses (copied below)
+        generateValue: true
       - key: ConnectionStrings__Default
         fromDatabase:
           name: learnpath-db
@@ -77,6 +81,13 @@ services:
         sync: false
       - key: COOKIE_SECURE
         value: "true"
+      - key: BFF_SHARED_KEY                         # same value as the API's Bff__SharedKey
+        fromService:
+          type: web
+          name: learnpath-api
+          envVarKey: Bff__SharedKey
+      - key: CLIENT_IP_HEADER
+        value: true-client-ip
       - key: NEXT_PUBLIC_BRAND_NAME
         value: LearnPath
       - key: NEXT_TELEMETRY_DISABLED

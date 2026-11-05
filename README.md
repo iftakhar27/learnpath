@@ -92,7 +92,9 @@ Integration tests create and drop a temporary database `learnpath_test_*`. Point
 | `Exams__SubmissionGraceSeconds` | Late-save grace (default 30) |
 | `Analytics__MinCohortForPercentile` | Hide percentile below this cohort size (default 100) |
 | `Database__MigrateOnStartup` | Set `false` in production and run reviewed scripts |
-| `ASPNETCORE_FORWARDEDHEADERS_ENABLED` | `true` behind a load balancer, so rate limits see real client IPs |
+| `ASPNETCORE_FORWARDEDHEADERS_ENABLED` | `true` behind a load balancer, so the API sees the original scheme (https) |
+| `ClientIp__Header` | Header your hosting edge sets to the visitor's address (Render: `True-Client-IP`); sign-in rate limits count per visitor |
+| `Bff__SharedKey` / web `BFF_SHARED_KEY` + `CLIENT_IP_HEADER` | Same 32+ character secret on both servers so the web server can pass its visitors' addresses to the API |
 
 ## Deployment
 

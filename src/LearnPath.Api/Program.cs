@@ -81,10 +81,12 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.StaffRead, p => p.RequireRole(Roles.Staff))
     .AddPolicy(Policies.SuperAdmin, p => p.RequireRole(Roles.SuperAdmin));
 
+var clientAddress = new ClientAddress(config);
+builder.Services.AddSingleton(clientAddress);
 builder.Services.AddRateLimiter(o =>
 {
     o.RejectionStatusCode = 429;
-    o.AddPolicy("auth", ctx => RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+    o.AddPolicy("auth", ctx => RateLimitPartition.GetFixedWindowLimiter(clientAddress.Resolve(ctx),
         _ => new FixedWindowRateLimiterOptions { PermitLimit = config.GetValue("RateLimit:AuthPerMinute", 20), Window = TimeSpan.FromMinutes(1) }));
 });
 
@@ -143,6 +145,7 @@ if (!app.Environment.IsProduction())
     app.MapGet("/api/v1/debug/client-ip", (HttpContext ctx) => Results.Ok(new
     {
         remoteIp = ctx.Connection.RemoteIpAddress?.ToString(),
+        rateLimitKey = ctx.RequestServices.GetRequiredService<ClientAddress>().Resolve(ctx),
         headers = ctx.Request.Headers
             .Where(h => h.Key.Contains("ip", StringComparison.OrdinalIgnoreCase) || h.Key.Contains("forwarded", StringComparison.OrdinalIgnoreCase)
                         || h.Key.StartsWith("cf-", StringComparison.OrdinalIgnoreCase) || h.Key.Contains("original", StringComparison.OrdinalIgnoreCase))

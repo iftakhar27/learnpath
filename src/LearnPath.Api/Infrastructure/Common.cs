@@ -176,3 +176,45 @@ public class DisabledOtpSender : IOtpSender
     public Task SendAsync(string phone, string code, CancellationToken ct) =>
         throw new AppException(503, "otp_unavailable", "Sign-in with a mobile number isn't available yet. Please use email.");
 }
+
+/// <summary>
+/// The address per-client limits (sign-in attempts) are counted against.
+/// <list type="bullet">
+/// <item>Calls from the web app's server carry its visitor's address, trusted only with the shared key
+/// (<c>Bff:SharedKey</c>), so website visitors don't all share the web server's limit.</item>
+/// <item>Behind a hosting edge that sets a trustworthy header (<c>ClientIp:Header</c>, e.g. <c>True-Client-IP</c> on
+/// Render, which its edge overwrites), that header.</item>
+/// <item>Otherwise the connection's address.</item>
+/// </list>
+/// </summary>
+public sealed class ClientAddress
+{
+    public const string BffKeyHeader = "X-LearnPath-Bff-Key";
+    public const string BffClientIpHeader = "X-LearnPath-Client-IP";
+    public const int MinKeyLength = 32;
+    private readonly string? _edgeHeader;
+    private readonly byte[]? _bffKey;
+
+    public ClientAddress(IConfiguration config)
+    {
+        _edgeHeader = string.IsNullOrWhiteSpace(config["ClientIp:Header"]) ? null : config["ClientIp:Header"]!.Trim();
+        var key = config["Bff:SharedKey"];
+        if (!string.IsNullOrEmpty(key))
+        {
+            if (key.Length < MinKeyLength) throw new InvalidOperationException($"Bff:SharedKey must be at least {MinKeyLength} characters.");
+            _bffKey = Encoding.UTF8.GetBytes(key);
+        }
+    }
+
+    public string Resolve(HttpContext ctx)
+    {
+        var headers = ctx.Request.Headers;
+        if (_bffKey is not null && headers.TryGetValue(BffKeyHeader, out var key)
+            && CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(key.ToString()), _bffKey)
+            && System.Net.IPAddress.TryParse(headers[BffClientIpHeader].ToString().Trim(), out var visitor))
+            return visitor.ToString();
+        if (_edgeHeader is not null && System.Net.IPAddress.TryParse(headers[_edgeHeader].ToString().Trim(), out var edge))
+            return edge.ToString();
+        return ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+    }
+}

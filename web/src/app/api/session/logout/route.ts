@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { API_BASE_URL, REFRESH_COOKIE, clearSessionCookies, isSameOrigin, problem } from "@/lib/server/session";
+import { API_BASE_URL, REFRESH_COOKIE, clearSessionCookies, isSameOrigin, problem, visitorHeaders } from "@/lib/server/session";
 
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) return problem(403, "cross_origin", "Cross-origin request rejected.");
@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   if (refreshToken) {
     await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...visitorHeaders(req) },
       body: JSON.stringify({ refreshToken }),
       cache: "no-store",
     }).catch(() => undefined);
