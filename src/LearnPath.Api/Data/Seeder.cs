@@ -39,6 +39,31 @@ public static class Seeder
             await SeedSampleContentAsync(db, now);
             logger.LogInformation("Seeded sample content");
         }
+
+        // Sample lessons have placeholder video IDs; point them at a public demo stream so playback can be tried
+        // before a video host (Bunny Stream) is connected. Real lessons are never touched.
+        var demoVideo = config["Seed:SampleVideoUrl"];
+        if (config.GetValue<bool>("Seed:SampleContent") && !string.IsNullOrWhiteSpace(demoVideo))
+        {
+            var updated = await UseDemoVideoForPlaceholdersAsync(db, demoVideo, config.GetValue("Seed:SampleVideoSeconds", 635), now);
+            if (updated > 0) logger.LogInformation("Sample lessons now use the demo video stream ({Count})", updated);
+        }
+    }
+
+    /// <summary>Replaces placeholder video IDs (<paramref name="placeholderPrefix"/>…) on video lessons; returns how many changed.</summary>
+    public static async Task<int> UseDemoVideoForPlaceholdersAsync(AppDbContext db, string url, int durationSeconds, DateTimeOffset now, string placeholderPrefix = "sample-")
+    {
+        var lessons = await db.LearningResources
+            .Where(r => r.Type == ResourceType.Video && r.VideoProviderId != null && r.VideoProviderId.StartsWith(placeholderPrefix))
+            .ToListAsync();
+        foreach (var r in lessons)
+        {
+            r.VideoProviderId = url;
+            r.DurationSeconds = durationSeconds; // so progress and the 90% completion rule match the real length
+            r.UpdatedAt = now;
+        }
+        if (lessons.Count > 0) await db.SaveChangesAsync();
+        return lessons.Count;
     }
 
     private static async Task SeedSampleContentAsync(AppDbContext db, DateTimeOffset now)

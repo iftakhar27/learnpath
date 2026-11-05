@@ -125,3 +125,43 @@ test("a video lesson resumes where the student stopped and completes at the end"
   await expect(page.getByText("Completed")).toBeVisible({ timeout: 15_000 });
   void API_URL;
 });
+
+test("an HLS lesson (the format video hosts deliver) plays through hls.js", async ({ page, request }) => {
+  const admin = await apiLogin(request, ADMIN.email, ADMIN.password);
+  const courses = await apiGet(request, "/api/v1/courses?free=true", admin);
+  const free = courses.items.find((c: { title: string }) => c.title === FREE);
+  const syllabus = await apiGet(request, `/api/v1/courses/${free.id}/syllabus`, admin);
+  const title = unique("HLS demo");
+  const created = await apiPost(request, "/api/v1/admin/resources", admin, {
+    topicId: syllabus.subjects[0].chapters[0].topics[0].id,
+    type: "Video",
+    titleEn: title,
+    language: "en",
+    sortOrder: 98,
+    isFreePreview: false,
+    videoProviderId: "https://video.test/hls/index.m3u8",
+    durationSeconds: 12,
+    allowDownload: false,
+  });
+  await apiPost(request, `/api/v1/admin/resources/${created.id}/status`, admin, { status: "Published" });
+  // A CDN serving the playlist and segments cross-site (as Bunny or Mux do).
+  const types: Record<string, string> = { m3u8: "application/vnd.apple.mpegurl", mp4: "video/mp4", m4s: "video/iso.segment" };
+  const requested: string[] = [];
+  await page.route("https://video.test/hls/**", (route) => {
+    const name = new URL(route.request().url()).pathname.split("/").pop()!;
+    requested.push(name);
+    return route.fulfill({ status: 200, contentType: types[name.split(".").pop()!], headers: { "access-control-allow-origin": "*" }, body: readFileSync(join(__dirname, "fixtures", "hls", name)) });
+  });
+
+  const s = await signedInStudent(page, request, "HLS Student");
+  await apiPost(request, `/api/v1/courses/${free.id}/enroll`, s.token);
+  await page.goto(`/watch/${created.id}`);
+  await expect(page.getByRole("heading", { name: title })).toBeVisible();
+  await page.locator("video").evaluate((v: HTMLVideoElement) => {
+    v.muted = true;
+    return v.play();
+  });
+  await expect.poll(() => page.locator("video").evaluate((v: HTMLVideoElement) => v.currentTime), { timeout: 15_000 }).toBeGreaterThan(1);
+  expect(requested).toEqual(expect.arrayContaining(["index.m3u8", "init.mp4", "seg0.m4s"]));
+  await expect(page.getByText("This video can't be played right now.")).toHaveCount(0);
+});

@@ -172,7 +172,12 @@ sign-out ends the session. Sign-in limits count per visitor through the website 
 visitor's address, not the web server's) and forged address headers were ignored. The temporary diagnostic endpoint
 used for this was removed afterwards.
 
-**Not verified / known gaps:** Razorpay live checkout (needs keys), video from a real CDN (none configured), Hindi
+**Video on staging (5 Nov 2026):** sample lessons had placeholder IDs, so every lesson said it couldn't play. With sample
+content on, they now use a public demo HLS stream (`Seed:SampleVideoUrl`, checked reachable with CORS `*`, H.264/AAC,
+635 s); real lessons are never changed (backend test). A new Playwright test plays an HLS lesson through hls.js from a
+cross-site "CDN" (the code path Bunny Stream uses).
+
+**Not verified / known gaps:** Razorpay live checkout (needs keys), video from a real Bunny CDN (none configured), Hindi
 copy review (study-plan reasons are still generated in English), no search page on the web yet, and a full page load
 renders English first for Hindi users.
 

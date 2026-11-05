@@ -42,6 +42,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Seed:AdminEmail", AdminEmail);
         builder.UseSetting("Seed:AdminPassword", AdminPassword);
         builder.UseSetting("Seed:SampleContent", "true");
+        builder.UseSetting("Seed:SampleVideoUrl", ""); // keep the fixed placeholder lessons these tests assert on
         builder.UseSetting("Razorpay:UseFakeGateway", "true");
         builder.UseSetting("Razorpay:KeySecret", KeySecret);
         builder.UseSetting("Razorpay:WebhookSecret", WebhookSecret);

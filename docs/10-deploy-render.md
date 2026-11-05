@@ -53,6 +53,26 @@ to a minute (longer if the API is asleep too).
 | Students | register in the app with email, or with a mobile number: no SMS is sent on staging, so the code appears on the admin portal's **Dashboard → Test sign-in codes** (and in the API service's **Logs**) |
 | Payments | simulated: checkout cannot complete. Grant course access from the admin portal (Students → Grant course access) or the API |
 
+## Video lessons
+
+On staging the sample lessons play a **public demo stream** (Big Buck Bunny, an open-licence film, from Mux's public
+HLS test streams), so playback can be tried before a video host is connected. This only applies to the sample
+lessons' placeholder IDs while `Seed__SampleContent=true`; set `Seed__SampleVideoUrl` to another HLS/MP4 URL or to an
+empty value to change or turn it off.
+
+To play your own videos, connect **Bunny Stream** (the integration the API is built for):
+
+1. Create a Bunny Stream library and upload a video. Note the **library ID** and the **video ID** (a GUID).
+2. In the library's settings, turn on **token authentication** for the pull zone (CDN) and note the **CDN hostname**
+   (e.g. `vz-xxxx.b-cdn.net`) and the **token key**.
+3. In Render, open **learnpath-api → Environment** and add `Video__LibraryId`, `Video__CdnHost`, `Video__CdnTokenKey`
+   (and `Video__TokenKey` for the embed player), then **Save and deploy**.
+4. In the admin portal, open the topic under **Courses & syllabus**, add a video lesson and paste the Bunny video ID
+   into **Video ID at the streaming provider**.
+
+The API signs a short-lived stream URL for each student with access; the website plays it with hls.js (natively on
+Safari) and the app with the phone's player.
+
 ## Costs and limits on the free plans
 
 - **Free web service:** sleeps after ~15 minutes without traffic. The next request wakes it in ~30–60 seconds, so the
