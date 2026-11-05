@@ -38,7 +38,8 @@ export function useLanguage() {
       if (next === getLanguage()) return;
       setCurrentLanguage(next);
       // Content (course titles, explanations) comes from the API in the chosen language.
-      void qc.invalidateQueries({ predicate: (q) => q.queryKey[0] !== "session" });
+      // Queries marked `meta.keepOnLanguageChange` (a running exam) must not reload mid-attempt.
+      void qc.invalidateQueries({ predicate: (q) => q.queryKey[0] !== "session" && !q.meta?.keepOnLanguageChange });
     },
     [qc],
   );

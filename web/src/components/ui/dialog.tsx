@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { useId, useLayoutEffect, useRef, type ReactNode } from "react";
 import { Button } from "./button";
 
 /** Accessible modal built on the native <dialog> element (focus trap, Esc to close, backdrop). */
@@ -11,6 +11,7 @@ export function Modal({
   children,
   footer,
   wide,
+  closeLabel = "Close",
 }: {
   open: boolean;
   onClose: () => void;
@@ -18,8 +19,10 @@ export function Modal({
   children: ReactNode;
   footer?: ReactNode;
   wide?: boolean;
+  closeLabel?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useLayoutEffect(() => {
     const d = ref.current;
     if (!d) return;
@@ -35,6 +38,7 @@ export function Modal({
   return (
     <dialog
       ref={ref}
+      aria-labelledby={titleId}
       onClose={onClose}
       onCancel={(e) => {
         e.preventDefault();
@@ -45,8 +49,10 @@ export function Modal({
       {open && (
         <div className="flex max-h-[85vh] flex-col">
           <header className="flex items-center justify-between border-b border-border px-5 py-3">
-            <h2 className="font-semibold">{title}</h2>
-            <button type="button" onClick={onClose} aria-label="Close" className="rounded p-1 text-fg-muted hover:bg-surface-muted">
+            <h2 id={titleId} className="font-semibold">
+              {title}
+            </h2>
+            <button type="button" onClick={onClose} aria-label={closeLabel} className="rounded p-1 text-fg-muted hover:bg-surface-muted">
               ✕
             </button>
           </header>
