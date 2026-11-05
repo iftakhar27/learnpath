@@ -140,17 +140,6 @@ app.MapGet("/", (IConfiguration c, IWebHostEnvironment env) => Results.Ok(new
     health = "/health",
     docs = env.IsProduction() ? null : "/swagger",
 })).ExcludeFromDescription();
-// TEMPORARY (staging diagnostics): which headers carry the real client address behind the hosting proxy.
-if (!app.Environment.IsProduction())
-    app.MapGet("/api/v1/debug/client-ip", (HttpContext ctx) => Results.Ok(new
-    {
-        remoteIp = ctx.Connection.RemoteIpAddress?.ToString(),
-        rateLimitKey = ctx.RequestServices.GetRequiredService<ClientAddress>().Resolve(ctx),
-        headers = ctx.Request.Headers
-            .Where(h => h.Key.Contains("ip", StringComparison.OrdinalIgnoreCase) || h.Key.Contains("forwarded", StringComparison.OrdinalIgnoreCase)
-                        || h.Key.StartsWith("cf-", StringComparison.OrdinalIgnoreCase) || h.Key.Contains("original", StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(h => h.Key, h => h.Value.ToString()),
-    })).ExcludeFromDescription();
 app.MapGet("/api/v1/config", (IConfiguration c) => new PublicConfigDto(c["Branding:ProductName"] ?? "LearnPath", "INR", "Asia/Kolkata", ["en", "hi"]));
 
 if (config.GetValue("Database:MigrateOnStartup", true))

@@ -165,9 +165,16 @@ review, resume after reload and offline recovery, preferences, plan, the progres
 support replies, purchases, sign-out and account deletion. Desktop and phone screenshots reviewed, chart in light and
 dark. Live: the API's rate-limit key was confirmed to follow the visitor and ignore forged headers.
 
+**Live staging (verified 5 Nov 2026, after the owner set `API_BASE_URL` and synced the Blueprint):** a scripted student
+journey through the website passed: register (httpOnly cookies), onboarding in Hindi, home with Hindi content, free
+enrolment, exam autosave, submit and result, OTP request; token endpoints are not reachable through the proxy and
+sign-out ends the session. Sign-in limits count per visitor through the website (the API keyed requests by the
+visitor's address, not the web server's) and forged address headers were ignored. The temporary diagnostic endpoint
+used for this was removed afterwards.
+
 **Not verified / known gaps:** Razorpay live checkout (needs keys), video from a real CDN (none configured), Hindi
-copy review, no search page on the web yet, the staging website's per-visitor limit until the Blueprint is synced
-(shared key), and a full page load renders English first for Hindi users.
+copy review (study-plan reasons are still generated in English), no search page on the web yet, and a full page load
+renders English first for Hindi users.
 
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
