@@ -29,7 +29,7 @@ export class ApiError extends Error {
 type Problem = { status?: number; code?: string; title?: string; errors?: Record<string, string[]> };
 
 function toApiError(status: number, body: unknown): ApiError {
-  const p = (body ?? {}) as Problem;
+  const p = (body && typeof body === "object" ? body : {}) as Problem;
   // ASP.NET model validation returns { errors: { Field: [messages] } } without a code.
   const firstValidation = p.errors ? Object.values(p.errors).flat()[0] : undefined;
   const message = firstValidation ?? p.title ?? (status >= 500 ? "Something went wrong. Please try again." : `Request failed (${status}).`);
@@ -57,7 +57,13 @@ export async function rawFetch<T>(input: string, init?: RequestInit): Promise<T>
     throw new ApiError(0, "network_error", "Network error. Check your connection and try again.");
   }
   const text = await res.text();
-  const body = text ? JSON.parse(text) : undefined;
+  let body: unknown;
+  try {
+    body = text ? JSON.parse(text) : undefined;
+  } catch {
+    // Not JSON (e.g. a hosting error page): never show a parser message to the user.
+    throw new ApiError(res.status, "bad_response", res.status >= 500 || res.ok ? "The server is unavailable right now. Please try again in a few seconds." : `Request failed (${res.status}).`);
+  }
   if (!res.ok) throw toApiError(res.status, body);
   return body as T;
 }

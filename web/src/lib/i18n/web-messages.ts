@@ -47,6 +47,7 @@ export const webMessages = {
     practiceAnswered: "Practice questions answered",
     unread: "Unread",
     removed: "Removed",
+    serverStarting: "The server is starting up. Please try again in a few seconds.",
   },
   hi: {
     landingTitle: "NEET, JEE और बोर्ड की स्मार्ट तैयारी",
@@ -92,5 +93,6 @@ export const webMessages = {
     practiceAnswered: "हल किए गए अभ्यास प्रश्न",
     unread: "अपठित",
     removed: "हटा दिया गया",
+    serverStarting: "सर्वर शुरू हो रहा है। कुछ सेकंड में फिर से कोशिश करें।",
   },
 } as const satisfies Record<"en" | "hi", Record<string, string>>;

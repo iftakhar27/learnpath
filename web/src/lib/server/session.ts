@@ -30,6 +30,40 @@ export function visitorHeaders(req: NextRequest): Record<string, string> {
 }
 const secureCookies = process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === "true" : process.env.NODE_ENV === "production";
 
+/**
+ * While the API restarts (a deploy) or wakes up (free hosting), the hosting edge answers with its own HTML error page
+ * instead of the API's JSON. Those requests never reached the API, so they are safe to repeat.
+ */
+export function isEdgeError(res: Response) {
+  return res.status >= 502 && res.status <= 504 && !(res.headers.get("content-type") ?? "").includes("json");
+}
+
+const EDGE_RETRY_DELAYS_MS = [1500, 3000, 5000];
+
+/** Calls the API; with `retryEdge`, repeats a request the hosting edge bounced (about 10 s in total). */
+export async function apiFetch(path: string, init: RequestInit, retryEdge = true): Promise<Response> {
+  // Each attempt is marked as a distinct request, so a retry is never served a de-duplicated copy of the bounced one.
+  const call = (attempt: number) => {
+    const headers = new Headers(init.headers);
+    if (attempt > 0) headers.set("x-learnpath-attempt", String(attempt));
+    return fetch(`${API_BASE_URL}${path}`, { cache: "no-store", redirect: "manual", ...init, headers });
+  };
+  let res = await call(0);
+  if (!retryEdge) return res;
+  for (const [i, delay] of EDGE_RETRY_DELAYS_MS.entries()) {
+    if (!isEdgeError(res)) break;
+    // Read the (small) error page to the end; cancelling the body instead could stall on Next.js's patched fetch.
+    await res.text().catch(() => "");
+    await new Promise((r) => setTimeout(r, delay));
+    res = await call(i + 1);
+  }
+  return res;
+}
+
+/** The API is restarting or waking up: say so in JSON (never pass the edge's HTML page to the browser). */
+export const apiStarting = () =>
+  NextResponse.json({ status: 503, code: "api_unavailable", title: "The server is starting up. Please try again in a few seconds." }, { status: 503 });
+
 export type AuthTokens = {
   accessToken: string;
   accessTokenExpiresAt: string;
@@ -69,23 +103,27 @@ export function clearSessionCookies(res: NextResponse) {
  * that still carry the old cookie (sent before the browser stored the new one) reuse the new tokens.
  * This is per server process: run a single Next.js instance or use sticky sessions.
  */
-const refreshes = new Map<string, { promise: Promise<AuthTokens | null>; expires: number }>();
+const refreshes = new Map<string, { promise: Promise<AuthTokens | null | "unavailable">; expires: number }>();
 const REFRESH_REUSE_MS = 60_000;
 
-export function refreshSession(refreshToken: string, extraHeaders: Record<string, string> = {}): Promise<AuthTokens | null> {
+export function refreshSession(refreshToken: string, extraHeaders: Record<string, string> = {}): Promise<AuthTokens | null | "unavailable"> {
   const now = Date.now();
   for (const [key, entry] of refreshes) if (entry.expires < now) refreshes.delete(key);
   const existing = refreshes.get(refreshToken);
   if (existing) return existing.promise;
 
-  const promise = fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+  const promise: Promise<AuthTokens | null | "unavailable"> = apiFetch("/api/v1/auth/refresh", {
     method: "POST",
     headers: { "content-type": "application/json", ...extraHeaders },
     body: JSON.stringify({ refreshToken }),
-    cache: "no-store",
   })
-    .then(async (r) => (r.ok ? ((await r.json()) as AuthTokens) : null))
-    .catch(() => null);
+    .then(async (r) => (r.ok ? ((await r.json()) as AuthTokens) : isEdgeError(r) || r.status >= 500 ? ("unavailable" as const) : null))
+    // A network failure is not a rejected session: keep the cookies and let the visitor retry.
+    .catch(() => "unavailable" as const)
+    .then((result) => {
+      if (result === "unavailable") refreshes.delete(refreshToken);
+      return result;
+    });
   refreshes.set(refreshToken, { promise, expires: now + REFRESH_REUSE_MS });
   return promise;
 }
@@ -96,6 +134,8 @@ export type ResolvedAccess = {
   refreshed: AuthTokens | null;
   /** True when a refresh token existed but the API rejected it; the caller should clear cookies. */
   expired: boolean;
+  /** The API couldn't be reached to refresh (restarting, waking up, network); keep the session and say so. */
+  unavailable?: boolean;
 };
 
 /** Returns a usable access token, refreshing when the current one is missing or about to expire. */
@@ -107,6 +147,7 @@ export async function resolveAccess(req: NextRequest, forceRefresh = false): Pro
   }
   if (!refresh) return { accessToken: null, refreshed: null, expired: false };
   const tokens = await refreshSession(refresh, visitorHeaders(req));
+  if (tokens === "unavailable") return { accessToken: null, refreshed: null, expired: false, unavailable: true };
   return tokens
     ? { accessToken: tokens.accessToken, refreshed: tokens, expired: false }
     : { accessToken: null, refreshed: null, expired: true };
@@ -159,15 +200,15 @@ export async function startSession(
 ): Promise<Response> {
   let upstream: Response;
   try {
-    upstream = await fetch(`${API_BASE_URL}${apiPath}`, {
+    upstream = await apiFetch(apiPath, {
       method: "POST",
       headers: { "content-type": "application/json", ...visitorHeaders(req) },
       body: JSON.stringify(body),
-      cache: "no-store",
     });
   } catch {
     return problem(502, "api_unreachable", "The server is unreachable. Please try again.");
   }
+  if (isEdgeError(upstream)) return apiStarting();
   if (!upstream.ok) {
     return new Response(upstream.body, { status: upstream.status, headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" } });
   }

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { API_BASE_URL, apiNotConfigured, applyAccessResult, isSameOrigin, problem, resolveAccess, visitorHeaders } from "@/lib/server/session";
+import { apiFetch, apiNotConfigured, apiStarting, applyAccessResult, isEdgeError, isSameOrigin, problem, resolveAccess, visitorHeaders } from "@/lib/server/session";
 
 /**
  * Forwards /api/v1/* from the browser to the backend API with the session's bearer token.
@@ -21,7 +21,9 @@ async function forward(req: NextRequest, ctx: RouteContext<"/api/v1/[...path]">)
   const notConfigured = apiNotConfigured();
   if (notConfigured) return notConfigured;
 
-  const url = `${API_BASE_URL}/api/v1/${path.map(encodeURIComponent).join("/")}${req.nextUrl.search}`;
+  const apiPath = `/api/v1/${path.map(encodeURIComponent).join("/")}${req.nextUrl.search}`;
+  // POSTs aren't repeated (not all are idempotent); reads and PUT/DELETE are.
+  const retryEdge = req.method !== "POST";
   const body = req.method === "GET" || req.method === "HEAD" ? undefined : await req.arrayBuffer();
 
   const send = (token: string | null) => {
@@ -31,10 +33,11 @@ async function forward(req: NextRequest, ctx: RouteContext<"/api/v1/[...path]">)
       if (v) headers.set(h, v);
     }
     if (token) headers.set("authorization", `Bearer ${token}`);
-    return fetch(url, { method: req.method, headers, body, cache: "no-store", redirect: "manual" });
+    return apiFetch(apiPath, { method: req.method, headers, body }, retryEdge);
   };
 
   let access = await resolveAccess(req);
+  if (access.unavailable) return apiStarting();
   let upstream: Response;
   try {
     upstream = await send(access.accessToken);
@@ -51,6 +54,8 @@ async function forward(req: NextRequest, ctx: RouteContext<"/api/v1/[...path]">)
   } catch {
     return problem(502, "api_unreachable", "The server is unreachable. Please try again.");
   }
+  if (access.unavailable) return apiStarting();
+  if (isEdgeError(upstream)) return applyAccessResult(apiStarting(), access);
 
   const headers = new Headers();
   for (const h of FORWARDED_RESPONSE_HEADERS) {

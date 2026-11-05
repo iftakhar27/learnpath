@@ -9,6 +9,8 @@ export function useErrorText() {
   return (e: unknown): string => {
     if (e instanceof ApiError) {
       if (e.status === 0) return t("errorNetwork");
+      if (e.code === "api_unavailable" || e.code === "bad_response") return t("serverStarting");
+      if (e.code === "api_unreachable") return t("serverUnreachable");
       if (e.code === "terms_required") return t("mustAcceptTerms");
       if (e.status >= 500 && e.code.startsWith("http_")) return t("errorGeneric");
     }
