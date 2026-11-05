@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useWakeApi } from "@/lib/api/warm-up";
 import { LanguageSwitch } from "./language-switch";
 
 const brand = process.env.NEXT_PUBLIC_BRAND_NAME ?? "LearnPath";
 
 /** Signed-out pages: brand, language choice, and a centred card. */
 export function AuthLayout({ title, subtitle, children, footer }: { title: string; subtitle?: string; children: ReactNode; footer?: ReactNode }) {
+  useWakeApi();
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4">

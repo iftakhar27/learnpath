@@ -38,9 +38,10 @@ export function isEdgeError(res: Response) {
   return res.status >= 502 && res.status <= 504 && !(res.headers.get("content-type") ?? "").includes("json");
 }
 
-const EDGE_RETRY_DELAYS_MS = [1500, 3000, 5000];
+// About 40 s in total: long enough for a free-plan server to wake up (typically 25–60 s).
+const EDGE_RETRY_DELAYS_MS = [1500, 3000, 5000, 8000, 10000, 12000];
 
-/** Calls the API; with `retryEdge`, repeats a request the hosting edge bounced (about 10 s in total). */
+/** Calls the API; with `retryEdge`, repeats a request the hosting edge bounced (about 40 s in total). */
 export async function apiFetch(path: string, init: RequestInit, retryEdge = true): Promise<Response> {
   // Each attempt is marked as a distinct request, so a retry is never served a de-duplicated copy of the bounced one.
   const call = (attempt: number) => {
