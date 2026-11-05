@@ -7,7 +7,6 @@ import { rawFetch } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { InlineError } from "@/components/ui/feedback";
 import { Field, Input } from "@/components/ui/field";
-import { useWakeApi } from "@/lib/api/warm-up";
 
 type Form = { email: string; password: string };
 
@@ -17,7 +16,6 @@ function safeNext(next: string | null) {
 }
 
 export function LoginForm() {
-  useWakeApi();
   const params = useSearchParams();
   const [error, setError] = useState<unknown>(null);
   const { register, handleSubmit, formState } = useForm<Form>();

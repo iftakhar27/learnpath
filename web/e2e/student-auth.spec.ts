@@ -130,3 +130,9 @@ test("the website's session routes refuse cross-site requests and keep tokens ou
   expect(cookies.find((c) => c.name === "lp_rt")?.httpOnly).toBe(true);
   void API_URL;
 });
+
+test("each page load wakes the API from the browser (free hosting only wakes on outside requests)", async ({ page }) => {
+  const wake = page.waitForRequest((r) => r.url() === `${API_URL}/health`);
+  await page.goto("/login");
+  expect((await wake).method()).toBe("GET");
+});

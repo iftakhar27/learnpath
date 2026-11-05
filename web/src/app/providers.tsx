@@ -4,6 +4,7 @@ import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@ta
 import { useState, type ReactNode } from "react";
 import { ApiError } from "@/lib/api/client";
 import { ToastProvider } from "@/components/ui/toast";
+import { useWakeApi } from "@/lib/api/warm-up";
 
 const PUBLIC_PATHS = ["/", "/login", "/register", "/admin/login"];
 
@@ -18,6 +19,7 @@ function onAuthError(error: unknown) {
 }
 
 export function Providers({ children }: { children: ReactNode }) {
+  useWakeApi();
   const [client] = useState(
     () =>
       new QueryClient({
