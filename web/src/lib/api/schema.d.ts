@@ -4681,6 +4681,13 @@ export interface components {
             expiresAt: string;
             /** Format: int32 */
             resumeAtSeconds: number;
+            title: string;
+            /** Format: uuid */
+            topicId: string;
+            topic: string;
+            /** Format: int32 */
+            durationSeconds?: number | null;
+            completed: boolean;
         };
         PlayerOptionDto: {
             /** Format: uuid */

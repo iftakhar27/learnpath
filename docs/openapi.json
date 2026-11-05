@@ -7713,9 +7713,13 @@
       },
       "PlaybackDto": {
         "required": [
+          "completed",
           "expiresAt",
           "resourceId",
           "resumeAtSeconds",
+          "title",
+          "topic",
+          "topicId",
           "type",
           "url"
         ],
@@ -7742,6 +7746,24 @@
           "resumeAtSeconds": {
             "type": "integer",
             "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "durationSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "completed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

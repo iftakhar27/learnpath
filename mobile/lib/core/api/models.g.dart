@@ -2443,7 +2443,19 @@ class PlanTaskDto {
 
 @immutable
 class PlaybackDto {
-  const PlaybackDto({required this.resourceId, required this.type, required this.url, this.streamUrl, required this.expiresAt, required this.resumeAtSeconds});
+  const PlaybackDto({
+    required this.resourceId,
+    required this.type,
+    required this.url,
+    this.streamUrl,
+    required this.expiresAt,
+    required this.resumeAtSeconds,
+    required this.title,
+    required this.topicId,
+    required this.topic,
+    this.durationSeconds,
+    required this.completed,
+  });
 
   factory PlaybackDto.fromJson(Map<String, dynamic> json) => PlaybackDto(
     resourceId: json['resourceId'] as String,
@@ -2452,6 +2464,11 @@ class PlaybackDto {
     streamUrl: json['streamUrl'] == null ? null : json['streamUrl'] as String,
     expiresAt: DateTime.parse(json['expiresAt'] as String),
     resumeAtSeconds: (json['resumeAtSeconds'] as num).toInt(),
+    title: json['title'] as String,
+    topicId: json['topicId'] as String,
+    topic: json['topic'] as String,
+    durationSeconds: json['durationSeconds'] == null ? null : (json['durationSeconds'] as num).toInt(),
+    completed: json['completed'] as bool,
   );
 
   final String resourceId;
@@ -2460,6 +2477,11 @@ class PlaybackDto {
   final String? streamUrl;
   final DateTime expiresAt;
   final int resumeAtSeconds;
+  final String title;
+  final String topicId;
+  final String topic;
+  final int? durationSeconds;
+  final bool completed;
 
   Map<String, dynamic> toJson() => {
     'resourceId': resourceId,
@@ -2468,6 +2490,11 @@ class PlaybackDto {
     'streamUrl': ?streamUrl,
     'expiresAt': expiresAt.toIso8601String(),
     'resumeAtSeconds': resumeAtSeconds,
+    'title': title,
+    'topicId': topicId,
+    'topic': topic,
+    'durationSeconds': ?durationSeconds,
+    'completed': completed,
   };
 }
 

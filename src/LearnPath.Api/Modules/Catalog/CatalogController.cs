@@ -17,7 +17,8 @@ public record CourseDetailDto(CourseSummaryDto Course, bool HasAccess, int Compl
 public record TopicDetailDto(Guid Id, Guid CourseId, string Title, string? Objectives, int EstimatedMinutes, string Chapter, string Subject, bool HasAccess,
     List<ResourceDto> Resources, int PracticeQuestionCount, Guid? PreviousTopicId, Guid? NextTopicId);
 /// <summary><c>Url</c> is the web player (videos) or download link (notes); <c>StreamUrl</c> is HLS for native video players.</summary>
-public record PlaybackDto(Guid ResourceId, string Type, string Url, string? StreamUrl, DateTimeOffset ExpiresAt, int ResumeAtSeconds);
+public record PlaybackDto(Guid ResourceId, string Type, string Url, string? StreamUrl, DateTimeOffset ExpiresAt, int ResumeAtSeconds,
+    string Title, Guid TopicId, string Topic, int? DurationSeconds, bool Completed);
 
 [ApiController]
 [Route("api/v1")]
@@ -146,8 +147,10 @@ public class CatalogController(AppDbContext db, RequestLanguage lang, Entitlemen
             ? videoSigner.GetPlaybackUrl(r.VideoProviderId ?? throw AppException.NotFound("Video"), userId, validFor)
             : docSigner.GetDownloadUrl(r.DocumentStorageKey ?? throw AppException.NotFound("Document"), validFor);
         var stream = r.Type == ResourceType.Video ? videoSigner.GetStreamUrl(r.VideoProviderId!, validFor) : null;
-        var resume = await db.ResourceProgress.Where(p => p.UserId == userId && p.ResourceId == resourceId).Select(p => p.PositionSeconds).FirstOrDefaultAsync(ct);
-        return new PlaybackDto(r.Id, r.Type.ToString(), url, stream, clock.GetUtcNow().Add(validFor), resume);
+        var progress = await db.ResourceProgress.Where(p => p.UserId == userId && p.ResourceId == resourceId)
+            .Select(p => new { p.PositionSeconds, p.Completed }).FirstOrDefaultAsync(ct);
+        return new PlaybackDto(r.Id, r.Type.ToString(), url, stream, clock.GetUtcNow().Add(validFor), progress?.PositionSeconds ?? 0,
+            lang.Pick(r.TitleEn, r.TitleHi), r.TopicId, lang.Pick(r.Topic.TitleEn, r.Topic.TitleHi), r.DurationSeconds, progress?.Completed ?? false);
     }
 
     private CourseSummaryDto ToSummary(Course c, bool enrolled) =>

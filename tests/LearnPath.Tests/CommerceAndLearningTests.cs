@@ -135,7 +135,10 @@ public class LearningTests(ApiFactory api)
 
         var p1 = await c.PostAsJsonAsync("/api/v1/learning/progress", new { resourceId = vid, positionSeconds = 120 }).Ok();
         Assert.False(p1.GetProperty("completed").GetBoolean());
-        Assert.Equal(120, (await c.GetAsync($"/api/v1/resources/{vid}/playback").Ok()).GetProperty("resumeAtSeconds").GetInt32());
+        var playback = await c.GetAsync($"/api/v1/resources/{vid}/playback").Ok();
+        Assert.Equal(120, playback.GetProperty("resumeAtSeconds").GetInt32());
+        Assert.Equal((video.Str("title"), topicId, 540, false), (playback.Str("title"), playback.Str("topicId"), playback.GetProperty("durationSeconds").GetInt32(), playback.GetProperty("completed").GetBoolean()));
+        Assert.False(string.IsNullOrEmpty(playback.Str("topic")));
 
         var dash = await c.GetAsync("/api/v1/student/dashboard").Ok();
         Assert.Equal(vid, dash.GetProperty("continueLearning")[0].Str("resourceId"));
