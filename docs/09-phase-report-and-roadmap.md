@@ -200,7 +200,10 @@ MSG91 account).
 `502 payment_gateway_error`; Razorpay settings are managed in Render (`sync: false`). **Verified:** 5 new backend tests
 against a fake Razorpay (order request: Basic auth, amount in paise, receipt; HMAC checkout and webhook signatures
 against independently computed values incl. tampering; "Authentication failed" logged without the secret; startup
-refusals). **Not verified yet:** a payment through Razorpay's real test environment (needs the owner's test keys).
+refusals). **Live (5 Nov 2026):** with the owner's test keys in Render, the API created real Razorpay test orders and the
+webhook endpoint rejects unsigned calls; the owner paid for the paid sample course on the website through Razorpay
+Checkout (test mode, Netbanking) and the course unlocked. **Still to check in the dashboard:** the payment shows as
+Captured and the webhook delivery succeeded; the Android app's checkout on a device.
 
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
