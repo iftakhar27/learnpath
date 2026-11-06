@@ -205,6 +205,15 @@ webhook endpoint rejects unsigned calls; the owner paid for the paid sample cour
 Checkout (test mode, Netbanking) and the course unlocked. **Still to check in the dashboard:** the payment shows as
 Captured and the webhook delivery succeeded; the Android app's checkout on a device.
 
+### iOS build (6 Nov 2026)
+
+**Built:** `.github/workflows/ios.yml` builds the app on GitHub's macOS runners (Xcode 26.3, Swift 6.2.4; the newest
+Xcode on the image is selected because `video_player_avfoundation` needs Swift 6.2) on every push to `main` that touches
+`mobile/`: an unsigned iPhone `.ipa` (9 MB) and an iOS Simulator build, kept as workflow artifacts for 30 days. App id
+`com.learnpath.app` on both platforms. **Verified:** both builds compile and package (first green run 42172622581).
+**Not verified:** running on an iPhone or the Simulator (needs the owner's device or a Mac); signed TestFlight builds
+need the Apple Developer Program.
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |
