@@ -92,4 +92,16 @@ After editing ARB files: `flutter gen-l10n` (also runs on build).
 - Razorpay checkout works on Android/iOS only; the web build shows a message instead. Access is granted only after
   the server verifies the payment signature.
 - Push notifications (FCM) are not wired yet; notifications are in-app.
-- iOS builds need a Mac with Xcode; they were not built in this (Linux) environment.
+- iOS builds run on GitHub's Mac runners (`.github/workflows/ios.yml`) on every push to `main` that touches `mobile/`,
+  or on demand (Actions → iOS build → Run workflow). Each run has two artifacts: **LearnPath-unsigned-ipa** (iPhone) and
+  **LearnPath-simulator** (iOS Simulator). The app id is `com.learnpath.app` on both platforms.
+
+### Installing the iOS build
+
+- **Your own iPhone, free:** install [Sideloadly](https://sideloadly.io) (Windows/macOS), connect the iPhone by cable,
+  drop in `LearnPath-unsigned.ipa`, sign in with your Apple ID and start. On the phone: Settings → General → VPN & Device
+  Management → trust your Apple ID, and turn on Developer Mode (Settings → Privacy & Security). A free Apple ID signs
+  apps for 7 days (then reinstall) and up to 3 apps at a time.
+- **Testers (TestFlight) or the App Store:** needs the Apple Developer Program (USD 99/year). Then add signing to the
+  workflow (distribution certificate, provisioning profile and an App Store Connect API key as repository secrets) and
+  build with `flutter build ipa` to upload to TestFlight.

@@ -1,0 +1,80 @@
+# Builds the iOS app on a GitHub-hosted Mac (iOS builds need macOS + Xcode). The results are workflow artifacts,
+# downloadable by signed-in users from the run's page:
+#   - LearnPath-unsigned-ipa: iPhone build without a signature (sideload with a free Apple ID via Sideloadly or
+#     AltStore, or sign it for TestFlight)
+#   - LearnPath-simulator: Runner.app for the iOS Simulator on a Mac
+# If a build step fails, the end of the build log is reported as error annotations on the run.
+name: iOS build
+
+on:
+  push:
+    branches: [main]
+    paths: ["mobile/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-build
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      # The API the app talks to (override with a repository variable).
+      API_BASE_URL: ${{ vars.API_BASE_URL || 'https://learnpath-api-89zs.onrender.com' }}
+      FLUTTER_SUPPRESS_ANALYTICS: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.9
+          channel: stable
+          cache: true
+
+      - name: Flutter and Xcode versions
+        run: flutter --version && xcodebuild -version
+
+      - name: Get packages
+        working-directory: mobile
+        run: flutter pub get
+
+      - name: Build for the iOS Simulator
+        working-directory: mobile
+        run: |
+          set -o pipefail
+          flutter build ios --simulator --dart-define=API_BASE_URL="$API_BASE_URL" 2>&1 | tee -a ../ios-build.log
+
+      - name: Build for iPhone (unsigned)
+        working-directory: mobile
+        run: |
+          set -o pipefail
+          flutter build ios --release --no-codesign --dart-define=API_BASE_URL="$API_BASE_URL" 2>&1 | tee -a ../ios-build.log
+          rm -rf Payload && mkdir Payload && cp -R build/ios/iphoneos/Runner.app Payload/
+          zip -qry ../LearnPath-unsigned.ipa Payload
+
+      - name: Upload the iPhone build
+        uses: actions/upload-artifact@v4
+        with:
+          name: LearnPath-unsigned-ipa
+          path: LearnPath-unsigned.ipa
+          retention-days: 30
+
+      - name: Upload the Simulator build
+        uses: actions/upload-artifact@v4
+        with:
+          name: LearnPath-simulator
+          path: mobile/build/ios/iphonesimulator/Runner.app
+          retention-days: 30
+
+      - name: Report the end of the build log
+        if: failure()
+        run: |
+          touch ios-build.log
+          # Error and warning lines first, then the last lines, as annotations (visible on the run and via the API).
+          grep -E "error:|Error:|ERROR|Exception|failed" ios-build.log | tail -n 10 | while IFS= read -r line; do echo "::error title=build::${line:0:900}"; done
+          tail -n 10 ios-build.log | while IFS= read -r line; do echo "::warning title=log tail::${line:0:900}"; done
