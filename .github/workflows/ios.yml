@@ -30,6 +30,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Current plugins (e.g. video_player's Swift code) need the newest Swift, so use the newest Xcode on the image.
+      - name: Select the newest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          newest=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -n 1)
+          sudo xcode-select -s "$newest/Contents/Developer"
+          echo "::notice title=Xcode::$(xcodebuild -version | tr '\n' ' ') from $newest (installed: $(ls -d /Applications/Xcode_*.app | xargs -n1 basename | tr '\n' ' '))"
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.9
@@ -37,7 +45,9 @@ jobs:
           cache: true
 
       - name: Flutter and Xcode versions
-        run: flutter --version && xcodebuild -version
+        run: |
+          flutter --version && xcodebuild -version
+          echo "::notice title=Swift::$(swift --version 2>&1 | head -n 1)"
 
       - name: Get packages
         working-directory: mobile
