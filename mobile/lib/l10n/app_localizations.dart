@@ -62,7 +62,8 @@ import 'app_localizations_hi.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,15 +84,19 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en'), Locale('hi')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('hi'),
+  ];
 
   /// No description provided for @appTagline.
   ///
@@ -1717,9 +1723,220 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 day ago} other{{count} days ago}}'**
   String timeDaysAgo(int count);
+
+  /// No description provided for @doubtsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My doubts'**
+  String get doubtsTitle;
+
+  /// No description provided for @askDoubt.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask a doubt'**
+  String get askDoubt;
+
+  /// No description provided for @doubtsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Stuck on something? Ask a teacher. You\'ll get a notification when they reply.'**
+  String get doubtsIntro;
+
+  /// No description provided for @yourDoubt.
+  ///
+  /// In en, this message translates to:
+  /// **'Your doubt'**
+  String get yourDoubt;
+
+  /// No description provided for @doubtHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe where you\'re stuck: the question, the step, or what isn\'t clear.'**
+  String get doubtHint;
+
+  /// No description provided for @doubtAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About: {title}'**
+  String doubtAbout(Object title);
+
+  /// No description provided for @doubtGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General doubt'**
+  String get doubtGeneral;
+
+  /// No description provided for @doubtSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Doubt sent. A teacher will reply soon.'**
+  String get doubtSent;
+
+  /// No description provided for @doubtTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Write at least 5 characters.'**
+  String get doubtTooShort;
+
+  /// No description provided for @doubtsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t asked any doubts yet.'**
+  String get doubtsEmpty;
+
+  /// No description provided for @doubtStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for a teacher'**
+  String get doubtStatusOpen;
+
+  /// No description provided for @doubtStatusAnswered.
+  ///
+  /// In en, this message translates to:
+  /// **'Answered'**
+  String get doubtStatusAnswered;
+
+  /// No description provided for @doubtStatusResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get doubtStatusResolved;
+
+  /// No description provided for @doubtReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No replies yet} =1{1 reply} other{{count} replies}}'**
+  String doubtReplies(int count);
+
+  /// No description provided for @doubtYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get doubtYou;
+
+  /// No description provided for @doubtTeacher.
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher'**
+  String get doubtTeacher;
+
+  /// No description provided for @doubtFollowUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask a follow-up'**
+  String get doubtFollowUp;
+
+  /// No description provided for @doubtMarkResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'My doubt is solved'**
+  String get doubtMarkResolved;
+
+  /// No description provided for @doubtResolvedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Still unclear? Ask a follow-up and a teacher will look again.'**
+  String get doubtResolvedHint;
+
+  /// No description provided for @topicQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic quiz'**
+  String get topicQuiz;
+
+  /// No description provided for @topicQuizInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 question} other{{count} questions}} · pass mark {percent}%'**
+  String topicQuizInfo(int count, Object percent);
+
+  /// No description provided for @topicQuizCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve covered this topic. Check your understanding with a short quiz.'**
+  String get topicQuizCovered;
+
+  /// No description provided for @topicQuizNotCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish the lessons first, or test yourself now.'**
+  String get topicQuizNotCovered;
+
+  /// No description provided for @topicDonePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic covered! Take a quick {count, plural, =1{1-question} other{{count}-question}} quiz.'**
+  String topicDonePrompt(int count);
+
+  /// No description provided for @startQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Start quiz'**
+  String get startQuiz;
+
+  /// No description provided for @retakeQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake quiz'**
+  String get retakeQuiz;
+
+  /// No description provided for @quizBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Best score {percent}%'**
+  String quizBest(Object percent);
+
+  /// No description provided for @quizPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get quizPassed;
+
+  /// No description provided for @quizNotPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not passed yet'**
+  String get quizNotPassed;
+
+  /// No description provided for @submitQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit quiz'**
+  String get submitQuiz;
+
+  /// No description provided for @quizUnanswered.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 question is unanswered.} other{{count} questions are unanswered.}} Submit anyway?'**
+  String quizUnanswered(int count);
+
+  /// No description provided for @quizResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz result'**
+  String get quizResult;
+
+  /// No description provided for @quizPassedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done! You passed this topic\'s quiz.'**
+  String get quizPassedBody;
+
+  /// No description provided for @quizFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You need {percent}% to pass. Revise the lessons and try again.'**
+  String quizFailedBody(Object percent);
+
+  /// No description provided for @backToTopic.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to topic'**
+  String get backToTopic;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -1728,7 +1945,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'hi'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'hi'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;

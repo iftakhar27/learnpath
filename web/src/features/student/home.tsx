@@ -122,6 +122,17 @@ export function StudentHome() {
         </div>
 
         <div className="space-y-6">
+          <Link href={routes.doubts} className="flex items-center gap-4 rounded-2xl border border-border bg-surface p-4 hover:border-primary sm:p-5">
+            <span className="rounded-xl bg-primary-soft p-2.5 text-primary">
+              <Icon name="chat" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">{t("askDoubt")}</span>
+              <span className="mt-0.5 block text-sm text-fg-muted">{t("doubtsIntro")}</span>
+            </span>
+            <Icon name="chevronRight" className="text-fg-muted" />
+          </Link>
+
           <Section title={t("thisWeek")}>
             <dl className="grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-surface-muted p-3">

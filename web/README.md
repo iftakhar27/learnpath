@@ -51,13 +51,14 @@ When the API contract changes: run `../scripts/export-openapi.sh`, then `npm run
 ```
 src/app/page.tsx, login, register, onboarding   student landing and sign-in (mobile OTP or email)
 src/app/(student)/...            student pages inside the site frame: home, learn, topics, watch, practice, tests,
-                                 results, plan, progress, profile, notifications, bookmarks, purchases, support
+                                 results, plan, progress, profile, notifications, bookmarks, purchases, support,
+                                 doubts, topic quizzes (topics/[id]/quiz)
 src/app/exam/[attemptId]         full-screen exam player (outside the frame)
 src/app/admin/login              staff sign-in page
 src/app/admin/(portal)/...       admin pages (thin server components; each wraps a client feature in <Suspense>)
 src/app/api/session, api/v1      BFF route handlers
 src/features/student/...         student screens; tests/exam-session.ts is the exam engine (port of the app's)
-src/features/admin/...           screens: catalog, questions, tests, students, ops (orders, support, announcements, audit)
+src/features/admin/...           screens: catalog, questions, tests, students, ops (doubts, orders, support, announcements, audit)
 src/lib/i18n                     English/Hindi: strings generated from the app's ARB files + web-messages.ts
 src/components/ui                design-system primitives (tokens in app/globals.css, light + dark)
 src/lib                          API client + generated types, session/permissions, formatting

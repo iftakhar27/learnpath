@@ -64,6 +64,16 @@ class HomeScreen extends ConsumerWidget {
           onRefresh: () async => ref.invalidate(dashboardProvider),
           children: [
             _Hero(d: d),
+            Card(
+              margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: ListTile(
+                leading: Icon(Icons.forum_outlined, color: Theme.of(context).colorScheme.primary),
+                title: Text(l.askDoubt, style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text(l.doubtsIntro),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/doubts'),
+              ),
+            ),
             SectionHeader(
               l.todaysPlan,
               action: TextButton(onPressed: () => context.push('/plan'), child: Text(l.viewFullPlan)),

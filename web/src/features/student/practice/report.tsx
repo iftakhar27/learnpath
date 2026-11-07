@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/field";
 import { Icon } from "@/components/ui/icons";
 import { useToast } from "@/components/ui/toast";
 import { StudentError } from "../errors";
+import { AskDoubtButton } from "../doubts/doubts";
 import { useBookmark } from "../learn/bookmarks";
 
 const REASONS = [
@@ -18,8 +19,8 @@ const REASONS = [
   ["other", "reportReasonOther"],
 ] as const;
 
-/** "Save for revision" and "Report a problem" for one question. */
-export function QuestionTools({ questionId }: { questionId: string }) {
+/** "Save for revision", "Ask a doubt" and "Report a problem" for one question. */
+export function QuestionTools({ questionId, stem }: { questionId: string; stem?: string }) {
   const t = useT();
   const toast = useToast();
   const bookmark = useBookmark("Question", questionId);
@@ -56,6 +57,7 @@ export function QuestionTools({ questionId }: { questionId: string }) {
         <Icon name="bookmark" size={16} fill={bookmark.saved ? "currentColor" : "none"} />
         {bookmark.saved ? t("bookmarked") : t("bookmark")}
       </button>
+      <AskDoubtButton link={{ questionId }} about={stem} />
       <button type="button" onClick={() => setOpen(true)} className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-surface-muted">
         <Icon name="flag" size={16} />
         {t("reportQuestion")}

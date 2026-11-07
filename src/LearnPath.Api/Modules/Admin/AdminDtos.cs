@@ -13,8 +13,9 @@ public record AdminCourseDto(Guid Id, Guid ExamId, string Slug, string TitleEn, 
 public record AdminResourceDto(Guid Id, Guid TopicId, ResourceType Type, string TitleEn, string? TitleHi, string Language, int SortOrder,
     bool IsFreePreview, PublishStatus Status, string? VideoProviderId, int? DurationSeconds, string? DocumentStorageKey, bool AllowDownload, int Version);
 
+/// <summary>The topic quiz uses up to <c>QuizQuestionCount</c> of the topic's <c>PublishedQuestionCount</c> questions (0 = no quiz).</summary>
 public record AdminTopicDto(Guid Id, Guid ChapterId, string TitleEn, string? TitleHi, string? ObjectivesEn, string? ObjectivesHi,
-    int EstimatedMinutes, int SortOrder, int QuestionCount, List<AdminResourceDto> Resources);
+    int EstimatedMinutes, int SortOrder, int QuestionCount, List<AdminResourceDto> Resources, int PublishedQuestionCount, int QuizQuestionCount, int QuizPassPercent);
 
 public record AdminChapterDto(Guid Id, Guid SubjectId, string? UnitTitleEn, string TitleEn, string? TitleHi, int SortOrder, List<AdminTopicDto> Topics);
 

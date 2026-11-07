@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:video_player/video_player.dart';
 
@@ -11,6 +12,7 @@ import '../../core/api/models.g.dart';
 import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
+import '../doubts/doubt_screens.dart';
 
 final playbackProvider = FutureProvider.autoDispose.family<PlaybackDto, String>((ref, id) => ref.watch(apiProvider).playback(id));
 
@@ -22,7 +24,10 @@ class VideoScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playback = ref.watch(playbackProvider(resourceId));
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.video)),
+      appBar: AppBar(
+        title: Text(context.l10n.video),
+        actions: [if (playback.value case final p?) AskDoubtAction(resourceId: p.resourceId, about: p.title)],
+      ),
       body: AsyncView(
         value: playback,
         onRetry: () => ref.invalidate(playbackProvider(resourceId)),
@@ -48,6 +53,7 @@ class _PlayerState extends State<_Player> {
   Timer? _saver;
   bool _failed = false;
   bool _completed = false;
+  TopicQuizSummaryDto? _quizPrompt; // set when this lesson completes the topic
   bool _fullscreen = false;
   int _lastSaved = -1;
 
@@ -89,6 +95,9 @@ class _PlayerState extends State<_Player> {
     try {
       final p = await widget.api.saveProgress(widget.playback.resourceId, seconds);
       if (p.completed && !_completed && mounted) setState(() => _completed = true);
+      if (p.topicCompleted && p.quiz != null && p.quiz!.attempts == 0 && _quizPrompt == null && mounted) {
+        setState(() => _quizPrompt = p.quiz);
+      }
     } catch (_) {
       // Progress saving is best-effort; the next save retries.
     }
@@ -193,6 +202,19 @@ class _PlayerState extends State<_Player> {
                 const SizedBox(width: 8),
                 Text(l.completed),
               ],
+            ),
+          ),
+        if (_quizPrompt case final quiz?)
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: ListTile(
+              leading: const Icon(Icons.fact_check_outlined),
+              title: Text(l.topicDonePrompt(quiz.questionCount)),
+              trailing: FilledButton(
+                onPressed: () => context.push('/topic/${widget.playback.topicId}/quiz'),
+                child: Text(l.startQuiz),
+              ),
             ),
           ),
       ],

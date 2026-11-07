@@ -21,6 +21,7 @@ const paths = {
   globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z",
   flag: "M5 21V4m0 0h11l-2 4 2 4H5",
   x: "M6 6l12 12M18 6 6 18",
+  chat: "M4 5h16v11H10l-5 4v-4H4z",
 } as const;
 
 export type IconName = keyof typeof paths;

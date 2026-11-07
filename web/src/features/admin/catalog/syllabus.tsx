@@ -27,7 +27,10 @@ const nodeBody = (kind: Kind, n: AnyNode, sortOrder: number): NodeUpsert => {
     return { parentId: c.subjectId, titleEn: c.titleEn, titleHi: c.titleHi, sortOrder, unitTitleEn: c.unitTitleEn };
   }
   const t = n as AdminTopic;
-  return { parentId: t.chapterId, titleEn: t.titleEn, titleHi: t.titleHi, sortOrder, objectivesEn: t.objectivesEn, objectivesHi: t.objectivesHi, estimatedMinutes: t.estimatedMinutes };
+  return {
+    parentId: t.chapterId, titleEn: t.titleEn, titleHi: t.titleHi, sortOrder, objectivesEn: t.objectivesEn, objectivesHi: t.objectivesHi, estimatedMinutes: t.estimatedMinutes,
+    quizQuestionCount: t.quizQuestionCount, quizPassPercent: t.quizPassPercent,
+  };
 };
 
 const resourceBody = (r: AdminResource, sortOrder: number): ResourceUpsert => ({
@@ -166,6 +169,8 @@ export function SyllabusEditor({ tree }: { tree: AdminCourseTree }) {
                             <Link href={`/admin/questions?courseId=${tree.course.id}&chapterId=${c.id}&topicId=${t.id}`} className="text-primary hover:underline">
                               {t.questionCount} question{t.questionCount === 1 ? "" : "s"}
                             </Link>
+                            {" · "}
+                            {quizLabel(t)}
                           </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-1">
@@ -294,7 +299,23 @@ function parseDuration(value: string): number | null {
 
 const KIND_LABEL: Record<Kind, string> = { subject: "subject", chapter: "chapter", topic: "topic" };
 
-type NodeValues = { titleEn: string; titleHi: string; unitTitleEn: string; objectivesEn: string; objectivesHi: string; estimatedMinutes: string };
+/** "Quiz: 5 of 8 published questions" — what students get at the end of the topic. */
+function quizLabel(t: AdminTopic): string {
+  if (t.quizQuestionCount === 0) return "No quiz";
+  if (t.publishedQuestionCount === 0) return "Quiz: needs published questions";
+  return `Quiz: ${Math.min(t.quizQuestionCount, t.publishedQuestionCount)} question${Math.min(t.quizQuestionCount, t.publishedQuestionCount) === 1 ? "" : "s"}, pass ${t.quizPassPercent}%`;
+}
+
+type NodeValues = {
+  titleEn: string;
+  titleHi: string;
+  unitTitleEn: string;
+  objectivesEn: string;
+  objectivesHi: string;
+  estimatedMinutes: string;
+  quizQuestionCount: string;
+  quizPassPercent: string;
+};
 
 function NodeModal({ state, treeKey, onClose }: { state: Extract<ModalState, { type: "node" }>; treeKey: unknown[]; onClose: () => void }) {
   const { kind, node } = state;
@@ -308,6 +329,8 @@ function NodeModal({ state, treeKey, onClose }: { state: Extract<ModalState, { t
       objectivesEn: topic?.objectivesEn ?? "",
       objectivesHi: topic?.objectivesHi ?? "",
       estimatedMinutes: String(topic?.estimatedMinutes ?? 30),
+      quizQuestionCount: String(topic?.quizQuestionCount ?? 5),
+      quizPassPercent: String(topic?.quizPassPercent ?? 60),
     },
   });
   const save = useAction((body: NodeUpsert) => (node ? putNode(kind, node.id, body) : postNode(kind, body)), {
@@ -331,6 +354,8 @@ function NodeModal({ state, treeKey, onClose }: { state: Extract<ModalState, { t
             objectivesEn: kind === "topic" ? blankToNull(v.objectivesEn) : null,
             objectivesHi: kind === "topic" ? blankToNull(v.objectivesHi) : null,
             estimatedMinutes: kind === "topic" ? Number(v.estimatedMinutes) || 0 : 0,
+            quizQuestionCount: kind === "topic" ? Number(v.quizQuestionCount) : null,
+            quizPassPercent: kind === "topic" ? Number(v.quizPassPercent) : null,
           }),
         )}
       >
@@ -360,6 +385,33 @@ function NodeModal({ state, treeKey, onClose }: { state: Extract<ModalState, { t
             <Field label="Estimated study time (minutes)" htmlFor="node-mins" error={formState.errors.estimatedMinutes?.message}>
               <Input id="node-mins" type="number" min={0} max={1000} {...register("estimatedMinutes", { validate: (v) => (Number(v) >= 0 && Number(v) <= 1000) || "Between 0 and 1000" })} />
             </Field>
+            <fieldset className="space-y-3 rounded-xl border border-border p-4">
+              <legend className="px-1 text-sm font-semibold">Topic quiz</legend>
+              <p className="text-xs text-fg-muted">
+                A short quiz students are offered when they finish the topic&apos;s lessons, drawn at random from its published questions
+                {topic ? ` (${topic.publishedQuestionCount} now)` : ""}. Set the number of questions to 0 to turn it off.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label="Questions per quiz" htmlFor="node-quiz-count" error={formState.errors.quizQuestionCount?.message}>
+                  <Input
+                    id="node-quiz-count"
+                    type="number"
+                    min={0}
+                    max={50}
+                    {...register("quizQuestionCount", { validate: (v) => (v !== "" && Number.isInteger(Number(v)) && Number(v) >= 0 && Number(v) <= 50) || "A whole number from 0 to 50" })}
+                  />
+                </Field>
+                <Field label="Pass mark (%)" htmlFor="node-quiz-pass" error={formState.errors.quizPassPercent?.message}>
+                  <Input
+                    id="node-quiz-pass"
+                    type="number"
+                    min={1}
+                    max={100}
+                    {...register("quizPassPercent", { validate: (v) => (v !== "" && Number.isInteger(Number(v)) && Number(v) >= 1 && Number(v) <= 100) || "A whole number from 1 to 100" })}
+                  />
+                </Field>
+              </div>
+            </fieldset>
           </>
         )}
         <div className="flex justify-end gap-2">

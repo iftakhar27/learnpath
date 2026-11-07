@@ -1,7 +1,7 @@
 # LearnPath — exam-prep learning platform (working codename)
 
-Backend and product docs for a NEET / JEE / Board learning app: recorded lessons, notes, practice, timed tests,
-analytics, study planner and paid courses, in English and Hindi. The brand name is configurable (`Branding__ProductName`).
+Backend and product docs for a NEET / JEE / Board learning app: recorded lessons, notes, practice, topic quizzes,
+timed tests, "ask a doubt" to teachers, analytics, study planner and paid courses, in English and Hindi. The brand name is configurable (`Branding__ProductName`).
 
 **Status:** planning docs, the backend API, the **student website**, the **admin portal** and the **Flutter student
 app** (Android/iOS) are built and tested. See [`docs/09-phase-report-and-roadmap.md`](docs/09-phase-report-and-roadmap.md).
@@ -28,7 +28,7 @@ src/LearnPath.Api/
   Data/              AppDbContext, Seeder, Migrations/
   Infrastructure/    errors, language, hashing, audit, Razorpay/OTP/video adapters
   Modules/           Identity, Catalog, Learning, Practice, Exams, Analytics, Planner, Commerce,
-                     Notifications, Search, Admin
+                     Notifications, Search, Support (doubts), Admin
 tests/LearnPath.Tests/  unit + integration tests (real PostgreSQL)
 web/                    Next.js student website (/) and admin portal (/admin) — see web/README.md
 mobile/                 Flutter student app (Android + iOS) — see mobile/README.md

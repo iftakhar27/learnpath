@@ -178,6 +178,20 @@ class LearnPathApi {
     ),
   );
 
+  // ---- Topic quiz ----
+  Future<QuizDto> startTopicQuiz(String topicId) => _call(() => _dio.post('/topics/$topicId/quiz'), (d) => QuizDto.fromJson(_map(d)));
+  Future<QuizResultDto> submitQuiz(String sessionId, QuizSubmitRequest body) =>
+      _call(() => _dio.post('/practice/quizzes/$sessionId/submit', data: body.toJson()), (d) => QuizResultDto.fromJson(_map(d)));
+
+  // ---- Doubts ----
+  Future<PagedResultOfDoubtSummaryDto> doubts() =>
+      _call(() => _dio.get('/doubts', queryParameters: {'pageSize': 50}), (d) => PagedResultOfDoubtSummaryDto.fromJson(_map(d)));
+  Future<DoubtDto> doubt(String id) => _call(() => _dio.get('/doubts/$id'), (d) => DoubtDto.fromJson(_map(d)));
+  Future<DoubtDto> askDoubt(AskDoubtRequest body) => _call(() => _dio.post('/doubts', data: body.toJson()), (d) => DoubtDto.fromJson(_map(d)));
+  Future<DoubtDto> followUpDoubt(String id, String text) =>
+      _call(() => _dio.post('/doubts/$id/messages', data: DoubtReplyRequest(text: text).toJson()), (d) => DoubtDto.fromJson(_map(d)));
+  Future<DoubtDto> resolveDoubt(String id) => _call(() => _dio.post('/doubts/$id/resolve'), (d) => DoubtDto.fromJson(_map(d)));
+
   // ---- Tests ----
   Future<List<TestSummaryDto>> tests({String? courseId}) =>
       _call(() => _dio.get('/tests', queryParameters: {'courseId': ?courseId}), (d) => _list(d, TestSummaryDto.fromJson));

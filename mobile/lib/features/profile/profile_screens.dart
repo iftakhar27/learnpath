@@ -154,6 +154,7 @@ class ProfileScreen extends ConsumerWidget {
           link(Icons.event_note_rounded, l.planTitle, '/plan'),
           link(Icons.bookmark_outline_rounded, l.bookmarksTitle, '/bookmarks'),
           link(Icons.notifications_none_rounded, l.notificationsTitle, '/notifications'),
+          link(Icons.forum_outlined, l.doubtsTitle, '/doubts'),
           link(Icons.receipt_long_outlined, l.myPurchases, '/orders'),
           link(Icons.support_agent_rounded, l.helpSupport, '/support'),
           ListTile(
@@ -353,6 +354,7 @@ class NotificationsScreen extends ConsumerWidget {
                       leading: Icon(switch (n.type) {
                         'payment' => Icons.receipt_long_outlined,
                         'support' => Icons.support_agent_rounded,
+                        'doubt' => Icons.forum_outlined,
                         _ => Icons.campaign_outlined,
                       }),
                       title: Text(n.title, style: n.read ? null : const TextStyle(fontWeight: FontWeight.w700)),
@@ -364,7 +366,10 @@ class NotificationsScreen extends ConsumerWidget {
                           ref.invalidate(notificationsProvider);
                           ref.invalidate(dashboardProvider);
                         }
-                        if (n.link == '/support' && context.mounted) context.push('/support');
+                        if (!context.mounted) return;
+                        final link = n.link ?? '';
+                        if (link == '/support') context.push('/support');
+                        if (link.startsWith('/doubts/')) context.push('/doubt/${link.substring('/doubts/'.length)}');
                       },
                     ),
                 ],

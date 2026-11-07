@@ -2,7 +2,8 @@
 
 Android and iOS app for students: sign-in (email or mobile OTP), onboarding, home dashboard with today's study plan,
 course catalog and syllabus, video lessons with resume, notes, practice with instant solutions, timed tests with a
-question palette, results and answer review, progress, bookmarks, notifications, purchases (Razorpay) and support.
+question palette, results and answer review, topic quizzes, "ask a doubt" (threads with teachers), progress, bookmarks,
+notifications, purchases (Razorpay) and support.
 English and Hindi throughout.
 
 Flutter 3.47 · Dart 3.13 · `material_ui` (the decoupled Material library) · Riverpod 3 · go_router 18 · Dio.
@@ -71,7 +72,7 @@ lib/
   core/api/api_client.dart  Dio, token refresh, ApiException
   core/api/learnpath_api.dart  typed endpoints
   core/providers.dart       session, language, API providers
-  features/                 auth, onboarding, home, learn (+video), practice, tests (+exam engine), profile, payments
+  features/                 auth, onboarding, home, learn (+video, topic quiz), practice, tests (+exam engine), doubts, profile, payments
   widgets/                  shared widgets, QuestionView
   l10n/app_en.arb, app_hi.arb  all UI strings
 tool/gen_models.dart        model generator

@@ -52,7 +52,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get haveAccountSignIn => 'Already have an account? Sign in';
 
   @override
-  String get acceptTerms => 'I agree to the Terms of Service and Privacy Policy';
+  String get acceptTerms =>
+      'I agree to the Terms of Service and Privacy Policy';
 
   @override
   String get viewTerms => 'Read terms and privacy policy';
@@ -104,7 +105,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mustAcceptTerms => 'Please accept the terms to continue';
 
   @override
-  String get errorNetwork => 'No internet connection. Check your network and try again.';
+  String get errorNetwork =>
+      'No internet connection. Check your network and try again.';
 
   @override
   String get errorGeneric => 'Something went wrong. Please try again.';
@@ -159,7 +161,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guardianName => 'Parent or guardian\'s name';
 
   @override
-  String get guardianConsent => 'My parent or guardian agrees to my use of this app';
+  String get guardianConsent =>
+      'My parent or guardian agrees to my use of this app';
 
   @override
   String get next => 'Next';
@@ -195,13 +198,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String daysToExam(num days, Object exam) {
-    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days days to $exam', one: '1 day to $exam', zero: '$exam is today');
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days to $exam',
+      one: '1 day to $exam',
+      zero: '$exam is today',
+    );
     return '$_temp0';
   }
 
   @override
   String streakDays(num days) {
-    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days-day streak', one: '1-day streak', zero: 'Start your streak today');
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days-day streak',
+      one: '1-day streak',
+      zero: 'Start your streak today',
+    );
     return '$_temp0';
   }
 
@@ -218,13 +233,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todaysPlan => 'Today\'s plan';
 
   @override
-  String get planBasis => 'Suggested from your syllabus progress, recent accuracy and daily study time.';
+  String get planBasis =>
+      'Suggested from your syllabus progress, recent accuracy and daily study time.';
 
   @override
   String get viewFullPlan => 'View full plan';
 
   @override
-  String get planEmpty => 'Nothing planned yet. Enroll in a course to get a daily plan.';
+  String get planEmpty =>
+      'Nothing planned yet. Enroll in a course to get a daily plan.';
 
   @override
   String get continueLearning => 'Continue learning';
@@ -313,7 +330,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String topicsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count topics', one: '1 topic');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count topics',
+      one: '1 topic',
+    );
     return '$_temp0';
   }
 
@@ -382,7 +404,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get practiceMistakes => 'Practise your mistakes';
 
   @override
-  String get practiceMistakesHint => 'Questions you got wrong in practice and tests';
+  String get practiceMistakesHint =>
+      'Questions you got wrong in practice and tests';
 
   @override
   String get practiceBookmarked => 'Bookmarked questions';
@@ -503,7 +526,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String questionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count questions', one: '1 question');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count questions',
+      one: '1 question',
+    );
     return '$_temp0';
   }
 
@@ -549,7 +577,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noNegativeMarking => 'No negative marking';
 
   @override
-  String get testRules => 'The timer keeps running if you leave. Answers are saved as you go, and the test submits automatically when time runs out.';
+  String get testRules =>
+      'The timer keeps running if you leave. Answers are saved as you go, and the test submits automatically when time runs out.';
 
   @override
   String get timeLeft => 'Time left';
@@ -605,7 +634,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leaveTestTitle => 'Leave the test?';
 
   @override
-  String get leaveTestBody => 'Your answers are saved, but the timer keeps running. You can resume from the Tests tab.';
+  String get leaveTestBody =>
+      'Your answers are saved, but the timer keeps running. You can resume from the Tests tab.';
 
   @override
   String get leave => 'Leave';
@@ -620,7 +650,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saved => 'Saved';
 
   @override
-  String get offlineWillRetry => 'Offline. Answers will be saved when you\'re back online.';
+  String get offlineWillRetry =>
+      'Offline. Answers will be saved when you\'re back online.';
 
   @override
   String get timeUp => 'Time\'s up. Submitting your test…';
@@ -739,7 +770,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteAccount => 'Delete my account';
 
   @override
-  String get deleteAccountBody => 'We\'ll delete your account and personal data after any open orders or refunds are settled. You\'ll be signed out now.';
+  String get deleteAccountBody =>
+      'We\'ll delete your account and personal data after any open orders or refunds are settled. You\'ll be signed out now.';
 
   @override
   String get delete => 'Delete';
@@ -757,7 +789,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markAllRead => 'Mark all as read';
 
   @override
-  String get bookmarksEmpty => 'Nothing saved yet. Tap the bookmark on a question to save it.';
+  String get bookmarksEmpty =>
+      'Nothing saved yet. Tap the bookmark on a question to save it.';
 
   @override
   String get remove => 'Remove';
@@ -832,13 +865,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noTestsYet => 'Take a test to see your progress here.';
 
   @override
-  String get purchaseOnMobileOnly => 'Purchases are available in the Android and iOS app.';
+  String get purchaseOnMobileOnly =>
+      'Purchases are available in the Android and iOS app.';
 
   @override
   String get paymentSuccess => 'Payment successful. The course is unlocked.';
 
   @override
-  String get paymentFailed => 'Payment didn\'t complete. No money was taken, or it will be refunded automatically.';
+  String get paymentFailed =>
+      'Payment didn\'t complete. No money was taken, or it will be refunded automatically.';
 
   @override
   String get paymentVerifying => 'Confirming your payment…';
@@ -876,26 +911,191 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueHere => 'Continue here';
 
   @override
-  String get sessionReplaced => 'You were signed out because your account was signed in on another device.';
+  String get sessionReplaced =>
+      'You were signed out because your account was signed in on another device.';
 
   @override
   String get timeJustNow => 'just now';
 
   @override
   String timeMinutesAgo(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count minutes ago', one: '1 minute ago');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes ago',
+      one: '1 minute ago',
+    );
     return '$_temp0';
   }
 
   @override
   String timeHoursAgo(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count hours ago', one: '1 hour ago');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours ago',
+      one: '1 hour ago',
+    );
     return '$_temp0';
   }
 
   @override
   String timeDaysAgo(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count days ago', one: '1 day ago');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: '1 day ago',
+    );
     return '$_temp0';
   }
+
+  @override
+  String get doubtsTitle => 'My doubts';
+
+  @override
+  String get askDoubt => 'Ask a doubt';
+
+  @override
+  String get doubtsIntro =>
+      'Stuck on something? Ask a teacher. You\'ll get a notification when they reply.';
+
+  @override
+  String get yourDoubt => 'Your doubt';
+
+  @override
+  String get doubtHint =>
+      'Describe where you\'re stuck: the question, the step, or what isn\'t clear.';
+
+  @override
+  String doubtAbout(Object title) {
+    return 'About: $title';
+  }
+
+  @override
+  String get doubtGeneral => 'General doubt';
+
+  @override
+  String get doubtSent => 'Doubt sent. A teacher will reply soon.';
+
+  @override
+  String get doubtTooShort => 'Write at least 5 characters.';
+
+  @override
+  String get doubtsEmpty => 'You haven\'t asked any doubts yet.';
+
+  @override
+  String get doubtStatusOpen => 'Waiting for a teacher';
+
+  @override
+  String get doubtStatusAnswered => 'Answered';
+
+  @override
+  String get doubtStatusResolved => 'Resolved';
+
+  @override
+  String doubtReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count replies',
+      one: '1 reply',
+      zero: 'No replies yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get doubtYou => 'You';
+
+  @override
+  String get doubtTeacher => 'Teacher';
+
+  @override
+  String get doubtFollowUp => 'Ask a follow-up';
+
+  @override
+  String get doubtMarkResolved => 'My doubt is solved';
+
+  @override
+  String get doubtResolvedHint =>
+      'Still unclear? Ask a follow-up and a teacher will look again.';
+
+  @override
+  String get topicQuiz => 'Topic quiz';
+
+  @override
+  String topicQuizInfo(int count, Object percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count questions',
+      one: '1 question',
+    );
+    return '$_temp0 · pass mark $percent%';
+  }
+
+  @override
+  String get topicQuizCovered =>
+      'You\'ve covered this topic. Check your understanding with a short quiz.';
+
+  @override
+  String get topicQuizNotCovered =>
+      'Finish the lessons first, or test yourself now.';
+
+  @override
+  String topicDonePrompt(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count-question',
+      one: '1-question',
+    );
+    return 'Topic covered! Take a quick $_temp0 quiz.';
+  }
+
+  @override
+  String get startQuiz => 'Start quiz';
+
+  @override
+  String get retakeQuiz => 'Retake quiz';
+
+  @override
+  String quizBest(Object percent) {
+    return 'Best score $percent%';
+  }
+
+  @override
+  String get quizPassed => 'Passed';
+
+  @override
+  String get quizNotPassed => 'Not passed yet';
+
+  @override
+  String get submitQuiz => 'Submit quiz';
+
+  @override
+  String quizUnanswered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count questions are unanswered.',
+      one: '1 question is unanswered.',
+    );
+    return '$_temp0 Submit anyway?';
+  }
+
+  @override
+  String get quizResult => 'Quiz result';
+
+  @override
+  String get quizPassedBody => 'Well done! You passed this topic\'s quiz.';
+
+  @override
+  String quizFailedBody(Object percent) {
+    return 'You need $percent% to pass. Revise the lessons and try again.';
+  }
+
+  @override
+  String get backToTopic => 'Back to topic';
 }

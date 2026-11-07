@@ -12,7 +12,7 @@ namespace LearnPath.Api.Modules.Admin;
 
 public record AdminDashboardDto(int TotalStudents, int ActiveStudents7d, int ActiveStudents30d, int Enrollments, int PaidOrders30d, long Revenue30dInPaise,
     int FailedOrders30d, int TestAttempts30d, double? AverageTestPercentage30d, int OpenTickets, int OpenQuestionReports, int FailedImportRows30d,
-    List<CourseStatDto> TopCourses);
+    List<CourseStatDto> TopCourses, int OpenDoubts);
 public record CourseStatDto(Guid CourseId, string Title, int Enrollments);
 public record UserStatusRequest([Required] UserStatus Status);
 public record GrantEnrollmentRequest([Required] Guid CourseId, [MaxLength(500)] string? Reason);
@@ -51,7 +51,8 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
             await db.SupportTickets.CountAsync(t => t.Status == "Open" || t.Status == "InProgress", ct),
             await db.QuestionReports.CountAsync(r => r.Status == "Open", ct),
             await db.ContentImportJobs.Where(j => j.CreatedAt >= d30).SumAsync(j => j.FailedRows, ct),
-            top.Select(t => new CourseStatDto(t.Key, titles.GetValueOrDefault(t.Key, "?"), t.Count)).ToList());
+            top.Select(t => new CourseStatDto(t.Key, titles.GetValueOrDefault(t.Key, "?"), t.Count)).ToList(),
+            await db.Doubts.CountAsync(d => d.Status == DoubtStatus.Open, ct));
     }
 
     /// <summary>Support lookup. Returns only the fields needed to help a student.</summary>

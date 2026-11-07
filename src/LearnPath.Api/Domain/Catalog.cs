@@ -68,7 +68,14 @@ public class Topic
     public string? ObjectivesHi { get; set; }
     public int EstimatedMinutes { get; set; }
     public int SortOrder { get; set; }
+    /// <summary>Questions in the short quiz offered once the topic is covered (drawn from its published questions); 0 = no quiz.</summary>
+    public int QuizQuestionCount { get; set; } = DefaultQuizQuestions;
+    /// <summary>Score (percent) that counts as passing the topic quiz.</summary>
+    public int QuizPassPercent { get; set; } = DefaultQuizPassPercent;
     public List<LearningResource> Resources { get; set; } = [];
+
+    public const int DefaultQuizQuestions = 5;
+    public const int DefaultQuizPassPercent = 60;
 }
 
 public class TopicPrerequisite

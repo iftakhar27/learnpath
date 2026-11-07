@@ -151,12 +151,15 @@ public class PracticeSession
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid UserId { get; set; }
-    public string Mode { get; set; } = "topic";  // topic, chapter, mixed, incorrect, bookmarked
+    public string Mode { get; set; } = "topic";  // topic, chapter, incorrect, bookmarked, previous_year, quiz (topic quiz)
     public Guid? TopicId { get; set; }
     public Guid? ChapterId { get; set; }
     public string QuestionIdsJson { get; set; } = "[]";
     public DateTimeOffset StartedAt { get; set; }
     public DateTimeOffset? CompletedAt { get; set; }
+    /// <summary>Topic quizzes only: the score once submitted, and whether it met the topic's pass mark at the time.</summary>
+    public int? ScorePercent { get; set; }
+    public bool? Passed { get; set; }
     public List<PracticeAnswer> Answers { get; set; } = [];
 }
 

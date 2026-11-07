@@ -20,8 +20,10 @@ const NAV: { href: string; label: MessageKey; icon: IconName; also?: string[] }[
   { href: "/learn", label: "tabLearn", icon: "book", also: ["/topics", "/watch"] },
   { href: "/practice", label: "tabPractice", icon: "pencil" },
   { href: "/tests", label: "tabTests", icon: "clipboard", also: ["/exam", "/results"] },
-  { href: "/profile", label: "tabProfile", icon: "user", also: ["/progress", "/bookmarks", "/purchases", "/support", "/notifications"] },
+  { href: "/profile", label: "tabProfile", icon: "user", also: ["/progress", "/bookmarks", "/purchases", "/support", "/notifications", "/doubts"] },
 ];
+/** Desktop only (phones reach doubts from Home, Profile and the "Ask a doubt" buttons). */
+const DOUBTS = { href: "/doubts", label: "doubtsTitle", icon: "chat" } as const;
 
 const isActive = (pathname: string, item: (typeof NAV)[number]) =>
   [item.href, ...(item.also ?? [])].some((p) => pathname === p || pathname.startsWith(p + "/"));
@@ -78,7 +80,7 @@ export function StudentShell({ children }: { children: ReactNode }) {
           </Link>
           <nav aria-label={t("primaryNav")} className="hidden md:block">
             <ul className="flex items-center gap-1">
-              {NAV.slice(0, 4).map((item) => {
+              {[...NAV.slice(0, 4), DOUBTS].map((item) => {
                 const on = isActive(pathname, item);
                 return (
                   <li key={item.href}>

@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * Navigation gate only: sends visitors without a session to the right login page before a protected page renders,
  * and signed-in visitors from the landing/login pages to their home. Every API call is still authorised by the API.
  */
-const STUDENT_AREAS = ["/home", "/onboarding", "/learn", "/topics", "/watch", "/practice", "/tests", "/exam", "/results", "/plan", "/progress", "/profile", "/notifications", "/bookmarks", "/purchases", "/support", "/search"];
+const STUDENT_AREAS = ["/home", "/onboarding", "/learn", "/topics", "/watch", "/practice", "/tests", "/exam", "/results", "/plan", "/progress", "/profile", "/notifications", "/bookmarks", "/purchases", "/support", "/search", "/doubts"];
 const STUDENT_PUBLIC = ["/", "/login", "/register"];
 
 export function proxy(request: NextRequest) {
@@ -51,6 +51,7 @@ export const config = {
     "/bookmarks/:path*",
     "/purchases/:path*",
     "/support/:path*",
+    "/doubts/:path*",
     "/search/:path*",
   ],
 };

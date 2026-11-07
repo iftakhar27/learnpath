@@ -81,11 +81,23 @@ public class PracticeController(AppDbContext db, EntitlementService entitlements
         };
         db.PracticeSessions.Add(session);
         await db.SaveChangesAsync(ct);
-        return new PracticeSessionDto(session.Id, session.Mode, questions.Select(x => new PracticeQuestionDto(x.Id, x.Type.ToString(), x.Difficulty.ToString(),
-            lang.Pick(x.StemEn, x.StemHi), x.ImageUrl, x.HintEn,
-            x.Options.OrderBy(o => o.SortOrder).Select(o => new PlayerOptionDto(o.Id, lang.Pick(o.TextEn, o.TextHi))).ToList(),
-            x.DefaultMarks, x.DefaultNegativeMarks)).ToList());
+        return new PracticeSessionDto(session.Id, session.Mode, questions.Select(x => ToPlayer(x, lang, withHint: true)).ToList());
     }
+
+    internal static PracticeQuestionDto ToPlayer(Question x, RequestLanguage lang, bool withHint) =>
+        new(x.Id, x.Type.ToString(), x.Difficulty.ToString(), lang.Pick(x.StemEn, x.StemHi), x.ImageUrl, withHint ? x.HintEn : null,
+            x.Options.OrderBy(o => o.SortOrder).Select(o => new PlayerOptionDto(o.Id, lang.Pick(o.TextEn, o.TextHi))).ToList(),
+            x.DefaultMarks, x.DefaultNegativeMarks);
+
+    /// <summary>The question as the scorer needs it (practice has no test, so test fields are empty).</summary>
+    internal static QuestionSnapshot SnapshotOf(Question q) =>
+        new(Guid.Empty, q.Id, q.Version, null, null, Guid.Empty, "", Guid.Empty, "", q.TopicId, "", q.Type, q.Difficulty,
+            q.StemEn, q.StemHi, q.ImageUrl, q.Options.Select(o => new OptionSnapshot(o.Id, o.TextEn, o.TextHi, o.IsCorrect)).ToList(),
+            q.NumericAnswer, q.NumericTolerance, q.DefaultMarks, q.DefaultNegativeMarks, q.AllowPartialMarking, q.ExplanationEn, q.ExplanationHi);
+
+    internal static PracticeFeedbackDto FeedbackOf(Question q, AnswerOutcome outcome, decimal marks, RequestLanguage lang) =>
+        new(q.Id, outcome.ToString(), marks, q.Options.Where(o => o.IsCorrect).Select(o => o.Id).ToList(), q.NumericAnswer,
+            lang.PickOpt(q.ExplanationEn, q.ExplanationHi), q.VideoSolutionId);
 
     /// <summary>Scores one practice answer and reveals the solution. Retries add new rows; test attempts are never touched.</summary>
     [HttpPost("sessions/{sessionId:guid}/answers")]
@@ -93,13 +105,13 @@ public class PracticeController(AppDbContext db, EntitlementService entitlements
     {
         var userId = User.UserId();
         var session = await db.PracticeSessions.FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId, ct) ?? throw AppException.NotFound("Practice session");
+        // Topic quizzes reveal answers only when the whole quiz is submitted.
+        if (session.Mode == TopicQuizController.Mode) throw AppException.BadRequest("quiz_session", "Submit the quiz to see the answers.");
         var ids = JsonSerializer.Deserialize<List<Guid>>(session.QuestionIdsJson)!;
         if (!ids.Contains(req.QuestionId)) throw AppException.BadRequest("not_in_session", "This question is not part of the session.");
         var q = await db.Questions.AsNoTracking().Include(x => x.Options).FirstAsync(x => x.Id == req.QuestionId, ct);
 
-        var snap = new QuestionSnapshot(Guid.Empty, q.Id, q.Version, null, null, Guid.Empty, "", Guid.Empty, "", q.TopicId, "", q.Type, q.Difficulty,
-            q.StemEn, q.StemHi, q.ImageUrl, q.Options.Select(o => new OptionSnapshot(o.Id, o.TextEn, o.TextHi, o.IsCorrect)).ToList(),
-            q.NumericAnswer, q.NumericTolerance, q.DefaultMarks, q.DefaultNegativeMarks, q.AllowPartialMarking, q.ExplanationEn, q.ExplanationHi);
+        var snap = SnapshotOf(q);
         Scoring.Validate(snap, req.Response);
         var scored = Scoring.Score(snap, req.Response);
 
@@ -112,8 +124,7 @@ public class PracticeController(AppDbContext db, EntitlementService entitlements
         db.LearningEvents.Add(new LearningEvent { UserId = userId, EventType = LearningEventTypes.QuestionAnswered, EntityId = q.Id, OccurredAt = now });
         await db.SaveChangesAsync(ct);
 
-        return new PracticeFeedbackDto(q.Id, scored.Outcome.ToString(), scored.Marks, q.Options.Where(o => o.IsCorrect).Select(o => o.Id).ToList(),
-            q.NumericAnswer, lang.PickOpt(q.ExplanationEn, q.ExplanationHi), q.VideoSolutionId);
+        return FeedbackOf(q, scored.Outcome, scored.Marks, lang);
     }
 
     [HttpPost("sessions/{sessionId:guid}/complete")]

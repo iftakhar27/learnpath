@@ -13,7 +13,9 @@ import { Icon } from "@/components/ui/icons";
 import { StudentError } from "../errors";
 import { routes } from "../routes";
 import { ProgressBar, useFormat } from "../ui";
+import { AskDoubtButton } from "../doubts/doubts";
 import { useBookmark } from "./bookmarks";
+import { TopicQuizCard } from "./quiz";
 
 type Resource = components["schemas"]["ResourceDto"];
 export const topicKey = (id: string) => ["student", "topic", id] as const;
@@ -165,16 +167,21 @@ export function TopicPage() {
         ))}
       </section>
 
+      {topic.hasAccess && topic.quiz && (
+        <TopicQuizCard topicId={topic.id} quiz={topic.quiz} covered={topic.resources.length > 0 && topic.resources.every((r) => r.completed)} />
+      )}
+
       {topic.hasAccess && (
-        <section className="rounded-2xl border border-border bg-surface p-5">
+        <section className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-surface p-5">
           {topic.practiceQuestionCount > 0 ? (
-            <Link href={routes.practiceTopic(topic.id)} className={buttonClass("primary", "md", "w-full sm:w-auto")}>
+            <Link href={routes.practiceTopic(topic.id)} className={buttonClass("secondary", "md", "w-full sm:w-auto")}>
               <Icon name="pencil" size={18} />
               {t("practiseTopic", { count: topic.practiceQuestionCount })}
             </Link>
           ) : (
             <p className="text-sm text-fg-muted">{t("noPracticeQuestions")}</p>
           )}
+          <AskDoubtButton link={{ topicId: topic.id }} about={topic.title} className="h-10 px-4" />
         </section>
       )}
 

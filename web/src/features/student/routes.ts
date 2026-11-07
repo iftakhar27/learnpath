@@ -6,6 +6,7 @@ export const routes = {
   learn: "/learn",
   course: (id: string) => `/learn/${id}`,
   topic: (id: string) => `/topics/${id}`,
+  topicQuiz: (id: string) => `/topics/${id}/quiz`,
   watch: (resourceId: string) => `/watch/${resourceId}`,
   practice: "/practice",
   practiceTopic: (topicId: string) => `/practice/topic/${topicId}`,
@@ -18,6 +19,8 @@ export const routes = {
   plan: "/plan",
   profile: "/profile",
   notifications: "/notifications",
+  doubts: "/doubts",
+  doubt: (id: string) => `/doubts/${id}`,
 };
 
 type PlanTask = components["schemas"]["PlanTaskDto"];

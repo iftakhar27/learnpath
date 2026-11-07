@@ -209,7 +209,7 @@ export function ReviewPage() {
               </div>
             )}
             <div className="mt-4">
-              <QuestionTools questionId={x.questionId} />
+              <QuestionTools questionId={x.questionId} stem={x.stem} />
             </div>
           </li>
         ))}

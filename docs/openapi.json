@@ -1139,6 +1139,230 @@
         }
       }
     },
+    "/api/v1/admin/doubts": {
+      "get": {
+        "tags": [
+          "AdminDoubts"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DoubtStatus"
+                }
+              ]
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfAdminDoubtListItem"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfAdminDoubtListItem"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfAdminDoubtListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/doubts/{id}": {
+      "get": {
+        "tags": [
+          "AdminDoubts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/doubts/{id}/reply": {
+      "post": {
+        "tags": [
+          "AdminDoubts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AdminDoubtReplyRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AdminDoubtReplyRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AdminDoubtReplyRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/doubts/{id}/resolve": {
+      "post": {
+        "tags": [
+          "AdminDoubts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDoubtDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/dashboard": {
       "get": {
         "tags": [
@@ -3236,6 +3460,273 @@
         }
       }
     },
+    "/api/v1/doubts": {
+      "post": {
+        "tags": [
+          "Doubts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AskDoubtRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AskDoubtRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AskDoubtRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Doubts"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DoubtStatus"
+                }
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfDoubtSummaryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfDoubtSummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfDoubtSummaryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/doubts/{id}": {
+      "get": {
+        "tags": [
+          "Doubts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/doubts/{id}/messages": {
+      "post": {
+        "tags": [
+          "Doubts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DoubtReplyRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DoubtReplyRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DoubtReplyRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/doubts/{id}/resolve": {
+      "post": {
+        "tags": [
+          "Doubts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoubtDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/learning/progress": {
       "post": {
         "tags": [
@@ -4906,6 +5397,117 @@
           }
         }
       }
+    },
+    "/api/v1/topics/{topicId}/quiz": {
+      "post": {
+        "tags": [
+          "TopicQuiz"
+        ],
+        "parameters": [
+          {
+            "name": "topicId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/practice/quizzes/{sessionId}/submit": {
+      "post": {
+        "tags": [
+          "TopicQuiz"
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/QuizSubmitRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/QuizSubmitRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/QuizSubmitRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5108,6 +5710,7 @@
           "enrollments",
           "failedImportRows30d",
           "failedOrders30d",
+          "openDoubts",
           "openQuestionReports",
           "openTickets",
           "paidOrders30d",
@@ -5172,6 +5775,159 @@
             "items": {
               "$ref": "#/components/schemas/CourseStatDto"
             }
+          },
+          "openDoubts": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminDoubtDto": {
+        "required": [
+          "context",
+          "createdAt",
+          "id",
+          "messages",
+          "status",
+          "studentName",
+          "text",
+          "updatedAt",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentName": {
+            "type": "string"
+          },
+          "studentEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "studentPhone": {
+            "type": "string",
+            "nullable": true
+          },
+          "text": {
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DoubtStatus"
+              }
+            ]
+          },
+          "context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DoubtContextDto"
+              }
+            ]
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DoubtMessageDto"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "answeredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminDoubtListItem": {
+        "required": [
+          "context",
+          "createdAt",
+          "id",
+          "messages",
+          "status",
+          "studentName",
+          "text",
+          "updatedAt",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentName": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DoubtStatus"
+              }
+            ]
+          },
+          "context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DoubtContextDto"
+              }
+            ]
+          },
+          "messages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "answeredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminDoubtReplyRequest": {
+        "required": [
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "resolve": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -6088,7 +6844,10 @@
           "chapterId",
           "estimatedMinutes",
           "id",
+          "publishedQuestionCount",
           "questionCount",
+          "quizPassPercent",
+          "quizQuestionCount",
           "resources",
           "sortOrder",
           "titleEn"
@@ -6135,6 +6894,18 @@
             "items": {
               "$ref": "#/components/schemas/AdminResourceDto"
             }
+          },
+          "publishedQuestionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quizQuestionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quizPassPercent": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -6274,6 +7045,33 @@
           "numericValue": {
             "type": "number",
             "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AskDoubtRequest": {
+        "required": [
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "resourceId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "questionId": {
+            "type": "string",
+            "format": "uuid",
             "nullable": true
           }
         },
@@ -6988,6 +7786,188 @@
         ],
         "type": "string"
       },
+      "DoubtContextDto": {
+        "type": "object",
+        "properties": {
+          "courseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "course": {
+            "type": "string",
+            "nullable": true
+          },
+          "topicId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "topic": {
+            "type": "string",
+            "nullable": true
+          },
+          "resourceId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "resource": {
+            "type": "string",
+            "nullable": true
+          },
+          "questionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "question": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DoubtDto": {
+        "required": [
+          "context",
+          "createdAt",
+          "id",
+          "messages",
+          "status",
+          "text",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DoubtContextDto"
+              }
+            ]
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DoubtMessageDto"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DoubtMessageDto": {
+        "required": [
+          "author",
+          "createdAt",
+          "fromStaff",
+          "id",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fromStaff": {
+            "type": "boolean"
+          },
+          "author": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DoubtReplyRequest": {
+        "required": [
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DoubtStatus": {
+        "enum": [
+          "Open",
+          "Answered",
+          "Resolved"
+        ],
+        "type": "string"
+      },
+      "DoubtSummaryDto": {
+        "required": [
+          "context",
+          "createdAt",
+          "id",
+          "replies",
+          "status",
+          "text",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DoubtContextDto"
+              }
+            ]
+          },
+          "replies": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
       "EnrolledCourseDto": {
         "required": [
           "completionPercent",
@@ -7281,6 +8261,16 @@
           "estimatedMinutes": {
             "type": "integer",
             "format": "int32"
+          },
+          "quizQuestionCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "quizPassPercent": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -7479,6 +8469,36 @@
         },
         "additionalProperties": false
       },
+      "PagedResultOfAdminDoubtListItem": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminDoubtListItem"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedResultOfAdminOrderDto": {
         "required": [
           "items",
@@ -7582,6 +8602,36 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CourseSummaryDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedResultOfDoubtSummaryDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DoubtSummaryDto"
             }
           },
           "page": {
@@ -8188,7 +9238,8 @@
         "required": [
           "completed",
           "positionSeconds",
-          "resourceId"
+          "resourceId",
+          "topicCompleted"
         ],
         "type": "object",
         "properties": {
@@ -8202,6 +9253,17 @@
           },
           "completed": {
             "type": "boolean"
+          },
+          "topicCompleted": {
+            "type": "boolean"
+          },
+          "quiz": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TopicQuizSummaryDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -8365,6 +9427,150 @@
               "$ref": "#/components/schemas/OptionUpsert"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuizAnswer": {
+        "required": [
+          "questionId",
+          "timeSpentSeconds"
+        ],
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "response": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnswerResponse"
+              }
+            ],
+            "nullable": true
+          },
+          "timeSpentSeconds": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuizDto": {
+        "required": [
+          "passPercent",
+          "questions",
+          "sessionId",
+          "topic",
+          "topicId"
+        ],
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topicId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "passPercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PracticeQuestionDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuizResultDto": {
+        "required": [
+          "correct",
+          "incorrect",
+          "items",
+          "partial",
+          "passed",
+          "passPercent",
+          "scorePercent",
+          "sessionId",
+          "skipped",
+          "topicId",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topicId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "correct": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "incorrect": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "partial": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "skipped": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scorePercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "passPercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PracticeFeedbackDto"
+            }
+          },
+          "nextTopicId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuizSubmitRequest": {
+        "required": [
+          "answers"
+        ],
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizAnswer"
+            }
           }
         },
         "additionalProperties": false
@@ -9578,6 +10784,14 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "quiz": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TopicQuizSummaryDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -9614,6 +10828,43 @@
           "completedResources": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TopicQuizSummaryDto": {
+        "required": [
+          "attempts",
+          "passed",
+          "passPercent",
+          "questionCount"
+        ],
+        "type": "object",
+        "properties": {
+          "questionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "passPercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "attempts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bestPercent": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "lastPercent": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "passed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

@@ -9,15 +9,18 @@ import type { components } from "@/lib/api/schema";
 import { useT } from "@/lib/i18n";
 import { PageLoading } from "@/components/ui/feedback";
 import { Icon } from "@/components/ui/icons";
+import { AskDoubtButton } from "../doubts/doubts";
 import { StudentError } from "../errors";
 import { routes } from "../routes";
 import { useFormat } from "../ui";
+import { TopicDonePrompt } from "./quiz";
 
 type Playback = components["schemas"]["PlaybackDto"];
+type Progress = components["schemas"]["ProgressDto"];
 const SAVE_EVERY_MS = 10_000;
 
 /** Best-effort progress save; `keepalive` lets the last save finish while the page unloads. */
-async function saveProgress(resourceId: string, positionSeconds: number, keepalive = false): Promise<boolean | null> {
+async function saveProgress(resourceId: string, positionSeconds: number, keepalive = false): Promise<Progress | null> {
   try {
     const res = await fetch("/api/v1/learning/progress", {
       method: "POST",
@@ -25,13 +28,13 @@ async function saveProgress(resourceId: string, positionSeconds: number, keepali
       body: JSON.stringify({ resourceId, positionSeconds: Math.floor(positionSeconds) }),
       keepalive,
     });
-    return res.ok ? ((await res.json()) as { completed: boolean }).completed : null;
+    return res.ok ? ((await res.json()) as Progress) : null;
   } catch {
     return null;
   }
 }
 
-function Player({ playback, onCompleted }: { playback: Playback; onCompleted: () => void }) {
+function Player({ playback, onCompleted }: { playback: Playback; onCompleted: (progress: Progress) => void }) {
   const t = useT();
   const f = useFormat();
   const ref = useRef<HTMLVideoElement>(null);
@@ -72,7 +75,8 @@ function Player({ playback, onCompleted }: { playback: Playback; onCompleted: ()
       const pos = Math.floor(video.currentTime);
       if (pos === lastSaved || pos === 0) return;
       lastSaved = pos;
-      if ((await saveProgress(playback.resourceId, pos, keepalive)) === true) onCompleted();
+      const progress = await saveProgress(playback.resourceId, pos, keepalive);
+      if (progress?.completed) onCompleted(progress);
     };
     const onMeta = () => {
       const at = playback.resumeAtSeconds;
@@ -134,9 +138,9 @@ export function WatchPage() {
     staleTime: 60 * 60_000, // signed for 2 hours
     refetchOnMount: "always",
   });
-  const [completedNow, setCompletedNow] = useState(false);
+  const [completedNow, setCompletedNow] = useState<Progress | null>(null);
   // Stable, so the player's progress listeners aren't re-attached on every render.
-  const markCompleted = useCallback(() => setCompletedNow(true), []);
+  const markCompleted = useCallback((progress: Progress) => setCompletedNow(progress), []);
 
   // When leaving, topic/course/home progress should reflect what was watched.
   useEffect(() => () => void qc.invalidateQueries({ predicate: (x) => x.queryKey[0] === "student" && x.queryKey[1] !== "playback" }), [qc]);
@@ -144,7 +148,8 @@ export function WatchPage() {
   if (q.isPending) return <PageLoading />;
   if (q.isError) return <StudentError error={q.error} onRetry={() => q.refetch()} />;
   const p = q.data;
-  const completed = p.completed || completedNow;
+  const completed = p.completed || !!completedNow;
+  const quiz = completedNow?.topicCompleted ? completedNow.quiz : null;
 
   return (
     <div className="mx-auto max-w-4xl space-y-4">
@@ -158,13 +163,17 @@ export function WatchPage() {
           <h1 className="text-xl font-semibold">{p.title}</h1>
           <p className="text-sm text-fg-muted">{p.topic}</p>
         </div>
-        {completed && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-3 py-1 text-sm font-medium text-success">
-            <Icon name="check" size={16} />
-            {t("completed")}
-          </span>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {completed && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-3 py-1 text-sm font-medium text-success">
+              <Icon name="check" size={16} />
+              {t("completed")}
+            </span>
+          )}
+          <AskDoubtButton link={{ resourceId: p.resourceId }} about={p.title} />
+        </div>
       </div>
+      {quiz && quiz.attempts === 0 && <TopicDonePrompt topicId={p.topicId} quiz={quiz} />}
     </div>
   );
 }

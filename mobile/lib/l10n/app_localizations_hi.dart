@@ -104,7 +104,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get mustAcceptTerms => 'आगे बढ़ने के लिए शर्तें स्वीकार करें';
 
   @override
-  String get errorNetwork => 'इंटरनेट कनेक्शन नहीं है। नेटवर्क जाँचें और फिर कोशिश करें।';
+  String get errorNetwork =>
+      'इंटरनेट कनेक्शन नहीं है। नेटवर्क जाँचें और फिर कोशिश करें।';
 
   @override
   String get errorGeneric => 'कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।';
@@ -116,7 +117,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get serverUnreachable => 'सर्वर से संपर्क नहीं हो पा रहा';
 
   @override
-  String get sessionExpired => 'आपका सत्र समाप्त हो गया। कृपया फिर से साइन इन करें।';
+  String get sessionExpired =>
+      'आपका सत्र समाप्त हो गया। कृपया फिर से साइन इन करें।';
 
   @override
   String get onboardingTitle => 'अपनी तैयारी सेट करें';
@@ -159,7 +161,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get guardianName => 'माता-पिता या अभिभावक का नाम';
 
   @override
-  String get guardianConsent => 'मेरे माता-पिता/अभिभावक इस ऐप के उपयोग के लिए सहमत हैं';
+  String get guardianConsent =>
+      'मेरे माता-पिता/अभिभावक इस ऐप के उपयोग के लिए सहमत हैं';
 
   @override
   String get next => 'आगे';
@@ -195,13 +198,25 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String daysToExam(num days, Object exam) {
-    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$exam में $days दिन', one: '$exam में 1 दिन', zero: '$exam आज है');
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$exam में $days दिन',
+      one: '$exam में 1 दिन',
+      zero: '$exam आज है',
+    );
     return '$_temp0';
   }
 
   @override
   String streakDays(num days) {
-    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days दिन लगातार', one: '1 दिन लगातार', zero: 'आज से लगातार पढ़ाई शुरू करें');
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days दिन लगातार',
+      one: '1 दिन लगातार',
+      zero: 'आज से लगातार पढ़ाई शुरू करें',
+    );
     return '$_temp0';
   }
 
@@ -218,13 +233,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get todaysPlan => 'आज की योजना';
 
   @override
-  String get planBasis => 'आपकी सिलेबस प्रगति, हाल की सटीकता और रोज़ के पढ़ाई समय के आधार पर सुझाव।';
+  String get planBasis =>
+      'आपकी सिलेबस प्रगति, हाल की सटीकता और रोज़ के पढ़ाई समय के आधार पर सुझाव।';
 
   @override
   String get viewFullPlan => 'पूरी योजना देखें';
 
   @override
-  String get planEmpty => 'अभी कोई योजना नहीं। रोज़ की योजना पाने के लिए किसी कोर्स में नामांकन करें।';
+  String get planEmpty =>
+      'अभी कोई योजना नहीं। रोज़ की योजना पाने के लिए किसी कोर्स में नामांकन करें।';
 
   @override
   String get continueLearning => 'पढ़ाई जारी रखें';
@@ -313,7 +330,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String topicsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count विषय', one: '1 विषय');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count विषय',
+      one: '1 विषय',
+    );
     return '$_temp0';
   }
 
@@ -341,7 +363,8 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get noPracticeQuestions => 'इस विषय के लिए अभी अभ्यास प्रश्न नहीं हैं।';
+  String get noPracticeQuestions =>
+      'इस विषय के लिए अभी अभ्यास प्रश्न नहीं हैं।';
 
   @override
   String get previousTopic => 'पिछला विषय';
@@ -400,7 +423,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get practiceByTopic => 'विषय के अनुसार अभ्यास';
 
   @override
-  String get practiceByTopicHint => 'सीखें में कोई भी विषय खोलें और \'अभ्यास करें\' दबाएँ';
+  String get practiceByTopicHint =>
+      'सीखें में कोई भी विषय खोलें और \'अभ्यास करें\' दबाएँ';
 
   @override
   String questionOf(Object current, Object total) {
@@ -503,7 +527,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String questionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count प्रश्न', one: '1 प्रश्न');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count प्रश्न',
+      one: '1 प्रश्न',
+    );
     return '$_temp0';
   }
 
@@ -549,7 +578,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get noNegativeMarking => 'कोई नकारात्मक अंकन नहीं';
 
   @override
-  String get testRules => 'टेस्ट छोड़ने पर भी समय चलता रहता है। उत्तर अपने आप सहेजे जाते हैं और समय खत्म होने पर टेस्ट अपने आप जमा हो जाता है।';
+  String get testRules =>
+      'टेस्ट छोड़ने पर भी समय चलता रहता है। उत्तर अपने आप सहेजे जाते हैं और समय खत्म होने पर टेस्ट अपने आप जमा हो जाता है।';
 
   @override
   String get timeLeft => 'बचा समय';
@@ -605,7 +635,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get leaveTestTitle => 'टेस्ट छोड़ें?';
 
   @override
-  String get leaveTestBody => 'आपके उत्तर सहेजे गए हैं, पर समय चलता रहेगा। आप टेस्ट टैब से फिर शुरू कर सकते हैं।';
+  String get leaveTestBody =>
+      'आपके उत्तर सहेजे गए हैं, पर समय चलता रहेगा। आप टेस्ट टैब से फिर शुरू कर सकते हैं।';
 
   @override
   String get leave => 'छोड़ें';
@@ -739,7 +770,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get deleteAccount => 'मेरा खाता हटाएँ';
 
   @override
-  String get deleteAccountBody => 'खुले ऑर्डर या रिफ़ंड निपटने के बाद हम आपका खाता और व्यक्तिगत डेटा हटा देंगे। अभी आप साइन आउट हो जाएँगे।';
+  String get deleteAccountBody =>
+      'खुले ऑर्डर या रिफ़ंड निपटने के बाद हम आपका खाता और व्यक्तिगत डेटा हटा देंगे। अभी आप साइन आउट हो जाएँगे।';
 
   @override
   String get delete => 'हटाएँ';
@@ -757,7 +789,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get markAllRead => 'सभी को पढ़ा हुआ चिह्नित करें';
 
   @override
-  String get bookmarksEmpty => 'अभी कुछ सहेजा नहीं गया। किसी प्रश्न पर बुकमार्क दबाकर सहेजें।';
+  String get bookmarksEmpty =>
+      'अभी कुछ सहेजा नहीं गया। किसी प्रश्न पर बुकमार्क दबाकर सहेजें।';
 
   @override
   String get remove => 'हटाएँ';
@@ -808,7 +841,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get ticketMessage => 'हम कैसे मदद कर सकते हैं?';
 
   @override
-  String get ticketSent => 'संदेश भेजा गया। हम यहीं जवाब देंगे और आपको सूचित करेंगे।';
+  String get ticketSent =>
+      'संदेश भेजा गया। हम यहीं जवाब देंगे और आपको सूचित करेंगे।';
 
   @override
   String get supportReply => 'सहायता टीम का जवाब';
@@ -838,7 +872,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get paymentSuccess => 'भुगतान सफल। कोर्स खुल गया है।';
 
   @override
-  String get paymentFailed => 'भुगतान पूरा नहीं हुआ। कोई पैसा नहीं कटा, या वह अपने आप वापस हो जाएगा।';
+  String get paymentFailed =>
+      'भुगतान पूरा नहीं हुआ। कोई पैसा नहीं कटा, या वह अपने आप वापस हो जाएगा।';
 
   @override
   String get paymentVerifying => 'आपका भुगतान पुष्टि हो रहा है…';
@@ -876,26 +911,190 @@ class AppLocalizationsHi extends AppLocalizations {
   String get continueHere => 'यहाँ जारी रखें';
 
   @override
-  String get sessionReplaced => 'आपको साइन आउट कर दिया गया क्योंकि आपका खाता किसी दूसरे डिवाइस पर साइन इन किया गया।';
+  String get sessionReplaced =>
+      'आपको साइन आउट कर दिया गया क्योंकि आपका खाता किसी दूसरे डिवाइस पर साइन इन किया गया।';
 
   @override
   String get timeJustNow => 'अभी';
 
   @override
   String timeMinutesAgo(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count मिनट पहले', one: '1 मिनट पहले');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count मिनट पहले',
+      one: '1 मिनट पहले',
+    );
     return '$_temp0';
   }
 
   @override
   String timeHoursAgo(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count घंटे पहले', one: '1 घंटा पहले');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count घंटे पहले',
+      one: '1 घंटा पहले',
+    );
     return '$_temp0';
   }
 
   @override
   String timeDaysAgo(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count दिन पहले', one: '1 दिन पहले');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन पहले',
+      one: '1 दिन पहले',
+    );
     return '$_temp0';
   }
+
+  @override
+  String get doubtsTitle => 'मेरे डाउट';
+
+  @override
+  String get askDoubt => 'डाउट पूछें';
+
+  @override
+  String get doubtsIntro =>
+      'कहीं अटके हैं? टीचर से पूछें। जवाब आने पर आपको सूचना मिलेगी।';
+
+  @override
+  String get yourDoubt => 'आपका डाउट';
+
+  @override
+  String get doubtHint =>
+      'बताएं कि कहाँ अटके हैं: कौन-सा सवाल, कौन-सा स्टेप, या क्या साफ़ नहीं है।';
+
+  @override
+  String doubtAbout(Object title) {
+    return 'विषय: $title';
+  }
+
+  @override
+  String get doubtGeneral => 'सामान्य डाउट';
+
+  @override
+  String get doubtSent => 'डाउट भेज दिया गया। टीचर जल्द जवाब देंगे।';
+
+  @override
+  String get doubtTooShort => 'कम से कम 5 अक्षर लिखें।';
+
+  @override
+  String get doubtsEmpty => 'आपने अभी तक कोई डाउट नहीं पूछा है।';
+
+  @override
+  String get doubtStatusOpen => 'टीचर के जवाब का इंतज़ार';
+
+  @override
+  String get doubtStatusAnswered => 'जवाब मिला';
+
+  @override
+  String get doubtStatusResolved => 'हल हो गया';
+
+  @override
+  String doubtReplies(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count जवाब',
+      one: '1 जवाब',
+      zero: 'अभी कोई जवाब नहीं',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get doubtYou => 'आप';
+
+  @override
+  String get doubtTeacher => 'टीचर';
+
+  @override
+  String get doubtFollowUp => 'आगे पूछें';
+
+  @override
+  String get doubtMarkResolved => 'मेरा डाउट हल हो गया';
+
+  @override
+  String get doubtResolvedHint =>
+      'अब भी साफ़ नहीं? आगे पूछें, टीचर फिर देखेंगे।';
+
+  @override
+  String get topicQuiz => 'टॉपिक क्विज़';
+
+  @override
+  String topicQuizInfo(int count, Object percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count प्रश्न',
+      one: '1 प्रश्न',
+    );
+    return '$_temp0 · पास अंक $percent%';
+  }
+
+  @override
+  String get topicQuizCovered =>
+      'आपने यह टॉपिक पूरा कर लिया है। एक छोटे क्विज़ से अपनी समझ जाँचें।';
+
+  @override
+  String get topicQuizNotCovered => 'पहले पाठ पूरे करें, या अभी खुद को जाँचें।';
+
+  @override
+  String topicDonePrompt(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count प्रश्नों का',
+      one: '1 प्रश्न का',
+    );
+    return 'टॉपिक पूरा! अब $_temp0 छोटा क्विज़ दें।';
+  }
+
+  @override
+  String get startQuiz => 'क्विज़ शुरू करें';
+
+  @override
+  String get retakeQuiz => 'क्विज़ फिर से दें';
+
+  @override
+  String quizBest(Object percent) {
+    return 'सर्वश्रेष्ठ स्कोर $percent%';
+  }
+
+  @override
+  String get quizPassed => 'पास';
+
+  @override
+  String get quizNotPassed => 'अभी पास नहीं';
+
+  @override
+  String get submitQuiz => 'क्विज़ जमा करें';
+
+  @override
+  String quizUnanswered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count प्रश्नों के उत्तर नहीं दिए गए हैं।',
+      one: '1 प्रश्न का उत्तर नहीं दिया गया है।',
+    );
+    return '$_temp0 फिर भी जमा करें?';
+  }
+
+  @override
+  String get quizResult => 'क्विज़ परिणाम';
+
+  @override
+  String get quizPassedBody => 'शाबाश! आपने इस टॉपिक का क्विज़ पास कर लिया।';
+
+  @override
+  String quizFailedBody(Object percent) {
+    return 'पास होने के लिए $percent% चाहिए। पाठ दोहराएँ और फिर कोशिश करें।';
+  }
+
+  @override
+  String get backToTopic => 'विषय पर वापस जाएँ';
 }

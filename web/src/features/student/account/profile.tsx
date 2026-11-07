@@ -20,6 +20,7 @@ const LINKS: { href: string; label: MessageKey; icon: IconName }[] = [
   { href: "/bookmarks", label: "bookmarksTitle", icon: "bookmark" },
   { href: "/purchases", label: "myPurchases", icon: "doc" },
   { href: "/notifications", label: "notificationsTitle", icon: "bell" },
+  { href: "/doubts", label: "doubtsTitle", icon: "chat" },
   { href: "/support", label: "helpSupport", icon: "flag" },
 ];
 const privacyUrl = process.env.NEXT_PUBLIC_PRIVACY_URL ?? "https://example.com/privacy";

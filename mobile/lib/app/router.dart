@@ -5,8 +5,10 @@ import 'package:material_ui/material_ui.dart';
 import '../core/api/models.g.dart';
 import '../core/providers.dart';
 import '../features/auth/auth_screens.dart';
+import '../features/doubts/doubt_screens.dart';
 import '../features/home/home_screen.dart';
 import '../features/learn/learn_screens.dart';
+import '../features/learn/quiz_screen.dart';
 import '../features/learn/video_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/practice/practice_screens.dart';
@@ -82,6 +84,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         parentNavigatorKey: _rootKey,
+        path: '/topic/:id/quiz',
+        builder: (_, s) => TopicQuizScreen(topicId: s.pathParameters['id']!),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootKey,
         path: '/video/:id',
         builder: (_, s) => VideoScreen(resourceId: s.pathParameters['id']!),
       ),
@@ -121,6 +128,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(parentNavigatorKey: _rootKey, path: '/orders', builder: (_, _) => const OrdersScreen()),
       GoRoute(parentNavigatorKey: _rootKey, path: '/support', builder: (_, _) => const SupportScreen()),
       GoRoute(parentNavigatorKey: _rootKey, path: '/search', builder: (_, _) => const SearchScreen()),
+      GoRoute(parentNavigatorKey: _rootKey, path: '/doubts', builder: (_, _) => const DoubtsScreen()),
+      GoRoute(
+        parentNavigatorKey: _rootKey,
+        path: '/doubt/:id',
+        builder: (_, s) => DoubtScreen(doubtId: s.pathParameters['id']!),
+      ),
     ],
   );
 });

@@ -368,6 +368,95 @@ namespace LearnPath.Api.Data.Migrations
                     b.ToTable("Courses");
                 });
 
+            modelBuilder.Entity("LearnPath.Api.Domain.Doubt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("AnsweredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ResourceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<Guid?>("TopicId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("ResourceId");
+
+                    b.HasIndex("TopicId");
+
+                    b.HasIndex("Status", "UpdatedAt");
+
+                    b.HasIndex("UserId", "UpdatedAt");
+
+                    b.ToTable("Doubts");
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.DoubtMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DoubtId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("FromStaff")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("DoubtId", "CreatedAt");
+
+                    b.ToTable("DoubtMessages");
+                });
+
             modelBuilder.Entity("LearnPath.Api.Domain.Enrollment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -788,9 +877,15 @@ namespace LearnPath.Api.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool?>("Passed")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("QuestionIdsJson")
                         .IsRequired()
                         .HasColumnType("jsonb");
+
+                    b.Property<int?>("ScorePercent")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("StartedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1433,6 +1528,12 @@ namespace LearnPath.Api.Data.Migrations
                     b.Property<string>("ObjectivesHi")
                         .HasColumnType("text");
 
+                    b.Property<int>("QuizPassPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuizQuestionCount")
+                        .HasColumnType("integer");
+
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
 
@@ -1636,6 +1737,50 @@ namespace LearnPath.Api.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Exam");
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.Doubt", b =>
+                {
+                    b.HasOne("LearnPath.Api.Domain.Course", null)
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LearnPath.Api.Domain.Question", null)
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LearnPath.Api.Domain.LearningResource", null)
+                        .WithMany()
+                        .HasForeignKey("ResourceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LearnPath.Api.Domain.Topic", null)
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LearnPath.Api.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.DoubtMessage", b =>
+                {
+                    b.HasOne("LearnPath.Api.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LearnPath.Api.Domain.Doubt", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("DoubtId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("LearnPath.Api.Domain.Enrollment", b =>
@@ -1890,6 +2035,11 @@ namespace LearnPath.Api.Data.Migrations
             modelBuilder.Entity("LearnPath.Api.Domain.Course", b =>
                 {
                     b.Navigation("Subjects");
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.Doubt", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("LearnPath.Api.Domain.PracticeSession", b =>

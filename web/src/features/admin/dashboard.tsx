@@ -36,6 +36,11 @@ export function Dashboard() {
           hint={can.support(user?.roles) && d.openTickets > 0 ? <Link className="text-primary hover:underline" href="/admin/support">Review tickets</Link> : undefined}
         />
         <StatTile
+          label="Doubts waiting for a teacher"
+          value={formatNumber(d.openDoubts)}
+          hint={can.doubts(user?.roles) && d.openDoubts > 0 ? <Link className="text-primary hover:underline" href="/admin/doubts">Answer doubts</Link> : undefined}
+        />
+        <StatTile
           label="Reported questions"
           value={formatNumber(d.openQuestionReports)}
           hint={d.failedImportRows30d > 0 ? `${formatNumber(d.failedImportRows30d)} failed import rows in 30 days` : undefined}

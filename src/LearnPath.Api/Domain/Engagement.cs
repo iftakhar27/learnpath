@@ -90,6 +90,39 @@ public class SupportTicket
     public DateTimeOffset? UpdatedAt { get; set; }
 }
 
+public enum DoubtStatus { Open, Answered, Resolved }
+
+/// <summary>
+/// A student's question for a teacher, optionally about a topic, lesson or practice question. Open = waiting for a
+/// teacher; Answered = a teacher replied; Resolved = the student (or staff) closed it. A follow-up re-opens it.
+/// </summary>
+public class Doubt
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
+    public Guid? CourseId { get; set; }
+    public Guid? TopicId { get; set; }
+    public Guid? ResourceId { get; set; }
+    public Guid? QuestionId { get; set; }
+    public string Text { get; set; } = "";
+    public DoubtStatus Status { get; set; } = DoubtStatus.Open;
+    public DateTimeOffset CreatedAt { get; set; }
+    /// <summary>Last activity (question, follow-up or reply); orders the lists.</summary>
+    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset? AnsweredAt { get; set; }
+    public List<DoubtMessage> Messages { get; set; } = [];
+}
+
+public class DoubtMessage
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid DoubtId { get; set; }
+    public Guid AuthorId { get; set; }
+    public bool FromStaff { get; set; }
+    public string Text { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
 public class AuditLog
 {
     public long Id { get; set; }

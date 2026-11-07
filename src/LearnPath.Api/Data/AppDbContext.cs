@@ -41,6 +41,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<StudyPlanTask> StudyPlanTasks => Set<StudyPlanTask>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+    public DbSet<Doubt> Doubts => Set<Doubt>();
+    public DbSet<DoubtMessage> DoubtMessages => Set<DoubtMessage>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<ContentImportJob> ContentImportJobs => Set<ContentImportJob>();
     public DbSet<ContentImportError> ContentImportErrors => Set<ContentImportError>();
@@ -230,6 +232,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         });
         b.Entity<Notification>(e => e.HasIndex(x => new { x.UserId, x.CreatedAt }));
         b.Entity<SupportTicket>(e => { e.HasIndex(x => x.UserId); e.HasIndex(x => x.Status); });
+        b.Entity<Doubt>(e =>
+        {
+            e.HasIndex(x => new { x.UserId, x.UpdatedAt });
+            e.HasIndex(x => new { x.Status, x.UpdatedAt });
+            e.Property(x => x.Text).HasMaxLength(4000);
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(16);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<Course>().WithMany().HasForeignKey(x => x.CourseId).OnDelete(DeleteBehavior.SetNull);
+            e.HasOne<Topic>().WithMany().HasForeignKey(x => x.TopicId).OnDelete(DeleteBehavior.SetNull);
+            e.HasOne<LearningResource>().WithMany().HasForeignKey(x => x.ResourceId).OnDelete(DeleteBehavior.SetNull);
+            e.HasOne<Question>().WithMany().HasForeignKey(x => x.QuestionId).OnDelete(DeleteBehavior.SetNull);
+            e.HasMany(x => x.Messages).WithOne().HasForeignKey(x => x.DoubtId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<DoubtMessage>(e =>
+        {
+            e.HasIndex(x => new { x.DoubtId, x.CreatedAt });
+            e.Property(x => x.Text).HasMaxLength(4000);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.Cascade);
+        });
         b.Entity<AuditLog>(e => { e.HasIndex(x => x.CreatedAt); e.Property(x => x.DataJson).HasColumnType("jsonb"); });
         b.Entity<ContentImportJob>(e => e.HasMany(x => x.Errors).WithOne().HasForeignKey(x => x.JobId).OnDelete(DeleteBehavior.Cascade));
 

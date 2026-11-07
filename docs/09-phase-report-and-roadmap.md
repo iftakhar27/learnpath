@@ -231,6 +231,27 @@ tests, 2 browser tests (two real browser contexts: ask, cancel, take over, expla
 2 app tests; all suites green (99 backend, 32 browser, 22 app). **To check:** on real phones after installing the new
 app builds.
 
+### Ask a doubt and topic quizzes (7 Nov 2026)
+
+**Ask a doubt:** students ask a teacher from a topic, a lesson, a practice or test question, a quiz answer, or their
+"My doubts" page (website and app; Home and Profile link to it). Each doubt is a thread: the teacher's reply notifies the
+student, who can follow up (re-opens it) or mark it solved. Doubts about paid topics need the course; 10 new doubts a
+day per student. Teachers, content admins and super admins answer under **Admin → Doubts** (open ones oldest first,
+search, the student and what the doubt is about, reply and/or resolve); the Dashboard counts doubts waiting.
+
+**Topic quizzes:** every topic offers a short quiz (default 5 questions, 60% to pass; set per topic in the syllabus
+editor, 0 turns it off) drawn from its published questions, unseen ones first. It is highlighted once all the topic's
+lessons are done, and finishing the last lesson prompts for it. Answers are scored together on submit, with the score,
+pass/fail, every answer and explanation, "Ask a doubt" per question, retake and next topic; quiz answers count towards
+accuracy and weak topics like practice. Existing topics got the default quiz.
+
+**Verified:** 6 backend tests (thread and notifications, paid-topic access and privacy, daily limit, quiz scoring and
+idempotent submit, admin settings, completion prompt), 3 browser tests (topic → doubt → admin reply → follow-up →
+resolved; covered topic → quiz with an unanswered question → result → card shows best score; admin quiz settings),
+2 app tests (quiz confirm and result, doubts list and validation); all suites green (105 backend, 35 browser, 24 app).
+**Not verified:** the Android build (no Android SDK in this environment; the iOS build on GitHub compiles the app).
+**Not included yet:** photos in doubts (needs file storage), assigning doubts to particular teachers.
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |

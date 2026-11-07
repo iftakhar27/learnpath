@@ -14,6 +14,7 @@ import '../../widgets/question_view.dart';
 import '../home/home_screen.dart';
 import '../practice/practice_screens.dart';
 import 'exam_session.dart';
+import '../doubts/doubt_screens.dart';
 
 final testsProvider = FutureProvider.autoDispose<List<TestSummaryDto>>((ref) => ref.watch(apiProvider).tests());
 final testDetailProvider = FutureProvider.autoDispose.family<TestDetailDto, String>((ref, id) => ref.watch(apiProvider).testDetail(id));
@@ -762,6 +763,7 @@ class _ReviewCard extends ConsumerWidget {
                   Pill(label, color: color),
                   const Spacer(),
                   Text(l.marksAwarded(formatNumber(q.marksAwarded))),
+                  AskDoubtAction(questionId: q.questionId, about: q.stem),
                   IconButton(
                     tooltip: l.reportQuestion,
                     icon: const Icon(Icons.flag_outlined, size: 20),

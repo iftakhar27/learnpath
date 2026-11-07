@@ -3,6 +3,7 @@ using LearnPath.Api.Data;
 using LearnPath.Api.Domain;
 using LearnPath.Api.Infrastructure;
 using LearnPath.Api.Modules.Catalog;
+using LearnPath.Api.Modules.Practice;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,8 @@ using Microsoft.EntityFrameworkCore;
 namespace LearnPath.Api.Modules.Learning;
 
 public record ProgressRequest([Required] Guid ResourceId, [Range(0, 86400)] int PositionSeconds, bool MarkCompleted = false);
-public record ProgressDto(Guid ResourceId, int PositionSeconds, bool Completed);
+/// <summary><c>TopicCompleted</c>: every lesson of the topic is done, so clients offer the topic's <c>Quiz</c> (null when it has none).</summary>
+public record ProgressDto(Guid ResourceId, int PositionSeconds, bool Completed, bool TopicCompleted, TopicQuizSummaryDto? Quiz);
 public record BookmarkRequest([Required] BookmarkType EntityType, [Required] Guid EntityId, [MaxLength(1000)] string? Note);
 public record HistoryItemDto(Guid ResourceId, string Title, Guid TopicId, string Topic, string Type, int PositionSeconds, int? DurationSeconds, bool Completed, DateTimeOffset UpdatedAt);
 public record BookmarkDto(Guid Id, string EntityType, Guid EntityId, string Title, string? Note, DateTimeOffset CreatedAt);
@@ -53,7 +55,17 @@ public class LearningController(AppDbContext db, EntitlementService entitlements
             db.LearningEvents.Add(new LearningEvent { UserId = userId, EventType = LearningEventTypes.ResourceCompleted, EntityId = resource.Id, OccurredAt = now });
         }
         await db.SaveChangesAsync(ct);
-        return new ProgressDto(p.ResourceId, p.PositionSeconds, p.Completed);
+
+        var topicCompleted = false;
+        TopicQuizSummaryDto? quiz = null;
+        if (p.Completed)
+        {
+            var remaining = await db.LearningResources.CountAsync(r => r.TopicId == resource.TopicId && r.Status == PublishStatus.Published
+                && !db.ResourceProgress.Any(x => x.UserId == userId && x.ResourceId == r.Id && x.Completed), ct);
+            topicCompleted = remaining == 0;
+            if (topicCompleted) quiz = await TopicQuizzes.SummaryAsync(db, userId, resource.Topic, ct);
+        }
+        return new ProgressDto(p.ResourceId, p.PositionSeconds, p.Completed, topicCompleted, quiz);
     }
 
     [HttpGet("history")]

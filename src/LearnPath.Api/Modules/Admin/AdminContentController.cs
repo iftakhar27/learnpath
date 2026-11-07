@@ -13,6 +13,7 @@ public static class Policies
     public const string ContentEdit = nameof(ContentEdit);       // Teacher, ContentAdmin, SuperAdmin
     public const string ContentPublish = nameof(ContentPublish); // ContentAdmin, SuperAdmin
     public const string SupportOps = nameof(SupportOps);         // Support, SuperAdmin
+    public const string Doubts = nameof(Doubts);                 // Teacher, ContentAdmin, SuperAdmin
     public const string Finance = nameof(Finance);               // Finance, SuperAdmin
     public const string StaffRead = nameof(StaffRead);           // any staff role
     public const string SuperAdmin = nameof(SuperAdmin);
@@ -23,7 +24,8 @@ public record CourseUpsert([Required] Guid ExamId, [Required, MaxLength(120), Re
     string? TitleHi, string? DescriptionEn, string? DescriptionHi, string? ClassLevel, string? Board, bool IsFree, [Range(0, 10_000_000_00)] long PriceInPaise,
     [Range(1, 3650)] int? AccessDays, DateTimeOffset? PublishAt);
 public record NodeUpsert([Required] Guid ParentId, [Required, MaxLength(200)] string TitleEn, string? TitleHi, int SortOrder = 0, string? UnitTitleEn = null,
-    string? ObjectivesEn = null, string? ObjectivesHi = null, [Range(0, 1000)] int EstimatedMinutes = 0);
+    string? ObjectivesEn = null, string? ObjectivesHi = null, [Range(0, 1000)] int EstimatedMinutes = 0,
+    [Range(0, 50)] int? QuizQuestionCount = null, [Range(1, 100)] int? QuizPassPercent = null); // topics only; null keeps the current (or default) value
 public record ResourceUpsert([Required] Guid TopicId, [Required] ResourceType Type, [Required, MaxLength(200)] string TitleEn, string? TitleHi,
     [RegularExpression("^(en|hi)$")] string Language, int SortOrder, bool IsFreePreview, string? VideoProviderId, [Range(1, 36000)] int? DurationSeconds,
     string? DocumentStorageKey, bool AllowDownload);
@@ -75,14 +77,15 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
             .AsSplitQuery().FirstOrDefaultAsync(c => c.Id == id, ct) ?? throw AppException.NotFound("Course");
         var topicIds = c.Subjects.SelectMany(s => s.Chapters).SelectMany(ch => ch.Topics).Select(t => t.Id).ToList();
         var questionCounts = await db.Questions.Where(q => topicIds.Contains(q.TopicId)).GroupBy(q => q.TopicId)
-            .Select(g => new { g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Key, x => x.Count, ct);
+            .Select(g => new { g.Key, Count = g.Count(), Published = g.Count(q => q.Status == PublishStatus.Published) }).ToDictionaryAsync(x => x.Key, ct);
         var enrollments = await db.Enrollments.CountAsync(e => e.CourseId == id, ct);
 
         return new AdminCourseTreeDto(ToDto(c, enrollments), c.Subjects.OrderBy(s => s.SortOrder).ThenBy(s => s.TitleEn).Select(s =>
             new AdminSubjectDto(s.Id, s.CourseId, s.TitleEn, s.TitleHi, s.SortOrder, s.Chapters.OrderBy(ch => ch.SortOrder).ThenBy(ch => ch.TitleEn).Select(ch =>
                 new AdminChapterDto(ch.Id, ch.SubjectId, ch.UnitTitleEn, ch.TitleEn, ch.TitleHi, ch.SortOrder, ch.Topics.OrderBy(t => t.SortOrder).ThenBy(t => t.TitleEn).Select(t =>
                     new AdminTopicDto(t.Id, t.ChapterId, t.TitleEn, t.TitleHi, t.ObjectivesEn, t.ObjectivesHi, t.EstimatedMinutes, t.SortOrder,
-                        questionCounts.GetValueOrDefault(t.Id), t.Resources.OrderBy(r => r.SortOrder).Select(ToDto).ToList())).ToList())).ToList())).ToList());
+                        questionCounts.GetValueOrDefault(t.Id)?.Count ?? 0, t.Resources.OrderBy(r => r.SortOrder).Select(ToDto).ToList(),
+                        questionCounts.GetValueOrDefault(t.Id)?.Published ?? 0, t.QuizQuestionCount, t.QuizPassPercent)).ToList())).ToList())).ToList());
     }
 
     internal static AdminCourseDto ToDto(Course c, int enrollments) => new(c.Id, c.ExamId, c.Slug, c.TitleEn, c.TitleHi, c.DescriptionEn, c.DescriptionHi,
@@ -160,7 +163,12 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
     public async Task<IdDto> CreateTopic(NodeUpsert req, CancellationToken ct)
     {
         if (!await db.Chapters.AnyAsync(c => c.Id == req.ParentId, ct)) throw AppException.NotFound("Chapter");
-        var t = new Topic { ChapterId = req.ParentId, TitleEn = req.TitleEn, TitleHi = req.TitleHi, SortOrder = req.SortOrder, ObjectivesEn = req.ObjectivesEn, ObjectivesHi = req.ObjectivesHi, EstimatedMinutes = req.EstimatedMinutes };
+        var t = new Topic
+        {
+            ChapterId = req.ParentId, TitleEn = req.TitleEn, TitleHi = req.TitleHi, SortOrder = req.SortOrder, ObjectivesEn = req.ObjectivesEn, ObjectivesHi = req.ObjectivesHi,
+            EstimatedMinutes = req.EstimatedMinutes, QuizQuestionCount = req.QuizQuestionCount ?? Topic.DefaultQuizQuestions,
+            QuizPassPercent = req.QuizPassPercent ?? Topic.DefaultQuizPassPercent,
+        };
         db.Topics.Add(t);
         return await Save("topic.create", "Topic", t.Id, req, ct);
     }
@@ -170,6 +178,8 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
     {
         var t = await db.Topics.FindAsync([id], ct) ?? throw AppException.NotFound("Topic");
         (t.TitleEn, t.TitleHi, t.SortOrder, t.ObjectivesEn, t.ObjectivesHi, t.EstimatedMinutes) = (req.TitleEn, req.TitleHi, req.SortOrder, req.ObjectivesEn, req.ObjectivesHi, req.EstimatedMinutes);
+        t.QuizQuestionCount = req.QuizQuestionCount ?? t.QuizQuestionCount;
+        t.QuizPassPercent = req.QuizPassPercent ?? t.QuizPassPercent;
         return await Save("topic.update", "Topic", id, req, ct);
     }
 

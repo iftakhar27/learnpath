@@ -25,7 +25,7 @@ npx @openapitools/openapi-generator-cli generate -i docs/openapi.json -g dart-di
 `invalid_credentials`, `email_taken`, `terms_required`, `otp_invalid`, `otp_too_soon` (429), `invalid_refresh_token` (401),
 `entitlement_required` (402 → show paywall), `attempt_closed`, `attempt_expired`, `max_attempts_reached`, `test_not_open`,
 `test_closed`, `invalid_answer`, `no_questions`, `signature_invalid`, `already_owned`, `exam_required`,
-`guardian_consent_required`, `internal_error` (500).
+`guardian_consent_required`, `no_quiz`, `quiz_session`, `doubt_limit` (429), `internal_error` (500).
 
 ## Test-taking flow
 
@@ -56,6 +56,34 @@ clear a response with `"response": null`.
    `X-Razorpay-Signature` and de-duplicated by `X-Razorpay-Event-Id`. Whichever arrives first grants access; the other is a no-op.
    Configure the webhook URL and secret in the Razorpay dashboard.
 
+## Topic quiz
+
+A short quiz at the end of each topic: up to `Topic.QuizQuestionCount` (default 5, set per topic in the admin portal;
+0 = no quiz) of the topic's published questions, unseen ones first.
+
+1. `GET /topics/{id}` includes `quiz` (`questionCount`, `passPercent`, `attempts`, `bestPercent`, `passed`), or `null`
+   when the topic has no quiz. `POST /learning/progress` returns `topicCompleted` and the same `quiz` when that lesson
+   finished the topic, so clients can offer it straight away.
+2. `POST /topics/{id}/quiz` → `{sessionId, questions}` (needs access to the course; a new set each time).
+3. `POST /practice/quizzes/{sessionId}/submit {answers:[{questionId, response, timeSpentSeconds}]}` →
+   `{scorePercent, passed, correct, incorrect, partial, skipped, items:[{outcome, correctOptionIds, explanation…}], nextTopicId}`.
+   Unanswered questions are `Skipped`. Submitting again returns the same result. Answers are not revealed before submit
+   (`POST /practice/sessions/{id}/answers` refuses quiz sessions with `quiz_session`). Score: correct = 1, partly
+   correct = ½, as a percentage of the questions.
+
+## Doubts
+
+Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in the admin portal.
+
+- `POST /doubts {text, topicId?, resourceId?, questionId?}`: any one link is enough; the API derives the topic and course.
+  A doubt about a paid topic needs access to the course (402). Up to 10 new doubts a day (`429 doubt_limit`).
+- `GET /doubts`, `GET /doubts/{id}` (thread), `POST /doubts/{id}/messages {text}` (follow-up; status back to `Open`),
+  `POST /doubts/{id}/resolve`.
+- Staff: `GET /admin/doubts?status=Open&q=…` (open ones oldest first), `GET /admin/doubts/{id}`,
+  `POST /admin/doubts/{id}/reply {text, resolve}` (status `Answered`, or `Resolved`; the student gets a notification
+  linking to `/doubts/{id}`), `POST /admin/doubts/{id}/resolve`.
+- Status: `Open` (waiting for a teacher) → `Answered` → `Resolved`; a follow-up re-opens it.
+
 ## Endpoint index
 
 | Method | Path |
@@ -64,12 +92,17 @@ clear a response with `"response": null`.
 | `GET` | `/api/v1/admin/audit-logs` |
 | `POST` | `/api/v1/admin/chapters` |
 | `PUT` | `/api/v1/admin/chapters/{id}` |
+| `DELETE` | `/api/v1/admin/chapters/{id}` |
 | `GET` | `/api/v1/admin/courses` |
 | `POST` | `/api/v1/admin/courses` |
 | `PUT` | `/api/v1/admin/courses/{id}` |
 | `POST` | `/api/v1/admin/courses/{id}/status` |
 | `GET` | `/api/v1/admin/courses/{id}/tree` |
 | `GET` | `/api/v1/admin/dashboard` |
+| `GET` | `/api/v1/admin/doubts` |
+| `GET` | `/api/v1/admin/doubts/{id}` |
+| `POST` | `/api/v1/admin/doubts/{id}/reply` |
+| `POST` | `/api/v1/admin/doubts/{id}/resolve` |
 | `GET` | `/api/v1/admin/exams` |
 | `POST` | `/api/v1/admin/exams` |
 | `PUT` | `/api/v1/admin/exams/{id}` |
@@ -85,17 +118,23 @@ clear a response with `"response": null`.
 | `POST` | `/api/v1/admin/questions/{id}/status` |
 | `POST` | `/api/v1/admin/resources` |
 | `PUT` | `/api/v1/admin/resources/{id}` |
+| `DELETE` | `/api/v1/admin/resources/{id}` |
 | `POST` | `/api/v1/admin/resources/{id}/status` |
 | `POST` | `/api/v1/admin/subjects` |
 | `PUT` | `/api/v1/admin/subjects/{id}` |
+| `DELETE` | `/api/v1/admin/subjects/{id}` |
+| `GET` | `/api/v1/admin/test-otp-codes` |
 | `GET` | `/api/v1/admin/tests` |
 | `POST` | `/api/v1/admin/tests` |
+| `GET` | `/api/v1/admin/tests/{id}` |
 | `PUT` | `/api/v1/admin/tests/{id}` |
+| `POST` | `/api/v1/admin/tests/{id}/duplicate` |
 | `POST` | `/api/v1/admin/tests/{id}/status` |
 | `GET` | `/api/v1/admin/tickets` |
 | `POST` | `/api/v1/admin/tickets/{id}/respond` |
 | `POST` | `/api/v1/admin/topics` |
 | `PUT` | `/api/v1/admin/topics/{id}` |
+| `DELETE` | `/api/v1/admin/topics/{id}` |
 | `GET` | `/api/v1/admin/users` |
 | `GET` | `/api/v1/admin/users/{id}` |
 | `POST` | `/api/v1/admin/users/{id}/enrollments` |
@@ -118,6 +157,11 @@ clear a response with `"response": null`.
 | `GET` | `/api/v1/courses` |
 | `POST` | `/api/v1/courses/{courseId}/enroll` |
 | `GET` | `/api/v1/courses/{courseId}/syllabus` |
+| `GET` | `/api/v1/doubts` |
+| `POST` | `/api/v1/doubts` |
+| `GET` | `/api/v1/doubts/{id}` |
+| `POST` | `/api/v1/doubts/{id}/messages` |
+| `POST` | `/api/v1/doubts/{id}/resolve` |
 | `GET` | `/api/v1/exams` |
 | `GET` | `/api/v1/learning/bookmarks` |
 | `POST` | `/api/v1/learning/bookmarks` |
@@ -132,6 +176,7 @@ clear a response with `"response": null`.
 | `POST` | `/api/v1/payments/orders/{orderId}/refund-request` |
 | `POST` | `/api/v1/payments/verify` |
 | `POST` | `/api/v1/payments/webhooks` |
+| `POST` | `/api/v1/practice/quizzes/{sessionId}/submit` |
 | `POST` | `/api/v1/practice/sessions` |
 | `POST` | `/api/v1/practice/sessions/{sessionId}/answers` |
 | `POST` | `/api/v1/practice/sessions/{sessionId}/complete` |
@@ -154,3 +199,4 @@ clear a response with `"response": null`.
 | `GET` | `/api/v1/tests/{testId}` |
 | `POST` | `/api/v1/tests/{testId}/attempts` |
 | `GET` | `/api/v1/topics/{topicId}` |
+| `POST` | `/api/v1/topics/{topicId}/quiz` |

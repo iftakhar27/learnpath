@@ -8,6 +8,7 @@ import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/question_view.dart';
+import '../doubts/doubt_screens.dart';
 
 final analyticsProvider = FutureProvider.autoDispose<StudentAnalyticsDto>((ref) => ref.watch(apiProvider).analytics());
 
@@ -192,6 +193,7 @@ class _PracticeSessionScreenState extends ConsumerState<PracticeSessionScreen> {
             icon: Icon(_bookmarked.contains(q.questionId) ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded),
             onPressed: _bookmarked.contains(q.questionId) ? null : _bookmark,
           ),
+          AskDoubtAction(questionId: q.questionId, about: q.stem),
           IconButton(tooltip: l.reportQuestion, icon: const Icon(Icons.flag_outlined), onPressed: () => showReportSheet(context, ref, q.questionId)),
         ],
         bottom: PreferredSize(
@@ -255,6 +257,7 @@ class FeedbackCard extends StatelessWidget {
     final (label, color, bg, icon) = switch (feedback.outcome) {
       'Correct' => (l.correct, scheme.success, scheme.successContainer, Icons.check_circle_rounded),
       'PartiallyCorrect' => (l.partiallyCorrect, scheme.warning, scheme.warningContainer, Icons.adjust_rounded),
+      'Skipped' => (l.notAnswered, scheme.onSurfaceVariant, scheme.surfaceContainerHighest, Icons.remove_circle_outline_rounded),
       _ => (l.incorrect, scheme.danger, scheme.dangerContainer, Icons.cancel_rounded),
     };
     return Card(

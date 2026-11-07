@@ -114,6 +114,7 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.ContentEdit, p => p.RequireRole(Roles.Teacher, Roles.ContentAdmin, Roles.SuperAdmin))
     .AddPolicy(Policies.ContentPublish, p => p.RequireRole(Roles.ContentAdmin, Roles.SuperAdmin))
     .AddPolicy(Policies.SupportOps, p => p.RequireRole(Roles.Support, Roles.SuperAdmin))
+    .AddPolicy(Policies.Doubts, p => p.RequireRole(Roles.Teacher, Roles.ContentAdmin, Roles.SuperAdmin))
     .AddPolicy(Policies.Finance, p => p.RequireRole(Roles.Finance, Roles.SuperAdmin))
     .AddPolicy(Policies.StaffRead, p => p.RequireRole(Roles.Staff))
     .AddPolicy(Policies.SuperAdmin, p => p.RequireRole(Roles.SuperAdmin));

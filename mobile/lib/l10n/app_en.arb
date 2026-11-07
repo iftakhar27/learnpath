@@ -466,5 +466,84 @@
         "type": "int"
       }
     }
-  }
+  },
+  "doubtsTitle": "My doubts",
+  "askDoubt": "Ask a doubt",
+  "doubtsIntro": "Stuck on something? Ask a teacher. You'll get a notification when they reply.",
+  "yourDoubt": "Your doubt",
+  "doubtHint": "Describe where you're stuck: the question, the step, or what isn't clear.",
+  "doubtAbout": "About: {title}",
+  "@doubtAbout": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "doubtGeneral": "General doubt",
+  "doubtSent": "Doubt sent. A teacher will reply soon.",
+  "doubtTooShort": "Write at least 5 characters.",
+  "doubtsEmpty": "You haven't asked any doubts yet.",
+  "doubtStatusOpen": "Waiting for a teacher",
+  "doubtStatusAnswered": "Answered",
+  "doubtStatusResolved": "Resolved",
+  "doubtReplies": "{count, plural, =0{No replies yet} =1{1 reply} other{{count} replies}}",
+  "@doubtReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "doubtYou": "You",
+  "doubtTeacher": "Teacher",
+  "doubtFollowUp": "Ask a follow-up",
+  "doubtMarkResolved": "My doubt is solved",
+  "doubtResolvedHint": "Still unclear? Ask a follow-up and a teacher will look again.",
+  "topicQuiz": "Topic quiz",
+  "topicQuizInfo": "{count, plural, =1{1 question} other{{count} questions}} · pass mark {percent}%",
+  "@topicQuizInfo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "percent": {}
+    }
+  },
+  "topicQuizCovered": "You've covered this topic. Check your understanding with a short quiz.",
+  "topicQuizNotCovered": "Finish the lessons first, or test yourself now.",
+  "topicDonePrompt": "Topic covered! Take a quick {count, plural, =1{1-question} other{{count}-question}} quiz.",
+  "@topicDonePrompt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "startQuiz": "Start quiz",
+  "retakeQuiz": "Retake quiz",
+  "quizBest": "Best score {percent}%",
+  "@quizBest": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "quizPassed": "Passed",
+  "quizNotPassed": "Not passed yet",
+  "submitQuiz": "Submit quiz",
+  "quizUnanswered": "{count, plural, =1{1 question is unanswered.} other{{count} questions are unanswered.}} Submit anyway?",
+  "@quizUnanswered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "quizResult": "Quiz result",
+  "quizPassedBody": "Well done! You passed this topic's quiz.",
+  "quizFailedBody": "You need {percent}% to pass. Revise the lessons and try again.",
+  "@quizFailedBody": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "backToTopic": "Back to topic"
 }

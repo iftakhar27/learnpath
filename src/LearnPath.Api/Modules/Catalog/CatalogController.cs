@@ -1,6 +1,7 @@
 using LearnPath.Api.Data;
 using LearnPath.Api.Domain;
 using LearnPath.Api.Infrastructure;
+using LearnPath.Api.Modules.Practice;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ public record ChapterDto(Guid Id, string? Unit, string Title, List<TopicDto> Top
 public record SubjectDto(Guid Id, string Title, List<ChapterDto> Chapters, int CompletionPercent);
 public record CourseDetailDto(CourseSummaryDto Course, bool HasAccess, int CompletionPercent, List<SubjectDto> Subjects);
 public record TopicDetailDto(Guid Id, Guid CourseId, string Title, string? Objectives, int EstimatedMinutes, string Chapter, string Subject, bool HasAccess,
-    List<ResourceDto> Resources, int PracticeQuestionCount, Guid? PreviousTopicId, Guid? NextTopicId);
+    List<ResourceDto> Resources, int PracticeQuestionCount, Guid? PreviousTopicId, Guid? NextTopicId, TopicQuizSummaryDto? Quiz);
 /// <summary><c>Url</c> is the web player (videos) or download link (notes); <c>StreamUrl</c> is HLS for native video players.</summary>
 public record PlaybackDto(Guid ResourceId, string Type, string Url, string? StreamUrl, DateTimeOffset ExpiresAt, int ResumeAtSeconds,
     string Title, Guid TopicId, string Topic, int? DurationSeconds, bool Completed);
@@ -129,7 +130,8 @@ public class CatalogController(AppDbContext db, RequestLanguage lang, Entitlemen
 
         return new TopicDetailDto(topic.Id, courseId, lang.Pick(topic.TitleEn, topic.TitleHi), lang.PickOpt(topic.ObjectivesEn, topic.ObjectivesHi),
             topic.EstimatedMinutes, lang.Pick(topic.Chapter.TitleEn, topic.Chapter.TitleHi), lang.Pick(topic.Chapter.Subject.TitleEn, topic.Chapter.Subject.TitleHi),
-            hasAccess, resources, practiceCount, idx > 0 ? order[idx - 1] : null, idx >= 0 && idx < order.Count - 1 ? order[idx + 1] : null);
+            hasAccess, resources, practiceCount, idx > 0 ? order[idx - 1] : null, idx >= 0 && idx < order.Count - 1 ? order[idx + 1] : null,
+            await TopicQuizzes.SummaryAsync(db, userId, topic, ct));
     }
 
     /// <summary>Returns a short-lived signed URL. Paid resources require an active entitlement.</summary>

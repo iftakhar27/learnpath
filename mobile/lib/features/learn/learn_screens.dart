@@ -9,6 +9,8 @@ import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../payments/checkout.dart';
+import '../doubts/doubt_screens.dart';
+import 'quiz_screen.dart';
 
 enum PriceFilter { all, free, paid }
 
@@ -315,6 +317,8 @@ class TopicScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 child: OutlinedButton(onPressed: () => context.push('/course/${t.courseId}'), child: Text(l.viewCourse)),
               ),
+            if (t.hasAccess && t.quiz != null)
+              TopicQuizCard(topicId: t.id, quiz: t.quiz!, covered: t.resources.isNotEmpty && t.resources.every((r) => r.completed)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: t.practiceQuestionCount > 0
@@ -330,6 +334,15 @@ class TopicScreen extends ConsumerWidget {
                     )
                   : Text(l.noPracticeQuestions, textAlign: TextAlign.center),
             ),
+            if (t.hasAccess)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.forum_outlined),
+                  label: Text(l.askDoubt),
+                  onPressed: () => showAskDoubtSheet(context, ref, topicId: t.id, about: t.title),
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(

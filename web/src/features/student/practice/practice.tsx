@@ -209,7 +209,7 @@ export function PracticeSession({ request, backHref }: { request: CreateRequest;
 
       <StudentError error={check.error ?? finish.error} />
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <QuestionTools questionId={q.questionId} />
+        <QuestionTools questionId={q.questionId} stem={q.stem} />
         {!feedback ? (
           <Button
             disabled={!isAnswered(answer)}

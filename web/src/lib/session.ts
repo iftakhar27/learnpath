@@ -34,6 +34,7 @@ export const can = {
   support: (r?: readonly string[]) => has(r, "Support", "SuperAdmin"),
   /** Tickets (support staff) or question reports (content staff). */
   supportPage: (r?: readonly string[]) => has(r, "Support", "Teacher", "ContentAdmin", "SuperAdmin"),
+  doubts: (r?: readonly string[]) => has(r, "Teacher", "ContentAdmin", "SuperAdmin"),
   finance: (r?: readonly string[]) => has(r, "Finance", "SuperAdmin"),
   superAdmin: (r?: readonly string[]) => has(r, "SuperAdmin"),
 };
