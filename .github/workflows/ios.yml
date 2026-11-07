@@ -1,4 +1,5 @@
-# Builds the iOS app on a GitHub-hosted Mac (iOS builds need macOS + Xcode). The results are workflow artifacts,
+# Builds the iOS app on a GitHub-hosted Mac (iOS builds need macOS + Xcode). Paused on pushes while the focus is
+# Android: run it on demand from Actions → iOS build → Run workflow. The results are workflow artifacts,
 # downloadable by signed-in users from the run's page:
 #   - LearnPath-unsigned-ipa: iPhone build without a signature (sideload with a free Apple ID via Sideloadly or
 #     AltStore, or sign it for TestFlight)
@@ -7,9 +8,8 @@
 name: iOS build
 
 on:
-  push:
-    branches: [main]
-    paths: ["mobile/**", ".github/workflows/ios.yml"]
+  # Automatic builds on push are paused (focus is Android). To resume, add back:
+  #   push: { branches: [main], paths: ["mobile/**", ".github/workflows/ios.yml"] }
   workflow_dispatch:
 
 permissions:

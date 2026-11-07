@@ -205,6 +205,12 @@ webhook endpoint rejects unsigned calls; the owner paid for the paid sample cour
 Checkout (test mode, Netbanking) and the course unlocked. **Still to check in the dashboard:** the payment shows as
 Captured and the webhook delivery succeeded; the Android app's checkout on a device.
 
+### Android first (7 Nov 2026)
+
+Owner's call: focus on Android, not iOS, for now. `.github/workflows/android.yml` analyzes, tests and builds the APK on
+every push to `main` that touches `mobile/` (artifact **LearnPath-android-apk**, 30 days); the iOS workflow now runs only
+on demand.
+
 ### iOS build (6 Nov 2026)
 
 **Built:** `.github/workflows/ios.yml` builds the app on GitHub's macOS runners (Xcode 26.3, Swift 6.2.4; the newest
@@ -249,7 +255,7 @@ accuracy and weak topics like practice. Existing topics got the default quiz.
 idempotent submit, admin settings, completion prompt), 3 browser tests (topic → doubt → admin reply → follow-up →
 resolved; covered topic → quiz with an unanswered question → result → card shows best score; admin quiz settings),
 2 app tests (quiz confirm and result, doubts list and validation); all suites green (105 backend, 35 browser, 24 app).
-**Not verified:** the Android build (no Android SDK in this environment; the iOS build on GitHub compiles the app).
+**Built:** the Android release APK (60 MB, staging API). **Not verified:** running it on a phone.
 **Not included yet:** photos in doubts (needs file storage), assigning doubts to particular teachers.
 
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)

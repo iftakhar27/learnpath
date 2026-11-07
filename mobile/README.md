@@ -93,9 +93,18 @@ After editing ARB files: `flutter gen-l10n` (also runs on build).
 - Razorpay checkout works on Android/iOS only; the web build shows a message instead. Access is granted only after
   the server verifies the payment signature.
 - Push notifications (FCM) are not wired yet; notifications are in-app.
-- iOS builds run on GitHub's Mac runners (`.github/workflows/ios.yml`) on every push to `main` that touches `mobile/`,
-  or on demand (Actions → iOS build → Run workflow). Each run has two artifacts: **LearnPath-unsigned-ipa** (iPhone) and
+- Android builds run on GitHub (`.github/workflows/android.yml`) on every push to `main` that touches `mobile/`, or on
+  demand (Actions → Android build → Run workflow): analyze, tests, then **LearnPath-android-apk** (`app-release.apk`,
+  pointing at the staging API) as an artifact for 30 days.
+- iOS builds (`.github/workflows/ios.yml`) are paused on push while the focus is Android; run them on demand
+  (Actions → iOS build → Run workflow). Each run has two artifacts: **LearnPath-unsigned-ipa** (iPhone) and
   **LearnPath-simulator** (iOS Simulator). The app id is `com.learnpath.app` on both platforms.
+
+### Installing the Android build
+
+Copy `app-release.apk` to the phone (or download it there), open it and allow installing from that app when Android
+asks ("Install unknown apps"). Test builds are signed with a debug key that differs between build machines, so if
+Android says the app "conflicts with an existing package", uninstall the old LearnPath first.
 
 ### Installing the iOS build
 
