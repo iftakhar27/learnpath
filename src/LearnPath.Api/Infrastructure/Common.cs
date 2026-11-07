@@ -9,10 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace LearnPath.Api.Infrastructure;
 
 /// <summary>Expected business failure; rendered as RFC 7807 problem details with a stable <c>code</c>.</summary>
-public class AppException(int status, string code, string message) : Exception(message)
+public class AppException(int status, string code, string message, IReadOnlyDictionary<string, object?>? extra = null) : Exception(message)
 {
     public int Status { get; } = status;
     public string Code { get; } = code;
+    /// <summary>Extra problem-details fields the client needs (e.g. the other device for "session_active").</summary>
+    public IReadOnlyDictionary<string, object?>? Extra { get; } = extra;
 
     public static AppException NotFound(string what) => new(404, "not_found", $"{what} not found.");
     public static AppException Forbidden(string message = "You do not have access to this resource.") => new(403, "forbidden", message);
@@ -30,6 +32,7 @@ public class AppExceptionHandler(ILogger<AppExceptionHandler> logger) : IExcepti
         {
             problem = new ProblemDetails { Status = app.Status, Title = app.Message };
             problem.Extensions["code"] = app.Code;
+            foreach (var (k, v) in app.Extra ?? new Dictionary<string, object?>()) problem.Extensions[k] = v;
         }
         else
         {
@@ -116,6 +119,7 @@ public class AppExceptionFilter : Microsoft.AspNetCore.Mvc.Filters.IExceptionFil
         if (context.Exception is not AppException app) return;
         var problem = new ProblemDetails { Status = app.Status, Title = app.Message };
         problem.Extensions["code"] = app.Code;
+        foreach (var (k, v) in app.Extra ?? new Dictionary<string, object?>()) problem.Extensions[k] = v;
         problem.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
         context.Result = new ObjectResult(problem) { StatusCode = app.Status };
         context.ExceptionHandled = true;

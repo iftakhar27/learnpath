@@ -262,5 +262,13 @@
   "play": "चलाएँ",
   "pause": "रोकें",
   "fullScreen": "पूरी स्क्रीन",
-  "exitFullScreen": "पूरी स्क्रीन से बाहर"
+  "exitFullScreen": "पूरी स्क्रीन से बाहर",
+  "sessionActiveTitle": "दूसरे डिवाइस पर पहले से साइन इन है",
+  "sessionActiveBody": "यह खाता {device} पर साइन इन है (आखिरी बार {time} सक्रिय)। यहाँ जारी रखें? उस डिवाइस से साइन आउट हो जाएगा।",
+  "continueHere": "यहाँ जारी रखें",
+  "sessionReplaced": "आपको साइन आउट कर दिया गया क्योंकि आपका खाता किसी दूसरे डिवाइस पर साइन इन किया गया।",
+  "timeJustNow": "अभी",
+  "timeMinutesAgo": "{count, plural, =1{1 मिनट पहले} other{{count} मिनट पहले}}",
+  "timeHoursAgo": "{count, plural, =1{1 घंटा पहले} other{{count} घंटे पहले}}",
+  "timeDaysAgo": "{count, plural, =1{1 दिन पहले} other{{count} दिन पहले}}"
 }

@@ -6,8 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/api/api_client.dart';
 import '../../core/config.dart';
 import '../../core/providers.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/common.dart';
 
 class SplashScreen extends ConsumerWidget {
@@ -101,7 +103,7 @@ class WelcomeScreen extends ConsumerWidget {
               if (session is SignedOut && session.expired) ...[
                 const SizedBox(height: 16),
                 Text(
-                  l.sessionExpired,
+                  session.replaced ? l.sessionReplaced : l.sessionExpired,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
@@ -144,7 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_form.currentState!.validate()) return;
-    await ref.read(sessionProvider.notifier).login(_email.text.trim(), _password.text);
+    await signInConfirmingTakeOver(context, (takeOver) => ref.read(sessionProvider.notifier).login(_email.text.trim(), _password.text, takeOver: takeOver));
   }
 
   @override
@@ -351,7 +353,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final valid = _codeForm.currentState!.validate();
     setState(() => _termsError = !_terms);
     if (!valid || !_terms) return;
-    await ref.read(sessionProvider.notifier).verifyOtp(phone: _digits, code: _code.text.trim(), fullName: _name.text.trim().isEmpty ? null : _name.text.trim());
+    await signInConfirmingTakeOver(
+      context,
+      (takeOver) => ref
+          .read(sessionProvider.notifier)
+          .verifyOtp(phone: _digits, code: _code.text.trim(), fullName: _name.text.trim().isEmpty ? null : _name.text.trim(), takeOver: takeOver),
+    );
   }
 
   @override
@@ -413,5 +420,39 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         ),
       ),
     );
+  }
+}
+
+/// "5 minutes ago" in the app's language.
+String timeAgo(AppLocalizations l, Object? iso) {
+  final at = iso is String ? DateTime.tryParse(iso) : null;
+  if (at == null) return l.timeJustNow;
+  final minutes = DateTime.now().difference(at).inMinutes;
+  if (minutes < 1) return l.timeJustNow;
+  if (minutes < 60) return l.timeMinutesAgo(minutes);
+  final hours = (minutes / 60).round();
+  return hours < 24 ? l.timeHoursAgo(hours) : l.timeDaysAgo((hours / 24).round());
+}
+
+/// Signs in; if the account is already signed in on another phone, asks first. Continuing signs that phone out.
+Future<void> signInConfirmingTakeOver(BuildContext context, Future<void> Function(bool takeOver) signIn) async {
+  try {
+    await signIn(false);
+  } on ApiException catch (e) {
+    if (e.code != 'session_active' || !context.mounted) rethrow;
+    final l = context.l10n;
+    final device = (e.details['deviceName'] as String?) ?? '?';
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(l.sessionActiveTitle),
+        content: Text(l.sessionActiveBody(device, timeAgo(l, e.details['lastActiveAt']))),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: Text(l.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(l.continueHere)),
+        ],
+      ),
+    );
+    if (ok == true) await signIn(true);
   }
 }

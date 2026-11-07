@@ -15,21 +15,27 @@ String jwt(DateTime expires) {
 
 /// Fake server: `/auth/refresh` rotates tokens; other paths require the current access token.
 class FakeServer implements HttpClientAdapter {
-  FakeServer({required this.validAccess, this.refreshSucceeds = true});
+  FakeServer({required this.validAccess, this.refreshSucceeds = true, this.refreshFailureCode = 'invalid_refresh_token'});
   String validAccess;
   bool refreshSucceeds;
+  String refreshFailureCode;
   int refreshCalls = 0;
   final seenAuth = <String?>[];
 
-  ResponseBody _json(int status, Object body) =>
-      ResponseBody.fromString(jsonEncode(body), status, headers: {Headers.contentTypeHeader: [Headers.jsonContentType]});
+  ResponseBody _json(int status, Object body) => ResponseBody.fromString(
+    jsonEncode(body),
+    status,
+    headers: {
+      Headers.contentTypeHeader: [Headers.jsonContentType],
+    },
+  );
 
   @override
   Future<ResponseBody> fetch(RequestOptions options, Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
     await Future<void>.delayed(const Duration(milliseconds: 20)); // let concurrent requests overlap
     if (options.path.endsWith('/auth/refresh')) {
       refreshCalls++;
-      if (!refreshSucceeds) return _json(401, {'code': 'invalid_refresh_token', 'title': 'Session expired.'});
+      if (!refreshSucceeds) return _json(401, {'code': refreshFailureCode, 'title': 'Session expired.'});
       validAccess = jwt(DateTime.now().add(const Duration(minutes: 15)));
       return _json(200, {'accessToken': validAccess, 'refreshToken': 'refresh-$refreshCalls'});
     }
@@ -47,7 +53,7 @@ void main() {
   late MemoryTokenStore store;
   setUp(() => store = MemoryTokenStore());
 
-  ApiClient client(FakeServer server, {void Function()? onExpired}) =>
+  ApiClient client(FakeServer server, {void Function(String?)? onExpired}) =>
       ApiClient(baseUrl: 'https://api.test', store: store, language: () => 'hi', onSessionExpired: onExpired, adapter: server);
 
   test('attaches the bearer token and Accept-Language', () async {
@@ -85,32 +91,62 @@ void main() {
     store.tokens = StoredTokens(accessToken: jwt(DateTime.now().subtract(const Duration(minutes: 1))), refreshToken: 'r0');
     final server = FakeServer(validAccess: 'x', refreshSucceeds: false);
     var expired = 0;
-    final api = client(server, onExpired: () => expired++);
+    final api = client(server, onExpired: (_) => expired++);
 
     await expectLater(api.dio.get<dynamic>('/student/dashboard'), throwsA(isA<DioException>()));
     expect(store.tokens, isNull);
     expect(expired, 1);
   });
 
+  test('a session replaced by another phone is reported with its reason', () async {
+    store.tokens = StoredTokens(accessToken: jwt(DateTime.now().subtract(const Duration(minutes: 1))), refreshToken: 'r0');
+    final server = FakeServer(validAccess: 'x', refreshSucceeds: false, refreshFailureCode: 'session_replaced');
+    String? reason;
+    final api = client(server, onExpired: (r) => reason = r);
+
+    await expectLater(api.dio.get<dynamic>('/student/dashboard'), throwsA(isA<DioException>()));
+    expect(store.tokens, isNull);
+    expect(reason, 'session_replaced');
+  });
+
   test('problem details become ApiException with code and message', () {
-    final e = ApiException.from(DioException(
-      requestOptions: RequestOptions(path: '/x'),
-      response: Response(requestOptions: RequestOptions(path: '/x'), statusCode: 402, data: {'code': 'entitlement_required', 'title': 'Buy it'}),
-    ));
+    final e = ApiException.from(
+      DioException(
+        requestOptions: RequestOptions(path: '/x'),
+        response: Response(
+          requestOptions: RequestOptions(path: '/x'),
+          statusCode: 402,
+          data: {'code': 'entitlement_required', 'title': 'Buy it'},
+        ),
+      ),
+    );
     expect((e.status, e.code, e.message, e.needsPurchase), (402, 'entitlement_required', 'Buy it', true));
 
-    final network = ApiException.from(DioException(requestOptions: RequestOptions(path: '/x'), type: DioExceptionType.connectionError));
+    final network = ApiException.from(
+      DioException(
+        requestOptions: RequestOptions(path: '/x'),
+        type: DioExceptionType.connectionError,
+      ),
+    );
     expect(network.isNetwork, isTrue);
   });
 
   test('ASP.NET validation errors surface the first field message', () {
-    final e = ApiException.from(DioException(
-      requestOptions: RequestOptions(path: '/x'),
-      response: Response(requestOptions: RequestOptions(path: '/x'), statusCode: 400, data: {
-        'title': 'One or more validation errors occurred.',
-        'errors': {'Password': ['The field Password must be a string with a minimum length of 8.']},
-      }),
-    ));
+    final e = ApiException.from(
+      DioException(
+        requestOptions: RequestOptions(path: '/x'),
+        response: Response(
+          requestOptions: RequestOptions(path: '/x'),
+          statusCode: 400,
+          data: {
+            'title': 'One or more validation errors occurred.',
+            'errors': {
+              'Password': ['The field Password must be a string with a minimum length of 8.'],
+            },
+          },
+        ),
+      ),
+    );
     expect(e.code, 'validation_failed');
     expect(e.message, contains('minimum length of 8'));
   });

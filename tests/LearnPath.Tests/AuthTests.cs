@@ -11,13 +11,15 @@ public class AuthTests(ApiFactory api)
     {
         var c = api.CreateClient();
         var email = $"a{Guid.NewGuid():N}@test.local";
-        var reg = await c.PostAsJsonAsync("/api/v1/auth/register", new { email, password = "Passw0rd!x", fullName = "A", acceptTerms = true }).Ok();
+        // The same device (same device id) signs in again later: no "already signed in" prompt.
+        var device = Guid.NewGuid().ToString();
+        var reg = await c.PostAsJsonAsync("/api/v1/auth/register", new { email, password = "Passw0rd!x", fullName = "A", acceptTerms = true, deviceId = device }).Ok();
         Assert.False(reg.GetProperty("onboardingComplete").GetBoolean());
 
         var dup = await c.PostAsJsonAsync("/api/v1/auth/register", new { email = email.ToUpperInvariant(), password = "Passw0rd!x", fullName = "A", acceptTerms = true });
         Assert.Equal(HttpStatusCode.Conflict, dup.StatusCode);
 
-        await c.PostAsJsonAsync("/api/v1/auth/login", new { email, password = "Passw0rd!x" }).Ok();
+        await c.PostAsJsonAsync("/api/v1/auth/login", new { email, password = "Passw0rd!x", deviceId = device }).Ok();
         var bad = await c.PostAsJsonAsync("/api/v1/auth/login", new { email, password = "nope-nope" });
         Assert.Equal(HttpStatusCode.Unauthorized, bad.StatusCode);
         Assert.Equal("invalid_credentials", (await bad.ReadJson()).Str("code"));

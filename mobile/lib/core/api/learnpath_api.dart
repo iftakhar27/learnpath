@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import 'api_client.dart';
 import 'models.g.dart';
@@ -24,23 +27,59 @@ class LearnPathApi {
   List<T> _list<T>(dynamic d, T Function(Map<String, dynamic>) f) => (d as List<dynamic>).map((x) => f(x as Map<String, dynamic>)).toList();
 
   // ---- Auth ----
-  Future<AuthTokens> login(String email, String password) => _call(
-    () => _dio.post(
-      '/auth/login',
-      data: LoginRequest(email: email, password: password).toJson(),
-      options: ApiClient.anonymous,
-    ),
-    (d) => AuthTokens.fromJson(_map(d)),
-  );
+  // Every sign-in says which device it comes from: the account may be signed in on one phone and one browser; another
+  // phone has to confirm taking over (takeOver), and this phone signing in again is recognised by its own id.
 
-  Future<AuthTokens> register({required String fullName, required String email, required String password, required bool acceptTerms}) => _call(
-    () => _dio.post(
-      '/auth/register',
-      data: RegisterRequest(email: email, password: password, fullName: fullName, acceptTerms: acceptTerms).toJson(),
-      options: ApiClient.anonymous,
-    ),
-    (d) => AuthTokens.fromJson(_map(d)),
-  );
+  static const _deviceIdKey = 'device_id';
+
+  Future<({String slot, String name, String id})> device() async {
+    var id = await client.store.readPreference(_deviceIdKey);
+    if (id == null) {
+      final r = Random.secure();
+      id = List.generate(16, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+      await client.store.writePreference(_deviceIdKey, id);
+    }
+    final name = kIsWeb
+        ? 'Web app'
+        : switch (defaultTargetPlatform) {
+            TargetPlatform.iOS => 'iPhone app',
+            TargetPlatform.android => 'Android app',
+            _ => 'Phone app',
+          };
+    return (slot: kIsWeb ? 'browser' : 'phone', name: name, id: id);
+  }
+
+  Future<AuthTokens> login(String email, String password, {bool takeOver = false}) async {
+    final d = await device();
+    return _call(
+      () => _dio.post(
+        '/auth/login',
+        data: LoginRequest(email: email, password: password, deviceSlot: d.slot, deviceName: d.name, deviceId: d.id, takeOver: takeOver).toJson(),
+        options: ApiClient.anonymous,
+      ),
+      (d) => AuthTokens.fromJson(_map(d)),
+    );
+  }
+
+  Future<AuthTokens> register({required String fullName, required String email, required String password, required bool acceptTerms}) async {
+    final d = await device();
+    return _call(
+      () => _dio.post(
+        '/auth/register',
+        data: RegisterRequest(
+          email: email,
+          password: password,
+          fullName: fullName,
+          acceptTerms: acceptTerms,
+          deviceSlot: d.slot,
+          deviceName: d.name,
+          deviceId: d.id,
+        ).toJson(),
+        options: ApiClient.anonymous,
+      ),
+      (d) => AuthTokens.fromJson(_map(d)),
+    );
+  }
 
   Future<void> requestOtp(String phone) => _send(
     () => _dio.post(
@@ -50,14 +89,26 @@ class LearnPathApi {
     ),
   );
 
-  Future<AuthTokens> verifyOtp({required String phone, required String code, String? fullName, required bool acceptTerms}) => _call(
-    () => _dio.post(
-      '/auth/otp/verify',
-      data: OtpVerifyRequest(phone: phone, code: code, fullName: fullName, acceptTerms: acceptTerms).toJson(),
-      options: ApiClient.anonymous,
-    ),
-    (d) => AuthTokens.fromJson(_map(d)),
-  );
+  Future<AuthTokens> verifyOtp({required String phone, required String code, String? fullName, required bool acceptTerms, bool takeOver = false}) async {
+    final d = await device();
+    return _call(
+      () => _dio.post(
+        '/auth/otp/verify',
+        data: OtpVerifyRequest(
+          phone: phone,
+          code: code,
+          fullName: fullName,
+          acceptTerms: acceptTerms,
+          deviceSlot: d.slot,
+          deviceName: d.name,
+          deviceId: d.id,
+          takeOver: takeOver,
+        ).toJson(),
+        options: ApiClient.anonymous,
+      ),
+      (d) => AuthTokens.fromJson(_map(d)),
+    );
+  }
 
   Future<void> logout(String refreshToken) => _send(
     () => _dio.post(

@@ -21,6 +21,8 @@ export class ApiError extends Error {
     public code: string,
     message: string,
     public validation?: Record<string, string[]>,
+    /** The whole problem body, for fields like the other device in "session_active". */
+    public details?: Record<string, unknown>,
   ) {
     super(message);
   }
@@ -33,7 +35,7 @@ function toApiError(status: number, body: unknown): ApiError {
   // ASP.NET model validation returns { errors: { Field: [messages] } } without a code.
   const firstValidation = p.errors ? Object.values(p.errors).flat()[0] : undefined;
   const message = firstValidation ?? p.title ?? (status >= 500 ? "Something went wrong. Please try again." : `Request failed (${status}).`);
-  return new ApiError(status, p.code ?? (p.errors ? "validation_failed" : "http_" + status), message, p.errors);
+  return new ApiError(status, p.code ?? (p.errors ? "validation_failed" : "http_" + status), message, p.errors, body && typeof body === "object" ? (body as Record<string, unknown>) : undefined);
 }
 
 /** Unwraps an openapi-fetch result: returns data, or throws ApiError for any non-2xx response. */

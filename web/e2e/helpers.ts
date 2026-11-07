@@ -20,15 +20,21 @@ export async function signIn(page: Page, email = ADMIN.email, password = ADMIN.p
 }
 
 /** Calls the API directly (not through the portal) to set up or verify state. */
+/**
+ * Students may have one phone and one browser signed in. Sessions made straight against the API act as the student's
+ * phone (one per account, so they never collide), leaving the browser slot to the website under test.
+ */
+const apiDevice = (email: string) => ({ deviceSlot: "phone", deviceName: "Test phone", deviceId: `api-${email.toLowerCase()}` });
+
 export async function apiLogin(request: APIRequestContext, email: string, password: string): Promise<string> {
-  const res = await request.post(`${API_URL}/api/v1/auth/login`, { data: { email, password } });
+  const res = await request.post(`${API_URL}/api/v1/auth/login`, { data: { email, password, ...apiDevice(email) } });
   expect(res.ok()).toBeTruthy();
   return (await res.json()).accessToken;
 }
 
 export async function registerStudent(request: APIRequestContext, name = "E2E Student") {
   const email = `${unique("student")}@e2e.test`;
-  const res = await request.post(`${API_URL}/api/v1/auth/register`, { data: { email, password: "Passw0rd!x", fullName: name, acceptTerms: true } });
+  const res = await request.post(`${API_URL}/api/v1/auth/register`, { data: { email, password: "Passw0rd!x", fullName: name, acceptTerms: true, ...apiDevice(email) } });
   expect(res.ok()).toBeTruthy();
   const body = await res.json();
   return { email, password: "Passw0rd!x", token: body.accessToken as string, userId: body.userId as string };

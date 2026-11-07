@@ -4525,6 +4525,10 @@ export interface components {
         LoginRequest: {
             email: string;
             password: string;
+            deviceSlot?: string | null;
+            deviceName?: string | null;
+            deviceId?: string | null;
+            takeOver?: boolean | null;
         };
         NodeUpsert: {
             /** Format: uuid */
@@ -4580,6 +4584,10 @@ export interface components {
             code: string;
             fullName?: string | null;
             acceptTerms: boolean;
+            deviceSlot?: string | null;
+            deviceName?: string | null;
+            deviceId?: string | null;
+            takeOver?: boolean | null;
         };
         PagedResultOfAdminAuditLogDto: {
             items: components["schemas"]["AdminAuditLogDto"][];
@@ -4875,6 +4883,9 @@ export interface components {
             password: string;
             fullName: string;
             acceptTerms: boolean;
+            deviceSlot?: string | null;
+            deviceName?: string | null;
+            deviceId?: string | null;
         };
         ReportQuestionRequest: {
             reason: string;

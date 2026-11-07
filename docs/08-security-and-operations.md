@@ -24,6 +24,7 @@ Legend: ✅ implemented and covered by tests · 🟡 implemented, not yet verifi
 | Minimal PII to staff (Analyst sees aggregates only) | ✅ | `AdminOpsController` policies |
 | Guardian consent recorded for minors | ✅ | `ProfileController` |
 | Fake gateway / log OTP refused in Production; unimplemented OTP providers refused everywhere | ✅ | `Program.cs` startup guard |
+| One person per student account | ✅ | Sessions per device: one phone + one browser; another device gets 409 `session_active` (names the other device) and must confirm `takeOver`, which ends the other session; access tokens carry the session id and ended sessions are refused on every request (401 `session_replaced`/`session_ended`), so a replaced device loses paid content at once; the same device (own random id) signs in again without a prompt; staff exempt; tested (backend, browser, app) |
 | OTP codes never logged when sent by SMS | ✅ | MSG91 client has request logging removed (the code is in the URL); failures logged with the last 4 digits only; tested |
 | Test sign-in codes visible to staff only on test servers | ✅ | `GET /admin/test-otp-codes` (Support/SuperAdmin) exists only with `Otp:Provider=log`; numbers masked to last 4 digits; codes kept in memory for 1 hour |
 | Secrets only from environment | ✅ | `appsettings.json` has empty secrets |

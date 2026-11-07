@@ -7,10 +7,13 @@ import 'token_store.dart';
 
 /// Problem-details error from the API, or a network failure (`status == 0`).
 class ApiException implements Exception {
-  const ApiException(this.status, this.code, this.message);
+  const ApiException(this.status, this.code, this.message, [this.details = const {}]);
   final int status;
   final String code;
   final String message;
+
+  /// The whole problem body, for fields such as the other device in "session_active".
+  final Map<String, dynamic> details;
 
   bool get isNetwork => status == 0;
   bool get needsPurchase => status == 402;
@@ -31,6 +34,7 @@ class ApiException implements Exception {
           res.statusCode ?? 0,
           (data['code'] as String?) ?? (errors != null ? 'validation_failed' : 'http_${res.statusCode}'),
           firstValidation ?? (data['title'] as String?) ?? 'Request failed (${res.statusCode})',
+          Map<String, dynamic>.from(data),
         );
       }
       return ApiException(res.statusCode ?? 0, 'http_${res.statusCode}', 'Request failed (${res.statusCode})');
@@ -77,7 +81,8 @@ class ApiClient {
   final String Function() language;
 
   /// Called when the refresh token is rejected; the app should return to sign-in.
-  final void Function()? onSessionExpired;
+  /// Called when the API ends the session; [reason] is its code, e.g. "session_replaced" (signed in on another device).
+  final void Function(String? reason)? onSessionExpired;
 
   Future<String?>? _refreshing;
 
@@ -131,7 +136,8 @@ class ApiClient {
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         await store.clear();
-        onSessionExpired?.call();
+        final body = e.response?.data;
+        onSessionExpired?.call(body is Map ? body['code'] as String? : null);
       }
       return null; // network failure: keep tokens and let the caller surface the error
     }

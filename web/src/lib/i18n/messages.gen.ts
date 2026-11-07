@@ -263,7 +263,15 @@ export const appMessages = {
     "play": "Play",
     "pause": "Pause",
     "fullScreen": "Full screen",
-    "exitFullScreen": "Exit full screen"
+    "exitFullScreen": "Exit full screen",
+    "sessionActiveTitle": "Already signed in on another device",
+    "sessionActiveBody": "This account is signed in on {device} (last active {time}). Continue here? That device will be signed out.",
+    "continueHere": "Continue here",
+    "sessionReplaced": "You were signed out because your account was signed in on another device.",
+    "timeJustNow": "just now",
+    "timeMinutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+    "timeHoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+    "timeDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}"
   },
   "hi": {
     "appTagline": "NEET, JEE और बोर्ड परीक्षाओं की तैयारी करें",
@@ -528,6 +536,14 @@ export const appMessages = {
     "play": "चलाएँ",
     "pause": "रोकें",
     "fullScreen": "पूरी स्क्रीन",
-    "exitFullScreen": "पूरी स्क्रीन से बाहर"
+    "exitFullScreen": "पूरी स्क्रीन से बाहर",
+    "sessionActiveTitle": "दूसरे डिवाइस पर पहले से साइन इन है",
+    "sessionActiveBody": "यह खाता {device} पर साइन इन है (आखिरी बार {time} सक्रिय)। यहाँ जारी रखें? उस डिवाइस से साइन आउट हो जाएगा।",
+    "continueHere": "यहाँ जारी रखें",
+    "sessionReplaced": "आपको साइन आउट कर दिया गया क्योंकि आपका खाता किसी दूसरे डिवाइस पर साइन इन किया गया।",
+    "timeJustNow": "अभी",
+    "timeMinutesAgo": "{count, plural, =1{1 मिनट पहले} other{{count} मिनट पहले}}",
+    "timeHoursAgo": "{count, plural, =1{1 घंटा पहले} other{{count} घंटे पहले}}",
+    "timeDaysAgo": "{count, plural, =1{1 दिन पहले} other{{count} दिन पहले}}"
   }
 } as const;

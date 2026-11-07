@@ -13,8 +13,10 @@ function onAuthError(error: unknown) {
   const { pathname, search } = window.location;
   if (error instanceof ApiError && error.status === 401 && !PUBLIC_PATHS.includes(pathname)) {
     const login = pathname.startsWith("/admin") ? "/admin/login" : "/login";
+    // "replaced": the account was signed in on another device, so say that rather than "session ended".
+    const why = error.code === "session_replaced" ? "replaced" : "expired";
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload clears every cached query after a session change
-    window.location.assign(`${login}?next=${encodeURIComponent(pathname + search)}&expired=1`);
+    window.location.assign(`${login}?next=${encodeURIComponent(pathname + search)}&${why}=1`);
   }
 }
 

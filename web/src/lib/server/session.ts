@@ -65,6 +65,31 @@ export async function apiFetch(path: string, init: RequestInit, retryEdge = true
 export const apiStarting = () =>
   NextResponse.json({ status: 503, code: "api_unavailable", title: "The server is starting up. Please try again in a few seconds." }, { status: 503 });
 
+/** The browser's User-Agent, so the API can tell phones from computers and name the device ("iPhone · Safari"). */
+export function agentHeader(req: NextRequest): Record<string, string> {
+  const ua = req.headers.get("user-agent");
+  return ua ? { "user-agent": ua.slice(0, 512) } : {};
+}
+
+/** A random id for this browser (httpOnly cookie), so signing in again here never asks about "another device". */
+export const DEVICE_COOKIE = "lp_did";
+function deviceId(req: NextRequest): { id: string; isNew: boolean } {
+  const existing = req.cookies.get(DEVICE_COOKIE)?.value;
+  return existing && /^[0-9a-f-]{36}$/.test(existing) ? { id: existing, isNew: false } : { id: crypto.randomUUID(), isNew: true };
+}
+function rememberDevice(res: NextResponse, device: { id: string; isNew: boolean }) {
+  if (device.isNew) res.cookies.set(DEVICE_COOKIE, device.id, { httpOnly: true, secure: secureCookies, sameSite: "lax", path: "/", maxAge: 400 * 24 * 3600 });
+}
+
+/** The account was signed in on another device: tell the browser why it is signed out. */
+export function sessionReplaced(access?: ResolvedAccess) {
+  const res = NextResponse.json(
+    { status: 401, code: "session_replaced", title: "You were signed out because your account was signed in on another device." },
+    { status: 401 },
+  );
+  return access ? applyAccessResult(res, access) : res;
+}
+
 export type AuthTokens = {
   accessToken: string;
   accessTokenExpiresAt: string;
@@ -104,21 +129,30 @@ export function clearSessionCookies(res: NextResponse) {
  * that still carry the old cookie (sent before the browser stored the new one) reuse the new tokens.
  * This is per server process: run a single Next.js instance or use sticky sessions.
  */
-const refreshes = new Map<string, { promise: Promise<AuthTokens | null | "unavailable">; expires: number }>();
+const refreshes = new Map<string, { promise: Promise<RefreshResult>; expires: number }>();
 const REFRESH_REUSE_MS = 60_000;
 
-export function refreshSession(refreshToken: string, extraHeaders: Record<string, string> = {}): Promise<AuthTokens | null | "unavailable"> {
+/** A refresh the API refused, with its reason (e.g. "session_replaced": the account was signed in on another device). */
+export type RefreshRejected = { rejected: string };
+type RefreshResult = AuthTokens | RefreshRejected | "unavailable";
+
+export function refreshSession(refreshToken: string, extraHeaders: Record<string, string> = {}): Promise<RefreshResult> {
   const now = Date.now();
   for (const [key, entry] of refreshes) if (entry.expires < now) refreshes.delete(key);
   const existing = refreshes.get(refreshToken);
   if (existing) return existing.promise;
 
-  const promise: Promise<AuthTokens | null | "unavailable"> = apiFetch("/api/v1/auth/refresh", {
+  const promise: Promise<RefreshResult> = apiFetch("/api/v1/auth/refresh", {
     method: "POST",
     headers: { "content-type": "application/json", ...extraHeaders },
     body: JSON.stringify({ refreshToken }),
   })
-    .then(async (r) => (r.ok ? ((await r.json()) as AuthTokens) : isEdgeError(r) || r.status >= 500 ? ("unavailable" as const) : null))
+    .then(async (r): Promise<RefreshResult> => {
+      if (r.ok) return (await r.json()) as AuthTokens;
+      if (isEdgeError(r) || r.status >= 500) return "unavailable";
+      const problemBody = (await r.json().catch(() => ({}))) as { code?: string };
+      return { rejected: problemBody.code ?? "invalid_refresh_token" };
+    })
     // A network failure is not a rejected session: keep the cookies and let the visitor retry.
     .catch(() => "unavailable" as const)
     .then((result) => {
@@ -137,6 +171,8 @@ export type ResolvedAccess = {
   expired: boolean;
   /** The API couldn't be reached to refresh (restarting, waking up, network); keep the session and say so. */
   unavailable?: boolean;
+  /** Why the API refused the refresh (e.g. "session_replaced"). */
+  reason?: string;
 };
 
 /** Returns a usable access token, refreshing when the current one is missing or about to expire. */
@@ -147,11 +183,10 @@ export async function resolveAccess(req: NextRequest, forceRefresh = false): Pro
     return { accessToken: access, refreshed: null, expired: false };
   }
   if (!refresh) return { accessToken: null, refreshed: null, expired: false };
-  const tokens = await refreshSession(refresh, visitorHeaders(req));
+  const tokens = await refreshSession(refresh, { ...visitorHeaders(req), ...agentHeader(req) });
   if (tokens === "unavailable") return { accessToken: null, refreshed: null, expired: false, unavailable: true };
-  return tokens
-    ? { accessToken: tokens.accessToken, refreshed: tokens, expired: false }
-    : { accessToken: null, refreshed: null, expired: true };
+  if ("rejected" in tokens) return { accessToken: null, refreshed: null, expired: true, reason: tokens.rejected };
+  return { accessToken: tokens.accessToken, refreshed: tokens, expired: false };
 }
 
 export function applyAccessResult(res: NextResponse, result: ResolvedAccess) {
@@ -199,19 +234,23 @@ export async function startSession(
   body: unknown,
   accept?: (tokens: AuthTokens) => Response | null,
 ): Promise<Response> {
+  const device = deviceId(req);
   let upstream: Response;
   try {
     upstream = await apiFetch(apiPath, {
       method: "POST",
-      headers: { "content-type": "application/json", ...visitorHeaders(req) },
-      body: JSON.stringify(body),
+      headers: { "content-type": "application/json", ...visitorHeaders(req), ...agentHeader(req) },
+      body: JSON.stringify({ ...(body as object), deviceId: device.id }),
     });
   } catch {
     return problem(502, "api_unreachable", "The server is unreachable. Please try again.");
   }
   if (isEdgeError(upstream)) return apiStarting();
   if (!upstream.ok) {
-    return new Response(upstream.body, { status: upstream.status, headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" } });
+    // e.g. 409 "session_active" naming the other device; the browser asks and may retry with takeOver.
+    const passed = new NextResponse(upstream.body, { status: upstream.status, headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" } });
+    rememberDevice(passed, device);
+    return passed;
   }
   const tokens = (await upstream.json()) as AuthTokens;
   const refused = accept?.(tokens);
@@ -227,6 +266,7 @@ export async function startSession(
   const summary: SessionStart = { userId: tokens.userId, roles: tokens.roles, onboardingComplete: tokens.onboardingComplete };
   const res = NextResponse.json(summary);
   setSessionCookies(res, tokens);
+  rememberDevice(res, device);
   return res;
 }
 

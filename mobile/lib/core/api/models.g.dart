@@ -2040,14 +2040,32 @@ class ImportResultDto {
 
 @immutable
 class LoginRequest {
-  const LoginRequest({required this.email, required this.password});
+  const LoginRequest({required this.email, required this.password, this.deviceSlot, this.deviceName, this.deviceId, this.takeOver});
 
-  factory LoginRequest.fromJson(Map<String, dynamic> json) => LoginRequest(email: json['email'] as String, password: json['password'] as String);
+  factory LoginRequest.fromJson(Map<String, dynamic> json) => LoginRequest(
+    email: json['email'] as String,
+    password: json['password'] as String,
+    deviceSlot: json['deviceSlot'] == null ? null : json['deviceSlot'] as String,
+    deviceName: json['deviceName'] == null ? null : json['deviceName'] as String,
+    deviceId: json['deviceId'] == null ? null : json['deviceId'] as String,
+    takeOver: json['takeOver'] == null ? null : json['takeOver'] as bool,
+  );
 
   final String email;
   final String password;
+  final String? deviceSlot;
+  final String? deviceName;
+  final String? deviceId;
+  final bool? takeOver;
 
-  Map<String, dynamic> toJson() => {'email': email, 'password': password};
+  Map<String, dynamic> toJson() => {
+    'email': email,
+    'password': password,
+    'deviceSlot': ?deviceSlot,
+    'deviceName': ?deviceName,
+    'deviceId': ?deviceId,
+    'takeOver': ?takeOver,
+  };
 }
 
 @immutable
@@ -2222,21 +2240,47 @@ class OtpRequest {
 
 @immutable
 class OtpVerifyRequest {
-  const OtpVerifyRequest({required this.phone, required this.code, this.fullName, required this.acceptTerms});
+  const OtpVerifyRequest({
+    required this.phone,
+    required this.code,
+    this.fullName,
+    required this.acceptTerms,
+    this.deviceSlot,
+    this.deviceName,
+    this.deviceId,
+    this.takeOver,
+  });
 
   factory OtpVerifyRequest.fromJson(Map<String, dynamic> json) => OtpVerifyRequest(
     phone: json['phone'] as String,
     code: json['code'] as String,
     fullName: json['fullName'] == null ? null : json['fullName'] as String,
     acceptTerms: json['acceptTerms'] as bool,
+    deviceSlot: json['deviceSlot'] == null ? null : json['deviceSlot'] as String,
+    deviceName: json['deviceName'] == null ? null : json['deviceName'] as String,
+    deviceId: json['deviceId'] == null ? null : json['deviceId'] as String,
+    takeOver: json['takeOver'] == null ? null : json['takeOver'] as bool,
   );
 
   final String phone;
   final String code;
   final String? fullName;
   final bool acceptTerms;
+  final String? deviceSlot;
+  final String? deviceName;
+  final String? deviceId;
+  final bool? takeOver;
 
-  Map<String, dynamic> toJson() => {'phone': phone, 'code': code, 'fullName': ?fullName, 'acceptTerms': acceptTerms};
+  Map<String, dynamic> toJson() => {
+    'phone': phone,
+    'code': code,
+    'fullName': ?fullName,
+    'acceptTerms': acceptTerms,
+    'deviceSlot': ?deviceSlot,
+    'deviceName': ?deviceName,
+    'deviceId': ?deviceId,
+    'takeOver': ?takeOver,
+  };
 }
 
 @immutable
@@ -3049,21 +3093,43 @@ class RefundRequest {
 
 @immutable
 class RegisterRequest {
-  const RegisterRequest({required this.email, required this.password, required this.fullName, required this.acceptTerms});
+  const RegisterRequest({
+    required this.email,
+    required this.password,
+    required this.fullName,
+    required this.acceptTerms,
+    this.deviceSlot,
+    this.deviceName,
+    this.deviceId,
+  });
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) => RegisterRequest(
     email: json['email'] as String,
     password: json['password'] as String,
     fullName: json['fullName'] as String,
     acceptTerms: json['acceptTerms'] as bool,
+    deviceSlot: json['deviceSlot'] == null ? null : json['deviceSlot'] as String,
+    deviceName: json['deviceName'] == null ? null : json['deviceName'] as String,
+    deviceId: json['deviceId'] == null ? null : json['deviceId'] as String,
   );
 
   final String email;
   final String password;
   final String fullName;
   final bool acceptTerms;
+  final String? deviceSlot;
+  final String? deviceName;
+  final String? deviceId;
 
-  Map<String, dynamic> toJson() => {'email': email, 'password': password, 'fullName': fullName, 'acceptTerms': acceptTerms};
+  Map<String, dynamic> toJson() => {
+    'email': email,
+    'password': password,
+    'fullName': fullName,
+    'acceptTerms': acceptTerms,
+    'deviceSlot': ?deviceSlot,
+    'deviceName': ?deviceName,
+    'deviceId': ?deviceId,
+  };
 }
 
 @immutable

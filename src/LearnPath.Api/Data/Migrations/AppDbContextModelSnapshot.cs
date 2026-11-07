@@ -984,6 +984,9 @@ namespace LearnPath.Api.Data.Migrations
                     b.Property<DateTimeOffset?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("SessionId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasColumnType("text");
@@ -992,6 +995,8 @@ namespace LearnPath.Api.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SessionId");
 
                     b.HasIndex("TokenHash")
                         .IsUnique();
@@ -1523,6 +1528,49 @@ namespace LearnPath.Api.Data.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("LearnPath.Api.Domain.UserSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeviceIdHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("DeviceName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DeviceSlot")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("EndReason")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<DateTimeOffset?>("EndedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "EndedAt");
+
+                    b.ToTable("UserSessions");
+                });
+
             modelBuilder.Entity("LearnPath.Api.Domain.AttemptAnswer", b =>
                 {
                     b.HasOne("LearnPath.Api.Domain.TestAttempt", null)
@@ -1685,6 +1733,11 @@ namespace LearnPath.Api.Data.Migrations
 
             modelBuilder.Entity("LearnPath.Api.Domain.RefreshToken", b =>
                 {
+                    b.HasOne("LearnPath.Api.Domain.UserSession", null)
+                        .WithMany()
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("LearnPath.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -1810,6 +1863,15 @@ namespace LearnPath.Api.Data.Migrations
                 {
                     b.HasOne("LearnPath.Api.Domain.User", null)
                         .WithMany("Roles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.UserSession", b =>
+                {
+                    b.HasOne("LearnPath.Api.Domain.User", null)
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

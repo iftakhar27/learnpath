@@ -214,6 +214,23 @@ Xcode on the image is selected because `video_player_avfoundation` needs Swift 6
 **Not verified:** running on an iPhone or the Simulator (needs the owner's device or a Mac); signed TestFlight builds
 need the Apple Developer Program.
 
+### Home-screen app and one person per account (7 Nov 2026)
+
+**Home-screen app:** web app manifest (standalone, starts at Home), LearnPath icons (incl. Apple touch and maskable),
+iPhone home-screen metadata and safe-area padding, so "Add to Home Screen" opens full screen like an app.
+
+**One person per student account (owner's choice: ask, then take over; one phone + one browser):** a `UserSessions`
+table records each signed-in device (slot, name, hashed device id, last active, end reason); refresh tokens and access
+tokens carry the session. A sign-in on another device of the same kind gets `409 session_active` with the other device
+and when it was last active; confirming (`takeOver`) ends that session, and the replaced device is refused on its very
+next request (even public pages) with `401 session_replaced`, so it can explain why it was signed out. The same device
+(its own random id: an httpOnly cookie on the web, secure storage in the app) signs in again without a prompt; signing
+out frees the slot; password changes end every session; staff accounts are exempt. The website and the app show a
+"Continue here?" dialog and the signed-out explanation (English and Hindi, shared strings). **Verified:** 7 backend
+tests, 2 browser tests (two real browser contexts: ask, cancel, take over, explanation; phone + computer together),
+2 app tests; all suites green (99 backend, 32 browser, 22 app). **To check:** on real phones after installing the new
+app builds.
+
 ## Roadmap (estimates assume one full-stack dev + part-time Flutter dev, AI-assisted)
 
 | Phase | Scope | Duration | Est. cost |

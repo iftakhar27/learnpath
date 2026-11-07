@@ -19,43 +19,71 @@ class FakeApi implements HttpClientAdapter {
   bool onboarded = false;
   final requests = <String>[];
 
-  ResponseBody _json(Object body, [int status = 200]) =>
-      ResponseBody.fromString(jsonEncode(body), status, headers: {Headers.contentTypeHeader: [Headers.jsonContentType]});
+  /// The account is already signed in on another phone (until a sign-in confirms takeOver).
+  bool otherPhoneActive = false;
+  final loginBodies = <Map<String, dynamic>>[];
+
+  ResponseBody _json(Object body, [int status = 200]) => ResponseBody.fromString(
+    jsonEncode(body),
+    status,
+    headers: {
+      Headers.contentTypeHeader: [Headers.jsonContentType],
+    },
+  );
 
   Map<String, dynamic> get _profile => {
-        'userId': 'u1',
-        'fullName': 'Priya Sharma',
-        'email': 'priya@example.com',
-        'phone': null,
-        'classLevel': null,
-        'board': null,
-        'targetExamId': onboarded ? 'neet' : null,
-        'targetYear': onboarded ? 2027 : null,
-        'language': 'en',
-        'dailyStudyMinutes': 120,
-        'targetScore': null,
-        'isMinor': false,
-        'guardianName': null,
-        'onboardingComplete': onboarded,
-        'roles': ['Student'],
-      };
+    'userId': 'u1',
+    'fullName': 'Priya Sharma',
+    'email': 'priya@example.com',
+    'phone': null,
+    'classLevel': null,
+    'board': null,
+    'targetExamId': onboarded ? 'neet' : null,
+    'targetYear': onboarded ? 2027 : null,
+    'language': 'en',
+    'dailyStudyMinutes': 120,
+    'targetScore': null,
+    'isMinor': false,
+    'guardianName': null,
+    'onboardingComplete': onboarded,
+    'roles': ['Student'],
+  };
 
   @override
   Future<ResponseBody> fetch(RequestOptions o, Stream<Uint8List>? body, Future<void>? cancel) async {
     requests.add('${o.method} ${o.path}');
+    if ('${o.method} ${o.path}' == 'POST /auth/login') loginBodies.add(Map<String, dynamic>.from(o.data as Map));
+    if ('${o.method} ${o.path}' == 'POST /auth/login' && otherPhoneActive && (o.data as Map)['takeOver'] != true) {
+      return _json({
+        'status': 409,
+        'code': 'session_active',
+        'title': 'This account is already signed in on another device.',
+        'deviceName': 'iPhone app',
+        'deviceSlot': 'phone',
+        'lastActiveAt': DateTime.now().toUtc().subtract(const Duration(minutes: 5)).toIso8601String(),
+      }, 409);
+    }
     return switch ('${o.method} ${o.path}') {
-      'POST /auth/login' => (o.data as Map)['password'] == 'Passw0rd!x'
-          ? _json({'accessToken': 'a.eyJleHAiOjk5OTk5OTk5OTl9.s', 'accessTokenExpiresAt': '2099-01-01T00:00:00Z', 'refreshToken': 'r', 'userId': 'u1', 'roles': ['Student'], 'onboardingComplete': false})
-          : _json({'status': 401, 'code': 'invalid_credentials', 'title': 'Incorrect email or password.'}, 401),
+      'POST /auth/login' =>
+        (o.data as Map)['password'] == 'Passw0rd!x'
+            ? _json({
+                'accessToken': 'a.eyJleHAiOjk5OTk5OTk5OTl9.s',
+                'accessTokenExpiresAt': '2099-01-01T00:00:00Z',
+                'refreshToken': 'r',
+                'userId': 'u1',
+                'roles': ['Student'],
+                'onboardingComplete': false,
+              })
+            : _json({'status': 401, 'code': 'invalid_credentials', 'title': 'Incorrect email or password.'}, 401),
       'GET /student/profile' => _json(_profile),
       'GET /exams' => _json([
-          {'id': 'neet', 'code': 'NEET', 'name': 'NEET (UG)', 'nextExamDate': null},
-          {'id': 'jee', 'code': 'JEE_MAIN', 'name': 'JEE Main', 'nextExamDate': null},
-        ]),
+        {'id': 'neet', 'code': 'NEET', 'name': 'NEET (UG)', 'nextExamDate': null},
+        {'id': 'jee', 'code': 'JEE_MAIN', 'name': 'JEE Main', 'nextExamDate': null},
+      ]),
       'PUT /student/profile' => () {
-          onboarded = true;
-          return _json(_profile);
-        }(),
+        onboarded = true;
+        return _json(_profile);
+      }(),
       _ => _json({'status': 404, 'code': 'not_found', 'title': 'Not found'}, 404),
     };
   }
@@ -65,13 +93,15 @@ class FakeApi implements HttpClientAdapter {
 }
 
 Widget app(FakeApi api, MemoryTokenStore store) => ProviderScope(
-      retry: (_, _) => null,
-      overrides: [
-        tokenStoreProvider.overrideWithValue(store),
-        apiClientProvider.overrideWith((ref) => ApiClient(baseUrl: 'https://api.test', store: store, language: () => ref.read(localeProvider).languageCode, adapter: api)),
-      ],
-      child: const LearnPathApp(),
-    );
+  retry: (_, _) => null,
+  overrides: [
+    tokenStoreProvider.overrideWithValue(store),
+    apiClientProvider.overrideWith(
+      (ref) => ApiClient(baseUrl: 'https://api.test', store: store, language: () => ref.read(localeProvider).languageCode, adapter: api),
+    ),
+  ],
+  child: const LearnPathApp(),
+);
 
 void main() {
   testWidgets('welcome screen switches the whole UI to Hindi', (tester) async {
@@ -131,22 +161,54 @@ void main() {
     expect(find.text('Practice'), findsOneWidget);
   });
 
+  testWidgets('signing in while another phone is signed in asks first, then takes over', (tester) async {
+    final api = FakeApi()..otherPhoneActive = true;
+    final store = MemoryTokenStore();
+    await tester.pumpWidget(app(api, store));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sign in with email'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextFormField, 'Email'), 'priya@example.com');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'Passw0rd!x');
+    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    // The button keeps its spinner while the question is open, so step time instead of waiting to settle.
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.text('Already signed in on another device'), findsOneWidget);
+    expect(find.textContaining('This account is signed in on iPhone app (last active 5 minutes ago)'), findsOneWidget);
+    expect(store.tokens, isNull);
+    expect(api.loginBodies.single, containsPair('deviceSlot', 'phone'));
+    expect(api.loginBodies.single['takeOver'], isNot(true));
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue here'));
+    await tester.pumpAndSettle();
+    expect(api.loginBodies.last['takeOver'], true);
+    expect(api.loginBodies.last['deviceId'], api.loginBodies.first['deviceId'], reason: 'the same phone keeps its id');
+    expect(store.tokens, isNotNull);
+    expect(find.text('Which exam are you preparing for?'), findsOneWidget);
+  });
+
   testWidgets('single-correct options are exclusive; multiple-correct options toggle', (tester) async {
     AnswerResponse? response;
     Widget view(String type) => MaterialApp(
-          home: Scaffold(
-            body: StatefulBuilder(
-              builder: (context, setState) => QuestionView(
-                type: type,
-                stem: 'Pick',
-                options: const [PlayerOptionDto(id: 'a', text: 'Alpha'), PlayerOptionDto(id: 'b', text: 'Beta')],
-                response: response,
-                onChanged: (r) => setState(() => response = r),
-              ),
-            ),
+      home: Scaffold(
+        body: StatefulBuilder(
+          builder: (context, setState) => QuestionView(
+            type: type,
+            stem: 'Pick',
+            options: const [
+              PlayerOptionDto(id: 'a', text: 'Alpha'),
+              PlayerOptionDto(id: 'b', text: 'Beta'),
+            ],
+            response: response,
+            onChanged: (r) => setState(() => response = r),
           ),
-          localizationsDelegates: [AppLocalizations.delegate, ...GlobalMaterialLocalizations.delegates],
-        );
+        ),
+      ),
+      localizationsDelegates: [AppLocalizations.delegate, ...GlobalMaterialLocalizations.delegates],
+    );
 
     await tester.pumpWidget(view('SingleCorrect'));
     await tester.tap(find.text('Alpha'));

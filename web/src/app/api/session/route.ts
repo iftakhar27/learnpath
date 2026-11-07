@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { apiFetch, apiStarting, applyAccessResult, isEdgeError, problem, resolveAccess } from "@/lib/server/session";
+import { apiFetch, apiStarting, applyAccessResult, isEdgeError, problem, resolveAccess, sessionReplaced } from "@/lib/server/session";
 
 import type { SessionUser } from "@/lib/session";
 
@@ -7,6 +7,7 @@ import type { SessionUser } from "@/lib/session";
 export async function GET(req: NextRequest) {
   const access = await resolveAccess(req);
   if (access.unavailable) return apiStarting();
+  if (access.reason === "session_replaced") return sessionReplaced(access);
   if (!access.accessToken) return applyAccessResult(NextResponse.json({ status: 401, code: "unauthenticated", title: "Not signed in." }, { status: 401 }), access);
 
   let upstream: Response;

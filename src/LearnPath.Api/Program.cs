@@ -87,7 +87,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidIssuer = jwt.Issuer, ValidAudience = jwt.Audience, ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SigningKey)), ClockSkew = TimeSpan.FromSeconds(30),
     };
+    o.Events = new JwtBearerEvents
+    {
+        // A device whose session ended (replaced by another device, signed out, password changed) is refused at once,
+        // not when its access token expires.
+        OnTokenValidated = async ctx =>
+        {
+            var sid = ctx.Principal?.FindFirst(SessionClaims.SessionId)?.Value;
+            if (!Guid.TryParse(sid, out var sessionId)) return; // tokens from before sessions existed (expire within minutes)
+            var state = await ctx.HttpContext.RequestServices.GetRequiredService<SessionService>().GetStateAsync(sessionId, ctx.HttpContext.RequestAborted);
+            if (state == SessionState.Active) return;
+            ctx.HttpContext.Items[nameof(SessionState)] = state;
+            ctx.Fail(state == SessionState.Replaced ? "session_replaced" : "session_ended");
+        },
+        OnChallenge = async ctx =>
+        {
+            if (ctx.HttpContext.Items[nameof(SessionState)] is not SessionState state) return;
+            ctx.HandleResponse();
+            await SessionResponses.WriteEndedAsync(ctx.HttpContext, state);
+        },
+    };
 });
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<SessionService>();
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.ContentEdit, p => p.RequireRole(Roles.Teacher, Roles.ContentAdmin, Roles.SuperAdmin))
     .AddPolicy(Policies.ContentPublish, p => p.RequireRole(Roles.ContentAdmin, Roles.SuperAdmin))
@@ -143,6 +165,13 @@ else
 app.UseCors();
 app.UseRateLimiter();
 app.UseAuthentication();
+// A request carrying the token of an ended session is refused even on public pages (the course list), so the device
+// learns at once that it was signed out instead of quietly continuing as a visitor.
+app.Use(async (ctx, next) =>
+{
+    if (ctx.Items[nameof(SessionState)] is SessionState state) await SessionResponses.WriteEndedAsync(ctx, state);
+    else await next();
+});
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");

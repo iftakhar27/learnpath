@@ -47,6 +47,45 @@ public class RefreshToken
     public DateTimeOffset ExpiresAt { get; set; }
     public DateTimeOffset? RevokedAt { get; set; }
     public Guid? ReplacedById { get; set; }
+    /// <summary>The sign-in this token belongs to (null for tokens issued before sessions existed).</summary>
+    public Guid? SessionId { get; set; }
+}
+
+public static class DeviceSlots
+{
+    public const string Phone = "phone";
+    public const string Browser = "browser";
+}
+
+public static class SessionEndReasons
+{
+    public const string SignedOut = "signed_out";
+    /// <summary>The account was signed in on another device of the same kind.</summary>
+    public const string Replaced = "replaced";
+    public const string PasswordChanged = "password_changed";
+    /// <summary>A rotated refresh token was used again (possible theft): every session was ended.</summary>
+    public const string Security = "security";
+}
+
+/// <summary>
+/// One signed-in device. Students may have one active session per device slot (one phone, one browser); signing in on
+/// another device of the same kind replaces it after the student confirms. A session is active while it has not
+/// ended and still holds an unrevoked, unexpired refresh token.
+/// </summary>
+public class UserSession
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
+    /// <summary><see cref="DeviceSlots"/>.</summary>
+    public string DeviceSlot { get; set; } = DeviceSlots.Browser;
+    /// <summary>Shown to the student, e.g. "iPhone · Safari" or "Android app".</summary>
+    public string DeviceName { get; set; } = "";
+    /// <summary>SHA-256 of the device's own random id, so signing in again on the same device needs no prompt.</summary>
+    public string? DeviceIdHash { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset LastSeenAt { get; set; }
+    public DateTimeOffset? EndedAt { get; set; }
+    public string? EndReason { get; set; }
 }
 
 public class OtpCode

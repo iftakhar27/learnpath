@@ -427,5 +427,44 @@
   "play": "Play",
   "pause": "Pause",
   "fullScreen": "Full screen",
-  "exitFullScreen": "Exit full screen"
+  "exitFullScreen": "Exit full screen",
+  "sessionActiveTitle": "Already signed in on another device",
+  "sessionActiveBody": "This account is signed in on {device} (last active {time}). Continue here? That device will be signed out.",
+  "@sessionActiveBody": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "continueHere": "Continue here",
+  "sessionReplaced": "You were signed out because your account was signed in on another device.",
+  "timeJustNow": "just now",
+  "timeMinutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeHoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

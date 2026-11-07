@@ -21,8 +21,8 @@ export function proxy(request: NextRequest) {
     return redirect("/admin/login", pathname + search);
   }
   if (STUDENT_PUBLIC.includes(pathname)) {
-    // "expired" means the API just rejected the session; let the visitor sign in again instead of bouncing.
-    return signedIn && !searchParams.has("expired") ? redirect("/home") : NextResponse.next();
+    // "expired"/"replaced" mean the API just rejected the session; let the visitor sign in again instead of bouncing.
+    return signedIn && !searchParams.has("expired") && !searchParams.has("replaced") ? redirect("/home") : NextResponse.next();
   }
   if (!signedIn && STUDENT_AREAS.some((a) => pathname === a || pathname.startsWith(a + "/"))) return redirect("/login", pathname + search);
   return NextResponse.next();

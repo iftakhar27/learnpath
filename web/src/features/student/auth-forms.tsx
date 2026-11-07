@@ -11,6 +11,7 @@ import { Field, Input } from "@/components/ui/field";
 import { AuthLayout } from "./auth-layout";
 import { StudentError } from "./errors";
 import { safeNext } from "./profile";
+import { TakeOverDialog, otherDevice, type OtherDevice } from "./take-over";
 
 type SessionStart = { userId: string; roles: string[]; onboardingComplete: boolean };
 
@@ -54,17 +55,29 @@ function Terms({ checked, onChange, error }: { checked: boolean; onChange: (v: b
 function EmailSignIn({ next }: { next: string | null }) {
   const t = useT();
   const [error, setError] = useState<unknown>(null);
+  const [other, setOther] = useState<{ device: OtherDevice; values: { email: string; password: string } } | null>(null);
+  const [takingOver, setTakingOver] = useState(false);
   const { register, handleSubmit, formState } = useForm<{ email: string; password: string }>();
-  const submit = handleSubmit(async (v) => {
+  const signIn = async (v: { email: string; password: string }, takeOver: boolean) => {
     setError(null);
     try {
-      enter(await post("/api/session/login", v), next);
+      enter(await post("/api/session/login", { ...v, takeOver }), next);
     } catch (e) {
-      setError(e);
+      const device = otherDevice(e);
+      if (device && !takeOver) setOther({ device, values: v });
+      else setError(e);
     }
-  });
+  };
+  const submit = handleSubmit((v) => signIn(v, false));
+  const continueHere = async () => {
+    setTakingOver(true);
+    await signIn(other!.values, true);
+    setTakingOver(false);
+    setOther(null);
+  };
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
+      <TakeOverDialog device={other?.device ?? null} busy={takingOver} onContinue={continueHere} onCancel={() => setOther(null)} />
       <StudentError error={error} />
       <Field label={t("email")} error={formState.errors.email?.message}>
         <Input
@@ -113,14 +126,25 @@ function MobileSignIn({ next }: { next: string | null }) {
   };
 
   const requestCode = phoneForm.handleSubmit(async (v) => send(parseIndianMobile(v.phone)!));
-  const verify = codeForm.handleSubmit(async (v) => {
+  const [other, setOther] = useState<{ device: OtherDevice; values: { code: string; fullName: string } } | null>(null);
+  const [takingOver, setTakingOver] = useState(false);
+  const verifyWith = async (v: { code: string; fullName: string }, takeOver: boolean) => {
     setError(null);
     try {
-      enter(await post("/api/session/otp/verify", { phone, code: v.code, fullName: v.fullName.trim() || null, acceptTerms: terms }), next);
+      enter(await post("/api/session/otp/verify", { phone, code: v.code, fullName: v.fullName.trim() || null, acceptTerms: terms, takeOver }), next);
     } catch (e) {
-      setError(e);
+      const device = otherDevice(e);
+      if (device && !takeOver) setOther({ device, values: v });
+      else setError(e);
     }
-  });
+  };
+  const verify = codeForm.handleSubmit((v) => verifyWith(v, false));
+  const continueHere = async () => {
+    setTakingOver(true);
+    await verifyWith(other!.values, true);
+    setTakingOver(false);
+    setOther(null);
+  };
 
   if (!phone) {
     return (
@@ -148,6 +172,7 @@ function MobileSignIn({ next }: { next: string | null }) {
 
   return (
     <form onSubmit={verify} className="space-y-4" noValidate>
+      <TakeOverDialog device={other?.device ?? null} busy={takingOver} onContinue={continueHere} onCancel={() => setOther(null)} />
       <p className="text-sm text-fg-muted">
         {t("otpSentTo", { phone: `+91 ${phone.slice(0, 5)} ${phone.slice(5)}` })}{" "}
         <button
@@ -209,7 +234,13 @@ export function StudentLogin() {
         </Link>
       }
     >
-      {params.get("expired") && <p className="mb-4 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">{t("sessionExpired")}</p>}
+      {params.get("replaced") ? (
+        <p role="status" className="mb-4 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
+          {t("sessionReplaced")}
+        </p>
+      ) : (
+        params.get("expired") && <p className="mb-4 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">{t("sessionExpired")}</p>
+      )}
       {params.get("deleted") && (
         <p role="status" className="mb-4 rounded-lg bg-primary-soft px-3 py-2 text-sm">
           {t("deleteRequested")}

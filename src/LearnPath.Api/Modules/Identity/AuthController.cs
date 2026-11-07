@@ -11,22 +11,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LearnPath.Api.Modules.Identity;
 
+// Sign-ins may describe the device: DeviceSlot "phone" or "browser" (default: from the User-Agent), a DeviceName shown to
+// the student, and a DeviceId (the device's own random id). TakeOver confirms signing out another device of the same kind.
 public record RegisterRequest(
     [Required, EmailAddress, MaxLength(256)] string Email,
     [Required, MinLength(8), MaxLength(128)] string Password,
     [Required, MaxLength(200)] string FullName,
-    [Required] bool AcceptTerms);
+    [Required] bool AcceptTerms,
+    [MaxLength(16)] string? DeviceSlot = null, [MaxLength(100)] string? DeviceName = null, [MaxLength(200)] string? DeviceId = null);
 
-public record LoginRequest([Required] string Email, [Required] string Password);
+public record LoginRequest([Required] string Email, [Required] string Password,
+    [MaxLength(16)] string? DeviceSlot = null, [MaxLength(100)] string? DeviceName = null, [MaxLength(200)] string? DeviceId = null, bool? TakeOver = null);
 public record OtpRequest([Required] string Phone);
-public record OtpVerifyRequest([Required] string Phone, [Required, StringLength(6, MinimumLength = 6)] string Code, string? FullName, bool AcceptTerms);
+public record OtpVerifyRequest([Required] string Phone, [Required, StringLength(6, MinimumLength = 6)] string Code, string? FullName, bool AcceptTerms,
+    [MaxLength(16)] string? DeviceSlot = null, [MaxLength(100)] string? DeviceName = null, [MaxLength(200)] string? DeviceId = null, bool? TakeOver = null);
 public record RefreshRequest([Required] string RefreshToken);
 
 [ApiController]
 [Route("api/v1/auth")]
 [EnableRateLimiting("auth")]
-public partial class AuthController(AppDbContext db, TokenService tokens, IOtpSender otpSender, TimeProvider clock, IConfiguration config) : ControllerBase
+public partial class AuthController(AppDbContext db, TokenService tokens, SessionService sessions, IOtpSender otpSender, TimeProvider clock, IConfiguration config) : ControllerBase
 {
+    private DeviceInfo Device(string? slot, string? name, string? id) => SessionService.Describe(slot, name, id, Request.Headers.UserAgent.ToString());
+
     private const string TermsVersion = "2026-01";
 
     [HttpPost("register")]
@@ -43,7 +50,8 @@ public partial class AuthController(AppDbContext db, TokenService tokens, IOtpSe
         db.Users.Add(user);
         AddTermsConsent(user.Id);
         await db.SaveChangesAsync(ct);
-        return Ok(await tokens.IssueAsync(user, ct));
+        var session = await sessions.StartAsync(user, Device(req.DeviceSlot, req.DeviceName, req.DeviceId), takeOver: false, ct);
+        return Ok(await tokens.IssueAsync(user, session, ct));
     }
 
     [HttpPost("login")]
@@ -55,7 +63,8 @@ public partial class AuthController(AppDbContext db, TokenService tokens, IOtpSe
         if (user?.PasswordHash is null || !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
             throw new AppException(401, "invalid_credentials", "Incorrect email or password.");
         if (user.Status != UserStatus.Active) throw new AppException(403, "account_inactive", "This account is not active. Contact support.");
-        return Ok(await tokens.IssueAsync(user, ct));
+        var session = await sessions.StartAsync(user, Device(req.DeviceSlot, req.DeviceName, req.DeviceId), req.TakeOver == true, ct);
+        return Ok(await tokens.IssueAsync(user, session, ct));
     }
 
     [HttpPost("otp/request")]
@@ -102,9 +111,10 @@ public partial class AuthController(AppDbContext db, TokenService tokens, IOtpSe
             await db.SaveChangesAsync(ct);
             throw AppException.BadRequest("otp_invalid", "Incorrect OTP.");
         }
-        otp.ConsumedAt = now;
 
+        var device = Device(req.DeviceSlot, req.DeviceName, req.DeviceId);
         var user = await db.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Phone == phone, ct);
+        UserSession session;
         if (user is null)
         {
             if (!req.AcceptTerms) throw AppException.BadRequest("terms_required", "You must accept the terms and privacy policy.");
@@ -112,17 +122,21 @@ public partial class AuthController(AppDbContext db, TokenService tokens, IOtpSe
             user.Phone = phone;
             db.Users.Add(user);
             AddTermsConsent(user.Id);
+            session = await sessions.StartAsync(user, device, takeOver: false, ct);
         }
-        else if (user.Status != UserStatus.Active)
+        else
         {
-            throw new AppException(403, "account_inactive", "This account is not active. Contact support.");
+            if (user.Status != UserStatus.Active) throw new AppException(403, "account_inactive", "This account is not active. Contact support.");
+            // May ask to confirm taking over another device; the code stays valid for that retry.
+            session = await sessions.StartAsync(user, device, req.TakeOver == true, ct);
         }
+        otp.ConsumedAt = now;
         await db.SaveChangesAsync(ct);
-        return Ok(await tokens.IssueAsync(user, ct));
+        return Ok(await tokens.IssueAsync(user, session, ct));
     }
 
     [HttpPost("refresh")]
-    public async Task<ActionResult<AuthTokens>> Refresh(RefreshRequest req, CancellationToken ct) => Ok(await tokens.RefreshAsync(req.RefreshToken, ct));
+    public async Task<ActionResult<AuthTokens>> Refresh(RefreshRequest req, CancellationToken ct) => Ok(await tokens.RefreshAsync(req.RefreshToken, Device(null, null, null), ct));
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(RefreshRequest req, CancellationToken ct)
@@ -139,9 +153,8 @@ public partial class AuthController(AppDbContext db, TokenService tokens, IOtpSe
         if (user.PasswordHash is null || !BCrypt.Net.BCrypt.Verify(req.CurrentPassword, user.PasswordHash))
             throw new AppException(400, "invalid_credentials", "Current password is incorrect.");
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword, workFactor: 11);
-        await db.RefreshTokens.Where(t => t.UserId == user.Id && t.RevokedAt == null)
-            .ExecuteUpdateAsync(s => s.SetProperty(t => t.RevokedAt, clock.GetUtcNow()), ct);
         await db.SaveChangesAsync(ct);
+        await sessions.EndAllAsync(user.Id, SessionEndReasons.PasswordChanged, ct);
         return NoContent();
     }
 

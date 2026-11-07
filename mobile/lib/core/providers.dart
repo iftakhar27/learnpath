@@ -48,7 +48,7 @@ final apiClientProvider = Provider<ApiClient>(
     baseUrl: AppConfig.apiBaseUrl,
     store: ref.watch(tokenStoreProvider),
     language: () => ref.read(localeProvider).languageCode,
-    onSessionExpired: () => ref.read(sessionProvider.notifier).expired(),
+    onSessionExpired: (reason) => ref.read(sessionProvider.notifier).expired(replaced: reason == 'session_replaced'),
   ),
 );
 
@@ -65,8 +65,11 @@ class SessionLoading extends SessionState {
 }
 
 class SignedOut extends SessionState {
-  const SignedOut({this.expired = false});
+  const SignedOut({this.expired = false, this.replaced = false});
   final bool expired;
+
+  /// Signed out because the account was signed in on another phone.
+  final bool replaced;
 }
 
 /// Tokens exist but the API could not be reached to confirm them.
@@ -118,13 +121,13 @@ class SessionController extends Notifier<SessionState> {
     await _loadProfile();
   }
 
-  Future<void> login(String email, String password) async => _signedIn(await _api.login(email, password));
+  Future<void> login(String email, String password, {bool takeOver = false}) async => _signedIn(await _api.login(email, password, takeOver: takeOver));
 
   Future<void> register({required String fullName, required String email, required String password}) async =>
       _signedIn(await _api.register(fullName: fullName, email: email, password: password, acceptTerms: true));
 
-  Future<void> verifyOtp({required String phone, required String code, String? fullName}) async =>
-      _signedIn(await _api.verifyOtp(phone: phone, code: code, fullName: fullName, acceptTerms: true));
+  Future<void> verifyOtp({required String phone, required String code, String? fullName, bool takeOver = false}) async =>
+      _signedIn(await _api.verifyOtp(phone: phone, code: code, fullName: fullName, acceptTerms: true, takeOver: takeOver));
 
   void profileUpdated(ProfileDto profile) => state = SignedIn(profile);
 
@@ -141,8 +144,8 @@ class SessionController extends Notifier<SessionState> {
     state = const SignedOut();
   }
 
-  void expired() {
-    if (state is SignedIn) state = const SignedOut(expired: true);
+  void expired({bool replaced = false}) {
+    if (state is SignedIn) state = SignedOut(expired: true, replaced: replaced);
   }
 }
 

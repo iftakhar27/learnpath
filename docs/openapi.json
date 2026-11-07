@@ -7224,6 +7224,22 @@
           },
           "password": {
             "type": "string"
+          },
+          "deviceSlot": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "takeOver": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -7413,6 +7429,22 @@
           },
           "acceptTerms": {
             "type": "boolean"
+          },
+          "deviceSlot": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "takeOver": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -8413,6 +8445,18 @@
           },
           "acceptTerms": {
             "type": "boolean"
+          },
+          "deviceSlot": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviceId": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User> Users => Set<User>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
     public DbSet<OtpCode> OtpCodes => Set<OtpCode>();
     public DbSet<StudentProfile> StudentProfiles => Set<StudentProfile>();
     public DbSet<ConsentRecord> ConsentRecords => Set<ConsentRecord>();
@@ -67,6 +68,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.HasIndex(x => x.TokenHash).IsUnique();
             e.HasIndex(x => x.UserId);
+            e.HasIndex(x => x.SessionId);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<UserSession>().WithMany().HasForeignKey(x => x.SessionId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<UserSession>(e =>
+        {
+            e.HasIndex(x => new { x.UserId, x.EndedAt });
+            e.Property(x => x.DeviceSlot).HasMaxLength(16);
+            e.Property(x => x.DeviceName).HasMaxLength(100);
+            e.Property(x => x.DeviceIdHash).HasMaxLength(64);
+            e.Property(x => x.EndReason).HasMaxLength(32);
             e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         });
         b.Entity<OtpCode>(e => e.HasIndex(x => new { x.Phone, x.CreatedAt }));

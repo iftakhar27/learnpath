@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { apiFetch, apiNotConfigured, apiStarting, applyAccessResult, isEdgeError, isSameOrigin, problem, resolveAccess, visitorHeaders } from "@/lib/server/session";
+import { apiFetch, apiNotConfigured, apiStarting, applyAccessResult, isEdgeError, isSameOrigin, problem, resolveAccess, sessionReplaced, visitorHeaders } from "@/lib/server/session";
 
 /**
  * Forwards /api/v1/* from the browser to the backend API with the session's bearer token.
@@ -38,6 +38,7 @@ async function forward(req: NextRequest, ctx: RouteContext<"/api/v1/[...path]">)
 
   let access = await resolveAccess(req);
   if (access.unavailable) return apiStarting();
+  if (access.reason === "session_replaced") return sessionReplaced(access);
   let upstream: Response;
   try {
     upstream = await send(access.accessToken);
@@ -55,6 +56,7 @@ async function forward(req: NextRequest, ctx: RouteContext<"/api/v1/[...path]">)
     return problem(502, "api_unreachable", "The server is unreachable. Please try again.");
   }
   if (access.unavailable) return apiStarting();
+  if (access.reason === "session_replaced") return sessionReplaced(access);
   if (isEdgeError(upstream)) return applyAccessResult(apiStarting(), access);
 
   const headers = new Headers();
