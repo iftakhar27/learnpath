@@ -11,7 +11,7 @@ async function signedInStudent(page: Page, request: APIRequestContext, name = "A
 }
 
 async function freeCourse(request: APIRequestContext, token: string) {
-  const courses = await apiGet(request, "/api/v1/courses?free=true", token);
+  const courses = await apiGet(request, "/api/v1/courses?free=true&q=NEET%20Physics%20Starter", token);
   return courses.items[0] as { id: string; title: string };
 }
 
@@ -57,19 +57,23 @@ test("study preferences save, the plan can be worked through, and progress chart
   await expect(page.getByRole("cell", { name: quiz.title })).toBeVisible();
 });
 
-test("notifications from staff show on the bell and can be read", async ({ page, request }) => {
+test("notifications from staff show on the bell without reloading, and can be read", async ({ page, request }) => {
+  await page.clock.install(); // so the bell's 30-second check can be fast-forwarded
   const s = await signedInStudent(page, request);
+  await expect(page.getByRole("link", { name: "Notifications: No unread notifications" })).toBeVisible();
   const free = await freeCourse(request, s.token);
   await apiPost(request, `/api/v1/courses/${free.id}/enroll`, s.token);
   const admin = await apiLogin(request, ADMIN.email, ADMIN.password);
   const title = unique("Live doubt session");
   await apiPost(request, "/api/v1/admin/announcements", admin, { title, body: "Join us on Sunday at 6 pm.", courseId: free.id });
 
-  await page.reload();
-  await expect(page.getByRole("link", { name: /^Notifications: [1-9]\d* unread notifications?$/ })).toBeVisible();
+  // The student stays on the page: the bell picks it up on its next check.
+  await page.clock.fastForward(31_000);
+  await expect(page.getByRole("link", { name: "Notifications: 1 unread notification" })).toBeVisible();
   await page.getByRole("link", { name: /^Notifications:/ }).click();
   await page.getByRole("button", { name: new RegExp(title) }).click();
   await expect(page.getByRole("button", { name: new RegExp(`Unread: ${title}`) })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Notifications: No unread notifications" })).toBeVisible();
 });
 
 test("saved items, support tickets with replies, and purchases", async ({ page, request }) => {

@@ -7,6 +7,7 @@ import '../../core/api/models.g.dart';
 import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
+import 'notification_bell.dart';
 
 final dashboardProvider = FutureProvider.autoDispose<DashboardDto>((ref) => ref.watch(apiProvider).dashboard());
 
@@ -46,15 +47,7 @@ class HomeScreen extends ConsumerWidget {
         title: Text(dash.hasValue ? l.greeting(dash.value!.fullName.split(' ').first) : ''),
         actions: [
           IconButton(tooltip: l.search, icon: const Icon(Icons.search_rounded), onPressed: () => context.push('/search')),
-          IconButton(
-            tooltip: l.notificationsTitle,
-            onPressed: () => context.push('/notifications'),
-            icon: Badge(
-              isLabelVisible: (dash.value?.unreadNotifications ?? 0) > 0,
-              label: Text('${dash.value?.unreadNotifications ?? 0}'),
-              child: const Icon(Icons.notifications_none_rounded),
-            ),
-          ),
+          const NotificationBell(),
         ],
       ),
       body: AsyncView(

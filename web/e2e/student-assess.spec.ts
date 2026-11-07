@@ -20,7 +20,7 @@ async function answer(page: Page, region = page.getByRole("main")) {
 
 test("practice a topic: check answers, read explanations, report a problem, see the summary", async ({ page, request }) => {
   const s = await signedInStudent(page, request);
-  const courses = await apiGet(request, "/api/v1/courses?free=true", s.token);
+  const courses = await apiGet(request, "/api/v1/courses?free=true&q=NEET%20Physics%20Starter", s.token);
   const free = courses.items[0];
   await apiPost(request, `/api/v1/courses/${free.id}/enroll`, s.token);
   const syllabus = await apiGet(request, `/api/v1/courses/${free.id}/syllabus`, s.token);

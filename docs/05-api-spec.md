@@ -170,6 +170,7 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/learning/progress` |
 | `GET` | `/api/v1/notifications` |
 | `POST` | `/api/v1/notifications/read-all` |
+| `GET` | `/api/v1/notifications/unread-count` |
 | `POST` | `/api/v1/notifications/{id}/read` |
 | `GET` | `/api/v1/payments/orders` |
 | `POST` | `/api/v1/payments/orders` |

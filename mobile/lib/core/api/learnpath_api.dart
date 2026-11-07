@@ -205,6 +205,7 @@ class LearnPathApi {
 
   // ---- Notifications, support, search ----
   Future<PagedResultOfNotificationDto> notifications() => _call(() => _dio.get('/notifications'), (d) => PagedResultOfNotificationDto.fromJson(_map(d)));
+  Future<int> unreadCount() => _call(() => _dio.get('/notifications/unread-count'), (d) => UnreadCountDto.fromJson(_map(d)).count);
   Future<void> markNotificationRead(String id) => _send(() => _dio.post('/notifications/$id/read'));
   Future<void> markAllNotificationsRead() => _send(() => _dio.post('/notifications/read-all'));
   Future<List<TicketDto>> tickets() => _call(() => _dio.get('/support/tickets'), (d) => _list(d, TicketDto.fromJson));

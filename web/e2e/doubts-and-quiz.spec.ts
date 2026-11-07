@@ -7,7 +7,7 @@ const TOPIC = "Dimensional Analysis"; // free sample course, 3 single-correct qu
 async function studentInFreeCourse(page: Page, request: APIRequestContext, name: string) {
   const s = await registerStudent(request, name);
   await onboardStudent(request, s.token);
-  const courses = await apiGet(request, "/api/v1/courses?free=true", s.token);
+  const courses = await apiGet(request, "/api/v1/courses?free=true&q=NEET%20Physics%20Starter", s.token);
   const course = courses.items.find((c: { title: string }) => c.title.startsWith("NEET Physics Starter"));
   await apiPost(request, `/api/v1/courses/${course.id}/enroll`, s.token);
   const syllabus = await apiGet(request, `/api/v1/courses/${course.id}/syllabus`, s.token);

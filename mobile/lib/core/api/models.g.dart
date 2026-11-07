@@ -5113,6 +5113,17 @@ class TopicQuizSummaryDto {
 }
 
 @immutable
+class UnreadCountDto {
+  const UnreadCountDto({required this.count});
+
+  factory UnreadCountDto.fromJson(Map<String, dynamic> json) => UnreadCountDto(count: (json['count'] as num).toInt());
+
+  final int count;
+
+  Map<String, dynamic> toJson() => {'count': count};
+}
+
+@immutable
 class UpdateProfileRequest {
   const UpdateProfileRequest({
     this.fullName,

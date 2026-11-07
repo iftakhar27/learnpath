@@ -38,6 +38,10 @@ public class DoubtTests(ApiFactory api)
         var note = (await s.GetAsync("/api/v1/notifications").Ok()).GetProperty("items").EnumerateArray().First();
         Assert.Equal("doubt", note.Str("type"));
         Assert.Equal($"/doubts/{id}", note.Str("link"));
+        // The bell badge count comes from a cheap endpoint clients poll.
+        Assert.Equal(1, (await s.GetAsync("/api/v1/notifications/unread-count").Ok()).GetProperty("count").GetInt32());
+        await s.PostAsync($"/api/v1/notifications/{note.Str("id")}/read", null);
+        Assert.Equal(0, (await s.GetAsync("/api/v1/notifications/unread-count").Ok()).GetProperty("count").GetInt32());
 
         var followed = await s.PostAsJsonAsync($"/api/v1/doubts/{id}/messages", new { text = "So the units match but the meaning differs?" }).Ok();
         Assert.Equal("Open", followed.Str("status"));

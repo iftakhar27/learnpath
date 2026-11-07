@@ -211,6 +211,12 @@ Owner's call: focus on Android, not iOS, for now. `.github/workflows/android.yml
 every push to `main` that touches `mobile/` (artifact **LearnPath-android-apk**, 30 days); the iOS workflow now runs only
 on demand.
 
+**Bell badge (owner's report: the count only appeared after opening the bell):** `GET /notifications/unread-count`; the
+app re-checks it every 30 seconds while on screen and on returning to the foreground (paused in the background), the
+website every 30 seconds while the tab is visible and on focus; reading notifications updates it at once. Alerts while
+the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
+a browser test (the badge updates without reloading).
+
 ### iOS build (6 Nov 2026)
 
 **Built:** `.github/workflows/ios.yml` builds the app on GitHub's macOS runners (Xcode 26.3, Swift 6.2.4; the newest

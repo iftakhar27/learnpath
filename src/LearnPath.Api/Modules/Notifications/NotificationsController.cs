@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LearnPath.Api.Modules.Notifications;
 
 public record NotificationDto(Guid Id, string Type, string Title, string Body, string? Link, DateTimeOffset CreatedAt, bool Read);
+public record UnreadCountDto(int Count);
 public record TicketRequest([Required, RegularExpression("^(payment|content|technical|account|other)$")] string Category,
     [Required, MaxLength(200)] string Subject, [Required, MaxLength(4000)] string Message);
 public record TicketDto(Guid Id, string Category, string Priority, string Subject, string Message, string Status, string? StaffResponse, DateTimeOffset CreatedAt, DateTimeOffset? UpdatedAt);
@@ -28,6 +29,14 @@ public class NotificationsController(AppDbContext db, TimeProvider clock) : Cont
         var items = await q.OrderByDescending(n => n.CreatedAt).Skip((p - 1) * size).Take(size)
             .Select(n => new NotificationDto(n.Id, n.Type, n.Title, n.Body, n.Link, n.CreatedAt, n.ReadAt != null)).ToListAsync(ct);
         return new(items, p, size, total);
+    }
+
+    /// <summary>For the bell badge: cheap enough for clients to poll while open.</summary>
+    [HttpGet("notifications/unread-count")]
+    public async Task<UnreadCountDto> UnreadCount(CancellationToken ct)
+    {
+        var userId = User.UserId();
+        return new UnreadCountDto(await db.Notifications.CountAsync(n => n.UserId == userId && n.ReadAt == null, ct));
     }
 
     [HttpPost("notifications/{id:guid}/read")]

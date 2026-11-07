@@ -67,7 +67,7 @@ test("paid course: locked lessons explain how to unlock; buying on a test server
 test("a video lesson resumes where the student stopped and completes at the end", async ({ page, request }) => {
   // A short lesson served from a local file, so the player can be tested without the video CDN.
   const admin = await apiLogin(request, ADMIN.email, ADMIN.password);
-  const courses = await apiGet(request, "/api/v1/courses?free=true", admin);
+  const courses = await apiGet(request, "/api/v1/courses?free=true&q=NEET%20Physics%20Starter", admin);
   const free = courses.items.find((c: { title: string }) => c.title === FREE);
   const syllabus = await apiGet(request, `/api/v1/courses/${free.id}/syllabus`, admin);
   const topicId = syllabus.subjects[0].chapters[0].topics[0].id;
@@ -128,7 +128,7 @@ test("a video lesson resumes where the student stopped and completes at the end"
 
 test("an HLS lesson (the format video hosts deliver) plays through hls.js", async ({ page, request }) => {
   const admin = await apiLogin(request, ADMIN.email, ADMIN.password);
-  const courses = await apiGet(request, "/api/v1/courses?free=true", admin);
+  const courses = await apiGet(request, "/api/v1/courses?free=true&q=NEET%20Physics%20Starter", admin);
   const free = courses.items.find((c: { title: string }) => c.title === FREE);
   const syllabus = await apiGet(request, `/api/v1/courses/${free.id}/syllabus`, admin);
   const title = unique("HLS demo");

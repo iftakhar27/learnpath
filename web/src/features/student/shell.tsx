@@ -29,6 +29,8 @@ const isActive = (pathname: string, item: (typeof NAV)[number]) =>
   [item.href, ...(item.also ?? [])].some((p) => pathname === p || pathname.startsWith(p + "/"));
 
 export const notificationsKey = ["student", "notifications"] as const;
+/** How often the bell re-checks while the tab is visible (also on focus, and when notifications are read). */
+const UNREAD_POLL_MS = 30_000;
 
 /** Frame for signed-in student pages: top bar (desktop nav), bottom tabs on phones, onboarding and language sync. */
 export function StudentShell({ children }: { children: ReactNode }) {
@@ -38,12 +40,15 @@ export function StudentShell({ children }: { children: ReactNode }) {
   const profile = useProfile();
   const { setLang } = useLanguage();
   const changeLanguage = useChangeLanguage();
-  const notifications = useQuery({
-    queryKey: notificationsKey,
-    queryFn: () => unwrap(api.GET("/api/v1/notifications")),
+  // Under notificationsKey, so reading notifications (which invalidates that key) updates the badge at once.
+  const unreadCount = useQuery({
+    queryKey: [...notificationsKey, "unread-count"],
+    queryFn: () => unwrap(api.GET("/api/v1/notifications/unread-count")),
     enabled: !!profile.data?.onboardingComplete,
+    refetchInterval: UNREAD_POLL_MS,
+    refetchOnWindowFocus: "always",
   });
-  const unread = notifications.data?.items.filter((n) => !n.read).length ?? 0;
+  const unread = unreadCount.data?.count ?? 0;
 
   const p = profile.data;
   useEffect(() => {
