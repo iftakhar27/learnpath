@@ -136,3 +136,14 @@ test("each page load wakes the API from the browser (free hosting only wakes on 
   await page.goto("/login");
   expect((await wake).method()).toBe("GET");
 });
+
+test("the website can be installed as an app (Add to Home Screen)", async ({ page, request }) => {
+  await page.goto("/login");
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", "/manifest.webmanifest");
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(1);
+  await expect(page.locator('meta[name="apple-mobile-web-app-capable"]')).toHaveAttribute("content", "yes");
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /viewport-fit=cover/);
+  const manifest = await (await request.get("/manifest.webmanifest")).json();
+  expect(manifest).toMatchObject({ display: "standalone", start_url: "/home", name: "LearnPath" });
+  for (const icon of manifest.icons as { src: string }[]) expect((await request.get(icon.src)).headers()["content-type"]).toBe("image/png");
+});

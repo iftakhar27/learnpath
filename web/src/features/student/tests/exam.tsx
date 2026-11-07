@@ -186,7 +186,7 @@ function ExamPlayer({ session }: { session: ExamSession }) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-20 border-b border-border bg-surface">
+      <header className="sticky top-0 z-20 border-b border-border bg-surface pt-[env(safe-area-inset-top)]">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
           <button type="button" onClick={() => setLeave(true)} className="rounded-lg p-2 text-fg-muted hover:bg-surface-muted" aria-label={t("leave")}>
             <Icon name="x" />

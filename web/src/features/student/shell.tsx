@@ -67,11 +67,11 @@ export function StudentShell({ children }: { children: ReactNode }) {
     );
 
   return (
-    <div className="min-h-dvh pb-20 md:pb-0">
+    <div className="min-h-dvh pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
         {t("skipToContent")}
       </a>
-      <header className="sticky top-0 z-30 border-b border-border bg-surface/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-border bg-surface/95 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
           <Link href="/home" className="text-lg font-semibold">
             {brand}
@@ -118,7 +118,7 @@ export function StudentShell({ children }: { children: ReactNode }) {
       <main id="main" className="mx-auto max-w-6xl px-4 py-6">
         {children}
       </main>
-      <nav aria-label={t("primaryNav")} className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface md:hidden">
+      <nav aria-label={t("primaryNav")} className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
         <ul className="grid grid-cols-5">
           {NAV.map((item) => {
             const on = isActive(pathname, item);
