@@ -51,11 +51,30 @@ jobs:
           flutter analyze
           flutter test
 
+      # Keeps the Gradle download and build dependencies between runs (fewer downloads, faster builds).
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/wrapper/dists
+            ~/.gradle/caches
+          key: gradle-${{ runner.os }}-${{ hashFiles('mobile/android/gradle/wrapper/gradle-wrapper.properties', 'mobile/android/**/*.gradle*', 'mobile/pubspec.lock') }}
+          restore-keys: gradle-${{ runner.os }}-
+
       - name: Build the APK
         working-directory: mobile
         run: |
           set -o pipefail
-          flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL" --dart-define=WEB_BASE_URL="$WEB_BASE_URL" 2>&1 | tee ../android-build.log
+          # Downloads (Gradle, Maven) sometimes time out on the runner: retry those, fail at once on anything else.
+          for attempt in 1 2 3; do
+            if flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL" --dart-define=WEB_BASE_URL="$WEB_BASE_URL" 2>&1 | tee ../android-build.log; then
+              exit 0
+            fi
+            grep -qE "Server returned HTTP response code: 5|Could not (GET|HEAD|resolve|download)|Read timed out|Connection reset" ../android-build.log || exit 1
+            echo "::warning title=retry::A download failed (attempt $attempt of 3); retrying in 30 seconds"
+            sleep 30
+          done
+          exit 1
 
       - name: Upload the APK
         uses: actions/upload-artifact@v4
