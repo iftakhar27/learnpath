@@ -2423,6 +2423,46 @@ class GrantEnrollmentRequest {
 }
 
 @immutable
+class HandoffDto {
+  const HandoffDto({required this.code, required this.expiresAt});
+
+  factory HandoffDto.fromJson(Map<String, dynamic> json) =>
+      HandoffDto(code: json['code'] as String, expiresAt: DateTime.parse(json['expiresAt'] as String));
+
+  final String code;
+  final DateTime expiresAt;
+
+  Map<String, dynamic> toJson() => {'code': code, 'expiresAt': expiresAt.toIso8601String()};
+}
+
+@immutable
+class HandoffRedeemRequest {
+  const HandoffRedeemRequest({required this.code, this.deviceSlot, this.deviceName, this.deviceId, this.takeOver});
+
+  factory HandoffRedeemRequest.fromJson(Map<String, dynamic> json) => HandoffRedeemRequest(
+    code: json['code'] as String,
+    deviceSlot: json['deviceSlot'] == null ? null : json['deviceSlot'] as String,
+    deviceName: json['deviceName'] == null ? null : json['deviceName'] as String,
+    deviceId: json['deviceId'] == null ? null : json['deviceId'] as String,
+    takeOver: json['takeOver'] == null ? null : json['takeOver'] as bool,
+  );
+
+  final String code;
+  final String? deviceSlot;
+  final String? deviceName;
+  final String? deviceId;
+  final bool? takeOver;
+
+  Map<String, dynamic> toJson() => {
+    'code': code,
+    'deviceSlot': ?deviceSlot,
+    'deviceName': ?deviceName,
+    'deviceId': ?deviceId,
+    'takeOver': ?takeOver,
+  };
+}
+
+@immutable
 class HistoryItemDto {
   const HistoryItemDto({
     required this.resourceId,

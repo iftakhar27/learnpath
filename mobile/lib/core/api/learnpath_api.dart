@@ -212,10 +212,8 @@ class LearnPathApi {
   Future<TicketDto> createTicket(TicketRequest body) => _call(() => _dio.post('/support/tickets', data: body.toJson()), (d) => TicketDto.fromJson(_map(d)));
   Future<List<SearchHitDto>> search(String q) => _call(() => _dio.get('/search', queryParameters: {'q': q}), (d) => _list(d, SearchHitDto.fromJson));
 
-  // ---- Payments ----
-  Future<CheckoutDto> createOrder(String courseId) =>
-      _call(() => _dio.post('/payments/orders', data: CreateOrderRequest(courseId: courseId).toJson()), (d) => CheckoutDto.fromJson(_map(d)));
-  Future<OrderDto> verifyPayment(VerifyPaymentRequest body) =>
-      _call(() => _dio.post('/payments/verify', data: body.toJson()), (d) => OrderDto.fromJson(_map(d)));
+  // ---- Payments (courses are bought on the website; the app lists orders) ----
+  /// One-time code that signs this student in on the website (used by "Buy on website").
+  Future<HandoffDto> createHandoff() => _call(() => _dio.post('/auth/handoff'), (d) => HandoffDto.fromJson(_map(d)));
   Future<List<OrderDto>> orders() => _call(() => _dio.get('/payments/orders'), (d) => _list(d, OrderDto.fromJson));
 }

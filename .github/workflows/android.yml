@@ -24,6 +24,8 @@ jobs:
     env:
       # The API the app talks to (override with a repository variable).
       API_BASE_URL: ${{ vars.API_BASE_URL || 'https://learnpath-api-89zs.onrender.com' }}
+      # The student website, where "Buy on website" sends students to pay.
+      WEB_BASE_URL: ${{ vars.WEB_BASE_URL || 'https://learnpath-admin.onrender.com' }}
       FLUTTER_SUPPRESS_ANALYTICS: "true"
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +53,7 @@ jobs:
 
       - name: Build the APK
         working-directory: mobile
-        run: flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL"
+        run: flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL" --dart-define=WEB_BASE_URL="$WEB_BASE_URL"
 
       - name: Upload the APK
         uses: actions/upload-artifact@v4

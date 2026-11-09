@@ -1136,6 +1136,39 @@ namespace LearnPath.Api.Data.Migrations
                     b.ToTable("ResourceProgress");
                 });
 
+            modelBuilder.Entity("LearnPath.Api.Domain.SignInHandoff", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodeHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SignInHandoffs");
+                });
+
             modelBuilder.Entity("LearnPath.Api.Domain.StudentProfile", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -1895,6 +1928,15 @@ namespace LearnPath.Api.Data.Migrations
                     b.HasOne("LearnPath.Api.Domain.LearningResource", null)
                         .WithMany()
                         .HasForeignKey("ResourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.SignInHandoff", b =>
+                {
+                    b.HasOne("LearnPath.Api.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

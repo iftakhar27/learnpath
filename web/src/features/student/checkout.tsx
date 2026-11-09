@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
@@ -43,7 +43,7 @@ function loadRazorpay(): Promise<RazorpayCtor> {
  * Buys a course: the API creates the order, Razorpay's checkout takes the payment, and access is granted only after
  * the API verifies the payment signature (a webhook also confirms it if the browser closes early).
  */
-export function BuyButton({ course, onPurchased }: { course: Course; onPurchased?: () => void }) {
+export function BuyButton({ course, onPurchased, autoStart }: { course: Course; onPurchased?: () => void; autoStart?: boolean }) {
   const t = useT();
   const f = useFormat();
   const toast = useToast();
@@ -107,6 +107,16 @@ export function BuyButton({ course, onPurchased }: { course: Course; onPurchased
       setNotice({ tone: "error", text: t("errorNetwork") });
     }
   };
+
+  // Arriving from the app's "Buy on website": open checkout straight away, once.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStart || autoStarted.current) return;
+    autoStarted.current = true;
+    const timer = setTimeout(() => void buy(), 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart]);
 
   return (
     <div className="space-y-2">

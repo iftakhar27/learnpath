@@ -2209,6 +2209,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/handoff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["HandoffDto"];
+                        "application/json": components["schemas"]["HandoffDto"];
+                        "text/json": components["schemas"]["HandoffDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/handoff/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["HandoffRedeemRequest"];
+                    "text/json": components["schemas"]["HandoffRedeemRequest"];
+                    "application/*+json": components["schemas"]["HandoffRedeemRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AuthTokens"];
+                        "application/json": components["schemas"]["AuthTokens"];
+                        "text/json": components["schemas"]["AuthTokens"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/logout": {
         parameters: {
             query?: never;
@@ -5074,6 +5154,18 @@ export interface components {
             /** Format: uuid */
             courseId: string;
             reason?: string | null;
+        };
+        HandoffDto: {
+            code: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        HandoffRedeemRequest: {
+            code: string;
+            deviceSlot?: string | null;
+            deviceName?: string | null;
+            deviceId?: string | null;
+            takeOver?: boolean | null;
         };
         HistoryItemDto: {
             /** Format: uuid */

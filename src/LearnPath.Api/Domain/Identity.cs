@@ -99,6 +99,20 @@ public class OtpCode
     public DateTimeOffset? ConsumedAt { get; set; }
 }
 
+/// <summary>
+/// A one-time code that signs the app's student in on the website (e.g. "Buy on website"), so they don't have to sign
+/// in again in the browser. Short-lived and single-use; only its hash is stored.
+/// </summary>
+public class SignInHandoff
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
+    public string CodeHash { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+    public DateTimeOffset? UsedAt { get; set; }
+}
+
 public class StudentProfile
 {
     public Guid UserId { get; set; }

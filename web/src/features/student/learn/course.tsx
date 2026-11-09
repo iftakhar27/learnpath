@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import { useT } from "@/lib/i18n";
@@ -21,6 +21,10 @@ export function CoursePage() {
   const toast = useToast();
   const qc = useQueryClient();
   const { courseId } = useParams<{ courseId: string }>();
+  // From the app's "Buy on website": open checkout at once, and point back to the app once the course is owned.
+  const params = useSearchParams();
+  const fromApp = params.get("from") === "app";
+  const autoBuy = params.get("buy") === "1";
   const q = useQuery({ queryKey: courseKey(courseId), queryFn: () => unwrap(api.GET("/api/v1/courses/{courseId}/syllabus", { params: { path: { courseId } } })) });
   const enroll = useMutation({
     mutationFn: () => unwrap(api.POST("/api/v1/courses/{courseId}/enroll", { params: { path: { courseId } } })),
@@ -54,6 +58,11 @@ export function CoursePage() {
             </div>
           ) : hasAccess ? (
             <div className="max-w-md space-y-2">
+              {fromApp && (
+                <p role="status" className="rounded-lg bg-success-soft px-3 py-2 text-sm font-medium text-success">
+                  {t("backToApp")}
+                </p>
+              )}
               <p className="inline-flex items-center gap-1.5 text-sm font-medium text-success">
                 <Icon name="check" size={16} />
                 {t("youHaveAccess")}
@@ -64,7 +73,7 @@ export function CoursePage() {
           ) : (
             <div className="space-y-2">
               <p className="text-sm text-fg-muted">{course.accessDays ? t("accessDays", { days: course.accessDays }) : t("lifetimeAccess")}</p>
-              <BuyButton course={course} />
+              <BuyButton course={course} autoStart={autoBuy} />
             </div>
           )}
         </div>

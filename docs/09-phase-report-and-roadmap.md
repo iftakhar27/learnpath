@@ -217,6 +217,18 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Buy on website (9 Nov 2026)
+
+Owner's choice: the app has no checkout; courses are bought on the website. On a paid course the app shows **Buy on
+website** (and a short note): it gets a one-time sign-in code (2 minutes, single use, only its hash stored), opens the
+website's `/handoff` page, which signs the student in as their browser (never asking to sign the app out) and opens the
+course with Razorpay checkout already started; when the student returns to the app the course refreshes and shows as
+unlocked, and the website says "go back to the app". The Razorpay SDK was removed from the app. `WEB_PURCHASE=false`
+hides the button for a store build if Google or Apple object to pointing to outside payment (their policies restrict
+it for digital content). **Verified:** 2 backend tests (single use, expiry, sign-in required, one-browser rule with
+take-over), 1 browser test (handoff → course with checkout started → back-to-app note → link refused the second time),
+1 app test (opens the right link, no payment calls, unlocks on return).
+
 ### iOS build (6 Nov 2026)
 
 **Built:** `.github/workflows/ios.yml` builds the app on GitHub's macOS runners (Xcode 26.3, Swift 6.2.4; the newest

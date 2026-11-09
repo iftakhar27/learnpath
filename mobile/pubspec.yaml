@@ -41,7 +41,6 @@ dependencies:
   intl: ^0.20.3
   video_player: ^2.14.1
   url_launcher: ^6.3.3
-  razorpay_flutter: ^1.4.7
   flutter_localizations:
     sdk: flutter
   material_ui: ^1.10.0

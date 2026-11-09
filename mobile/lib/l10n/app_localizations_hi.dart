@@ -1097,4 +1097,16 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get backToTopic => 'विषय पर वापस जाएँ';
+
+  @override
+  String buyOnWebsite(Object price) {
+    return 'वेबसाइट पर खरीदें · $price';
+  }
+
+  @override
+  String get buyOnWebsiteHint =>
+      'सुरक्षित भुगतान के लिए हमारी वेबसाइट खुलेगी। भुगतान के बाद ऐप पर लौटें, कोर्स अपने-आप खुल जाएगा।';
+
+  @override
+  String get notForSaleInApp => 'यह कोर्स ऐप में नहीं खरीदा जा सकता।';
 }

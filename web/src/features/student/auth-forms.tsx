@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { rawFetch } from "@/lib/api/client";
+import { ApiError, rawFetch } from "@/lib/api/client";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
@@ -215,6 +215,78 @@ function MobileSignIn({ next }: { next: string | null }) {
         )}
       </p>
     </form>
+  );
+}
+
+/**
+ * Opened by the app ("Buy on website") with a one-time code: signs the student in here and continues to `next`
+ * (e.g. the course with checkout open). The code is used once; an expired one falls back to the sign-in page.
+ */
+export function StudentHandoff() {
+  const t = useT();
+  const router = useRouter();
+  const params = useSearchParams();
+  const code = params.get("code") ?? "";
+  const next = safeNext(params.get("next"));
+  const [error, setError] = useState<unknown>(null);
+  const [expired, setExpired] = useState(!code);
+  const [other, setOther] = useState<OtherDevice | null>(null);
+  const [takingOver, setTakingOver] = useState(false);
+  const started = useRef(false);
+
+  const redeem = async (takeOver: boolean) => {
+    try {
+      enter(await post("/api/session/handoff", { code, takeOver }), next);
+    } catch (e) {
+      const device = otherDevice(e);
+      if (device && !takeOver) return setOther(device);
+      if (e instanceof ApiError && e.code === "handoff_invalid") return setExpired(true);
+      setError(e);
+    }
+  };
+
+  useEffect(() => {
+    if (started.current || !code) return;
+    started.current = true;
+    void redeem(false);
+    // Runs once per visit: the code is single-use.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const signInHref = `/login?next=${encodeURIComponent(next)}`;
+  return (
+    <AuthLayout title={expired ? t("signIn") : t("handoffSigningIn")}>
+      {expired ? (
+        <div className="space-y-4">
+          <p>{t("handoffExpired")}</p>
+          <Link href={signInHref} className="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-fg hover:bg-primary-hover">
+            {t("signIn")}
+          </Link>
+        </div>
+      ) : error ? (
+        <div className="space-y-4">
+          <StudentError error={error} onRetry={() => (setError(null), void redeem(false))} />
+          <Link href={signInHref} className="text-sm font-medium text-primary hover:underline">
+            {t("signIn")}
+          </Link>
+        </div>
+      ) : (
+        <p role="status" className="text-fg-muted">
+          {t("loading")}
+        </p>
+      )}
+      <TakeOverDialog
+        device={other}
+        busy={takingOver}
+        onContinue={async () => {
+          setTakingOver(true);
+          await redeem(true);
+          setTakingOver(false);
+          setOther(null);
+        }}
+        onCancel={() => router.push(signInHref)}
+      />
+    </AuthLayout>
   );
 }
 

@@ -8,7 +8,9 @@ import '../../core/api/models.g.dart';
 import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
-import '../payments/checkout.dart';
+import '../../core/config.dart';
+import '../home/home_screen.dart';
+import '../payments/buy_on_website.dart';
 import '../doubts/doubt_screens.dart';
 import 'quiz_screen.dart';
 
@@ -202,7 +204,16 @@ class CourseScreen extends ConsumerWidget {
                       child: Text(l.enrollFree),
                     )
                   else ...[
-                    BuyButton(course: d.course, onPurchased: () => ref.invalidate(courseProvider(courseId))),
+                    if (AppConfig.webPurchase)
+                      BuyOnWebsiteButton(
+                        course: d.course,
+                        onReturn: () {
+                          ref.invalidate(courseProvider(courseId));
+                          ref.invalidate(dashboardProvider);
+                        },
+                      )
+                    else
+                      Text(l.notForSaleInApp),
                     const SizedBox(height: 6),
                     Text(d.course.accessDays == null ? l.lifetimeAccess : l.accessDays(d.course.accessDays!), style: Theme.of(context).textTheme.bodySmall),
                   ],

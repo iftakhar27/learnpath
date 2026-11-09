@@ -1098,4 +1098,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backToTopic => 'Back to topic';
+
+  @override
+  String buyOnWebsite(Object price) {
+    return 'Buy on website · $price';
+  }
+
+  @override
+  String get buyOnWebsiteHint =>
+      'Opens our website to pay securely. Come back to the app afterwards: the course unlocks by itself.';
+
+  @override
+  String get notForSaleInApp => 'This course can\'t be bought in the app.';
 }

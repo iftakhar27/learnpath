@@ -1933,6 +1933,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to topic'**
   String get backToTopic;
+
+  /// No description provided for @buyOnWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy on website · {price}'**
+  String buyOnWebsite(Object price);
+
+  /// No description provided for @buyOnWebsiteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens our website to pay securely. Come back to the app afterwards: the course unlocks by itself.'**
+  String get buyOnWebsiteHint;
+
+  /// No description provided for @notForSaleInApp.
+  ///
+  /// In en, this message translates to:
+  /// **'This course can\'t be bought in the app.'**
+  String get notForSaleInApp;
 }
 
 class _AppLocalizationsDelegate

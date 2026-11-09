@@ -545,5 +545,13 @@
       "percent": {}
     }
   },
-  "backToTopic": "Back to topic"
+  "backToTopic": "Back to topic",
+  "buyOnWebsite": "Buy on website · {price}",
+  "@buyOnWebsite": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "buyOnWebsiteHint": "Opens our website to pay securely. Come back to the app afterwards: the course unlocks by itself.",
+  "notForSaleInApp": "This course can't be bought in the app."
 }

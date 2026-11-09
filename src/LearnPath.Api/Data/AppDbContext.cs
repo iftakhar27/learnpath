@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<UserSession> UserSessions => Set<UserSession>();
     public DbSet<OtpCode> OtpCodes => Set<OtpCode>();
+    public DbSet<SignInHandoff> SignInHandoffs => Set<SignInHandoff>();
     public DbSet<StudentProfile> StudentProfiles => Set<StudentProfile>();
     public DbSet<ConsentRecord> ConsentRecords => Set<ConsentRecord>();
 
@@ -84,6 +85,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         });
         b.Entity<OtpCode>(e => e.HasIndex(x => new { x.Phone, x.CreatedAt }));
+        b.Entity<SignInHandoff>(e =>
+        {
+            e.HasIndex(x => x.CodeHash).IsUnique();
+            e.Property(x => x.CodeHash).HasMaxLength(64);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
         b.Entity<StudentProfile>(e =>
         {
             e.HasKey(x => x.UserId);

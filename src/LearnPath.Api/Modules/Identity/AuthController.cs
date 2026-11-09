@@ -26,6 +26,9 @@ public record OtpRequest([Required] string Phone);
 public record OtpVerifyRequest([Required] string Phone, [Required, StringLength(6, MinimumLength = 6)] string Code, string? FullName, bool AcceptTerms,
     [MaxLength(16)] string? DeviceSlot = null, [MaxLength(100)] string? DeviceName = null, [MaxLength(200)] string? DeviceId = null, bool? TakeOver = null);
 public record RefreshRequest([Required] string RefreshToken);
+public record HandoffDto(string Code, DateTimeOffset ExpiresAt);
+public record HandoffRedeemRequest([Required, MaxLength(100)] string Code,
+    [MaxLength(16)] string? DeviceSlot = null, [MaxLength(100)] string? DeviceName = null, [MaxLength(200)] string? DeviceId = null, bool? TakeOver = null);
 
 [ApiController]
 [Route("api/v1/auth")]
@@ -137,6 +140,42 @@ public partial class AuthController(AppDbContext db, TokenService tokens, Sessio
 
     [HttpPost("refresh")]
     public async Task<ActionResult<AuthTokens>> Refresh(RefreshRequest req, CancellationToken ct) => Ok(await tokens.RefreshAsync(req.RefreshToken, Device(null, null, null), ct));
+
+    /// <summary>How long a website sign-in code from the app stays valid.</summary>
+    public static readonly TimeSpan HandoffLifetime = TimeSpan.FromMinutes(2);
+
+    /// <summary>
+    /// The app asks for a one-time code, then opens the website with it (e.g. to buy a course), so the student arrives
+    /// signed in. The website exchanges it with <see cref="RedeemHandoff"/> as a normal browser sign-in.
+    /// </summary>
+    [Authorize]
+    [HttpPost("handoff")]
+    public async Task<HandoffDto> CreateHandoff(CancellationToken ct)
+    {
+        var now = clock.GetUtcNow();
+        var code = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        var handoff = new SignInHandoff { UserId = User.UserId(), CodeHash = Hashing.Sha256(code), CreatedAt = now, ExpiresAt = now + HandoffLifetime };
+        db.SignInHandoffs.Add(handoff);
+        await db.SaveChangesAsync(ct);
+        return new HandoffDto(code, handoff.ExpiresAt);
+    }
+
+    /// <summary>Signs in with a code from <see cref="CreateHandoff"/>. Single use; the one-person-per-account rules apply.</summary>
+    [HttpPost("handoff/redeem")]
+    public async Task<ActionResult<AuthTokens>> RedeemHandoff(HandoffRedeemRequest req, CancellationToken ct)
+    {
+        var now = clock.GetUtcNow();
+        var handoff = await db.SignInHandoffs.FirstOrDefaultAsync(h => h.CodeHash == Hashing.Sha256(req.Code), ct);
+        if (handoff is null || handoff.UsedAt != null || handoff.ExpiresAt <= now)
+            throw AppException.BadRequest("handoff_invalid", "This sign-in link has expired. Please sign in.");
+        var user = await db.Users.Include(u => u.Roles).FirstAsync(u => u.Id == handoff.UserId, ct);
+        if (user.Status != UserStatus.Active) throw new AppException(403, "account_inactive", "This account is not active. Contact support.");
+        // May ask to confirm taking over another browser; the code stays valid for that retry.
+        var session = await sessions.StartAsync(user, Device(req.DeviceSlot, req.DeviceName, req.DeviceId), req.TakeOver == true, ct);
+        handoff.UsedAt = now;
+        await db.SaveChangesAsync(ct);
+        return Ok(await tokens.IssueAsync(user, session, ct));
+    }
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(RefreshRequest req, CancellationToken ct)

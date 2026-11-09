@@ -74,6 +74,12 @@ open, and admins grant access instead. To take **test-mode** payments (no real m
    UPI ID `success@razorpay`, or card `4111 1111 1111 1111` (any future expiry, any CVV) and choose **Success** on the
    test bank page. The course unlocks straight away; the payment and the webhook delivery appear in the dashboard.
 
+**Buying from the app:** the Android app has no checkout of its own. "Buy on website" opens the website signed in (a
+one-time code) with checkout already open, and the course unlocks in the app when the student returns. App builds need
+the website address: `--dart-define=WEB_BASE_URL=https://<admin-service>.onrender.com` (the GitHub Android build passes
+it). Google Play and the App Store restrict pointing to outside payment for digital content; for a store build that must
+comply, add `--dart-define=WEB_PURCHASE=false` to hide the button.
+
 Access is granted only after the API verifies Razorpay's signature (from the checkout, or from the webhook if the
 browser closed early); both paths are idempotent. If order creation fails, the API logs Razorpay's reason
 (`Razorpay order creation failed (401): Authentication failed` for wrong keys). For real money later, repeat with

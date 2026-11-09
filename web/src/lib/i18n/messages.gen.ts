@@ -306,7 +306,10 @@ export const appMessages = {
     "quizResult": "Quiz result",
     "quizPassedBody": "Well done! You passed this topic's quiz.",
     "quizFailedBody": "You need {percent}% to pass. Revise the lessons and try again.",
-    "backToTopic": "Back to topic"
+    "backToTopic": "Back to topic",
+    "buyOnWebsite": "Buy on website · {price}",
+    "buyOnWebsiteHint": "Opens our website to pay securely. Come back to the app afterwards: the course unlocks by itself.",
+    "notForSaleInApp": "This course can't be bought in the app."
   },
   "hi": {
     "appTagline": "NEET, JEE और बोर्ड परीक्षाओं की तैयारी करें",
@@ -614,6 +617,9 @@ export const appMessages = {
     "quizResult": "क्विज़ परिणाम",
     "quizPassedBody": "शाबाश! आपने इस टॉपिक का क्विज़ पास कर लिया।",
     "quizFailedBody": "पास होने के लिए {percent}% चाहिए। पाठ दोहराएँ और फिर कोशिश करें।",
-    "backToTopic": "विषय पर वापस जाएँ"
+    "backToTopic": "विषय पर वापस जाएँ",
+    "buyOnWebsite": "वेबसाइट पर खरीदें · {price}",
+    "buyOnWebsiteHint": "सुरक्षित भुगतान के लिए हमारी वेबसाइट खुलेगी। भुगतान के बाद ऐप पर लौटें, कोर्स अपने-आप खुल जाएगा।",
+    "notForSaleInApp": "यह कोर्स ऐप में नहीं खरीदा जा सकता।"
   }
 } as const;

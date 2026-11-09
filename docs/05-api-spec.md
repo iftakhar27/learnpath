@@ -56,6 +56,14 @@ clear a response with `"response": null`.
    `X-Razorpay-Signature` and de-duplicated by `X-Razorpay-Event-Id`. Whichever arrives first grants access; the other is a no-op.
    Configure the webhook URL and secret in the Razorpay dashboard.
 
+## Buying from the app ("Buy on website")
+
+The apps take no payments. On a paid course the app calls `POST /auth/handoff` (signed in) → `{code, expiresAt}` (valid
+2 minutes, single use) and opens `<website>/handoff?code=…&next=/learn/{courseId}?buy=1&from=app` in the browser. The
+website exchanges the code with `POST /auth/handoff/redeem {code, deviceSlot:"browser", deviceId, takeOver?}` → the same
+tokens as a sign-in (the one-browser rule applies: `409 session_active`, retry with `takeOver`; `400 handoff_invalid`
+when used or expired), then opens the course with Razorpay checkout started. Back in the app, the course is refreshed.
+
 ## Topic quiz
 
 A short quiz at the end of each topic: up to `Topic.QuizQuestionCount` (default 5, set per topic in the admin portal;
@@ -147,6 +155,8 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `GET` | `/api/v1/attempts/{attemptId}/results` |
 | `POST` | `/api/v1/attempts/{attemptId}/submit` |
 | `POST` | `/api/v1/auth/change-password` |
+| `POST` | `/api/v1/auth/handoff` |
+| `POST` | `/api/v1/auth/handoff/redeem` |
 | `POST` | `/api/v1/auth/login` |
 | `POST` | `/api/v1/auth/logout` |
 | `POST` | `/api/v1/auth/otp/request` |

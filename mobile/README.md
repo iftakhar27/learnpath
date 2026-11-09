@@ -25,7 +25,7 @@ The backend must be running (see the root README). Development sample login: any
 ## Build
 
 ```bash
-flutter build apk --release --dart-define=API_BASE_URL=https://api.example.com      # Android APK
+flutter build apk --release --dart-define=API_BASE_URL=https://api.example.com --dart-define=WEB_BASE_URL=https://www.example.com  # Android APK
 flutter build appbundle --release --dart-define=API_BASE_URL=https://api.example.com # Play Store
 flutter build ipa --release --dart-define=API_BASE_URL=https://api.example.com      # iOS (needs macOS + Xcode)
 ```
@@ -34,11 +34,21 @@ Release builds are currently signed with the debug key so they install for testi
 upload keystore and configure `android/key.properties` / `signingConfigs` (see Flutter's "Build and release an Android
 app"), and change `applicationId` (`com.learnpath.app`) to your own.
 
+### Buying courses
+
+The app takes no payments itself. On a paid course, **Buy on website** gets a one-time sign-in code from the API
+(`POST /auth/handoff`), opens the website's `/handoff` page in the browser (signed in, then the course with Razorpay
+checkout already open) and, when the student comes back, refreshes the course so it shows as unlocked. Store policies:
+Google Play and the App Store restrict pointing to outside payment for digital content; a store build can hide the
+button with `--dart-define=WEB_PURCHASE=false` (the course then says it can't be bought in the app).
+
 ### Build-time settings (`--dart-define`)
 
 | Key | Default | Purpose |
 |---|---|---|
 | `API_BASE_URL` | `http://10.0.2.2:5080` | Backend URL without `/api/v1`. Must be HTTPS outside development |
+| `WEB_BASE_URL` | `http://10.0.2.2:3000` | Student website, where "Buy on website" goes (staging: `https://learnpath-admin.onrender.com`) |
+| `WEB_PURCHASE` | `true` | Show "Buy on website" on paid courses; `false` for a store build that must not point to outside payment |
 | `BRAND_NAME` | `LearnPath` | Product name shown in the app |
 | `PRIVACY_URL`, `TERMS_URL` | example.com | Legal pages opened from the app |
 | `ENABLE_SEMANTICS` | `false` | Forces the accessibility tree on (used for browser-driven demos) |
