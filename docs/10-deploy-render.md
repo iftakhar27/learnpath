@@ -110,6 +110,25 @@ The API still generates, stores (hashed) and checks every code; MSG91 only deliv
 credit, wrong template, outage) the student sees "We couldn't send the code right now" and can ask again at once, and the
 reason is in the API's logs (`MSG91 SendOTP failed`). Codes are never written to the logs.
 
+## Password reset emails (Brevo)
+
+"Forgot password?" (website, admin sign-in and the app) emails a link to the website's `/reset-password` page; it works
+once, for 30 minutes. Staging starts with `Email:Provider=log`: nothing is sent, and each email (with its link) is
+written to **learnpath-api → Logs** (search for "Reset your") and kept for staff at `GET /api/v1/admin/test-emails`.
+To send real emails (Render's free plan blocks outgoing SMTP, so this uses Brevo's HTTPS API):
+
+1. Create a free account at [Brevo](https://www.brevo.com) (300 emails a day on the free plan).
+2. **Senders, Domains & Dedicated IPs → Senders → Add a sender:** enter the address emails should come from (e.g. your
+   Gmail) and confirm the code Brevo sends to it. A domain of your own (verified in Brevo) gives better delivery later.
+3. **SMTP & API → API Keys → Generate a new API key.** Copy it.
+4. **Render → learnpath-api → Environment:** add `Email__Provider` = `brevo`, `Email__FromEmail` = the verified sender,
+   `Email__Brevo__ApiKey` = the key, then **Save and deploy**. The API refuses to start if either value is missing.
+5. Try "Forgot password?" with your email. If nothing arrives, check the spam folder, then the API's Logs for
+   `Brevo send failed` with Brevo's reason.
+
+Links point to `Web:BaseUrl` (staging: `https://learnpath-admin.onrender.com`, in `appsettings.Staging.json`; set
+`Web__BaseUrl` in Render if the website moves).
+
 ## Video lessons
 
 On staging the sample lessons play a **public demo stream** (Big Buck Bunny, an open-licence film, from Mux's public

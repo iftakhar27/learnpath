@@ -2408,6 +2408,18 @@ class ExamUpsert {
 }
 
 @immutable
+class ForgotPasswordRequest {
+  const ForgotPasswordRequest({required this.email});
+
+  factory ForgotPasswordRequest.fromJson(Map<String, dynamic> json) =>
+      ForgotPasswordRequest(email: json['email'] as String);
+
+  final String email;
+
+  Map<String, dynamic> toJson() => {'email': email};
+}
+
+@immutable
 class GrantEnrollmentRequest {
   const GrantEnrollmentRequest({required this.courseId, this.reason});
 
@@ -4049,6 +4061,19 @@ class ReportResolveRequest {
 }
 
 @immutable
+class ResetPasswordRequest {
+  const ResetPasswordRequest({required this.token, required this.newPassword});
+
+  factory ResetPasswordRequest.fromJson(Map<String, dynamic> json) =>
+      ResetPasswordRequest(token: json['token'] as String, newPassword: json['newPassword'] as String);
+
+  final String token;
+  final String newPassword;
+
+  Map<String, dynamic> toJson() => {'token': token, 'newPassword': newPassword};
+}
+
+@immutable
 class ResetPasswordResultDto {
   const ResetPasswordResultDto({required this.temporaryPassword});
 
@@ -4682,6 +4707,25 @@ class TestDetailDto {
     'sections': sections.map((x) => x).toList(),
     'negativeMarksPerWrong': ?negativeMarksPerWrong,
   };
+}
+
+@immutable
+class TestEmailDto {
+  const TestEmailDto({required this.to, required this.subject, required this.text, required this.sentAt});
+
+  factory TestEmailDto.fromJson(Map<String, dynamic> json) => TestEmailDto(
+    to: json['to'] as String,
+    subject: json['subject'] as String,
+    text: json['text'] as String,
+    sentAt: DateTime.parse(json['sentAt'] as String),
+  );
+
+  final String to;
+  final String subject;
+  final String text;
+  final DateTime sentAt;
+
+  Map<String, dynamic> toJson() => {'to': to, 'subject': subject, 'text': text, 'sentAt': sentAt.toIso8601String()};
 }
 
 @immutable

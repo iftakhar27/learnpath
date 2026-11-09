@@ -559,5 +559,16 @@
   "newPassword": "New password",
   "confirmNewPassword": "Confirm new password",
   "passwordsDontMatch": "The passwords don't match",
-  "passwordChangedToast": "Password changed. Other devices were signed out."
+  "passwordChangedToast": "Password changed. Other devices were signed out.",
+  "forgotPassword": "Forgot password?",
+  "forgotPasswordTitle": "Reset your password",
+  "forgotPasswordBody": "Enter the email you signed up with. We'll send you a link to choose a new password.",
+  "sendResetLink": "Send reset link",
+  "resetLinkSent": "If an account exists for {email}, we've sent a link to choose a new password. Check your inbox and spam folder; the link works for 30 minutes.",
+  "@resetLinkSent": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "backToSignIn": "Back to sign in"
 }

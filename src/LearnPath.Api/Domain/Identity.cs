@@ -115,6 +115,17 @@ public class SignInHandoff
     public DateTimeOffset? UsedAt { get; set; }
 }
 
+/// <summary>A "forgot password" link sent by email: single use, short-lived; only its hash is stored.</summary>
+public class PasswordResetToken
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
+    public string TokenHash { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+    public DateTimeOffset? UsedAt { get; set; }
+}
+
 public class StudentProfile
 {
     public Guid UserId { get; set; }

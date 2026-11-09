@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ApiError, rawFetch } from "@/lib/api/client";
+import { ApiError, api, rawFetch, unwrap } from "@/lib/api/client";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
@@ -90,6 +90,11 @@ function EmailSignIn({ next }: { next: string | null }) {
       <Field label={t("password")} error={formState.errors.password?.message}>
         <Input type="password" autoComplete="current-password" aria-invalid={!!formState.errors.password} {...register("password", { required: t("fieldRequired") })} />
       </Field>
+      <div className="-mt-2 text-right">
+        <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">
+          {t("forgotPassword")}
+        </Link>
+      </div>
       <Button type="submit" className="w-full" loading={formState.isSubmitting}>
         {t("signIn")}
       </Button>
@@ -286,6 +291,129 @@ export function StudentHandoff() {
         }}
         onCancel={() => router.push(signInHref)}
       />
+    </AuthLayout>
+  );
+}
+
+/** "Forgot password?": emails a link (the answer is the same whether or not the email has an account). */
+export function StudentForgotPassword() {
+  const t = useT();
+  const params = useSearchParams();
+  const admin = params.get("admin") === "1";
+  const signInHref = admin ? "/admin/login" : "/login";
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
+  const { register, handleSubmit, formState } = useForm<{ email: string }>();
+  const submit = handleSubmit(async ({ email }) => {
+    setError(null);
+    try {
+      await unwrap(api.POST("/api/v1/auth/password/forgot", { body: { email: email.trim() } }));
+      setSentTo(email.trim());
+    } catch (e) {
+      setError(e);
+    }
+  });
+  const back = (
+    <Link href={signInHref} className="text-sm font-medium text-primary hover:underline">
+      {t("backToSignIn")}
+    </Link>
+  );
+  return (
+    <AuthLayout title={t("forgotPasswordTitle")} subtitle={sentTo ? undefined : t("forgotPasswordBody")} footer={back}>
+      {sentTo ? (
+        <p role="status" className="rounded-lg bg-success-soft px-3 py-2 text-sm">
+          {t("resetLinkSent", { email: sentTo })}
+        </p>
+      ) : (
+        <form onSubmit={submit} className="space-y-4" noValidate>
+          <StudentError error={error} />
+          <Field label={t("email")} error={formState.errors.email?.message}>
+            <Input
+              type="email"
+              autoComplete="username"
+              autoFocus
+              aria-invalid={!!formState.errors.email}
+              {...register("email", { required: t("fieldRequired"), pattern: { value: EMAIL, message: t("invalidEmail") } })}
+            />
+          </Field>
+          <Button type="submit" className="w-full" loading={formState.isSubmitting}>
+            {t("sendResetLink")}
+          </Button>
+        </form>
+      )}
+    </AuthLayout>
+  );
+}
+
+/** The page the emailed link opens: choose a new password (the link works once, for 30 minutes). */
+export function StudentResetPassword() {
+  const t = useT();
+  const params = useSearchParams();
+  const token = params.get("token") ?? "";
+  const [done, setDone] = useState(false);
+  const [invalid, setInvalid] = useState(!token);
+  const [error, setError] = useState<unknown>(null);
+  const { register, handleSubmit, formState, getValues } = useForm<{ password: string; confirm: string }>();
+  const submit = handleSubmit(async ({ password }) => {
+    setError(null);
+    try {
+      await unwrap(api.POST("/api/v1/auth/password/reset", { body: { token, newPassword: password } }));
+      setDone(true);
+    } catch (e) {
+      if (e instanceof ApiError && e.code === "reset_invalid") setInvalid(true);
+      else setError(e);
+    }
+  });
+  return (
+    <AuthLayout title={t("resetPasswordTitle")}>
+      {done ? (
+        <div className="space-y-4">
+          <p role="status" className="rounded-lg bg-success-soft px-3 py-2 text-sm">
+            {t("resetPasswordDone")}
+          </p>
+          <Link href="/login" className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-fg hover:bg-primary-hover">
+            {t("signIn")}
+          </Link>
+          <p className="text-center">
+            <Link href="/admin/login" className="text-sm text-fg-muted hover:underline">
+              {t("adminSignIn")}
+            </Link>
+          </p>
+        </div>
+      ) : invalid ? (
+        <div className="space-y-4">
+          <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
+            {t("resetLinkInvalid")}
+          </p>
+          <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">
+            {t("forgotPassword")}
+          </Link>
+        </div>
+      ) : (
+        <form onSubmit={submit} className="space-y-4" noValidate>
+          <StudentError error={error} />
+          <Field label={t("newPassword")} error={formState.errors.password?.message}>
+            <Input
+              type="password"
+              autoComplete="new-password"
+              autoFocus
+              aria-invalid={!!formState.errors.password}
+              {...register("password", { required: t("fieldRequired"), minLength: { value: 8, message: t("passwordTooShort") } })}
+            />
+          </Field>
+          <Field label={t("confirmNewPassword")} error={formState.errors.confirm?.message}>
+            <Input
+              type="password"
+              autoComplete="new-password"
+              aria-invalid={!!formState.errors.confirm}
+              {...register("confirm", { validate: (v) => v === getValues("password") || t("passwordsDontMatch") })}
+            />
+          </Field>
+          <Button type="submit" className="w-full" loading={formState.isSubmitting}>
+            {t("save")}
+          </Button>
+        </form>
+      )}
     </AuthLayout>
   );
 }

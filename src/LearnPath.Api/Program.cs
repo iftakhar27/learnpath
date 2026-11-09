@@ -63,6 +63,29 @@ else
     builder.Services.AddSingleton<TestOtpOutbox>(); // read by GET /api/v1/admin/test-otp-codes
     builder.Services.AddSingleton<IOtpSender, LoggingOtpSender>();
 }
+// Email (password reset links): "disabled" sends nothing, "log" (test servers) writes emails to the log and the staff
+// outbox, "brevo" sends through Brevo's HTTPS API (Render's free plan blocks outbound SMTP).
+// An empty value (e.g. a blank dashboard variable) counts as unset: test servers log, Production sends nothing.
+var emailProvider = config["Email:Provider"] is { } ep && !string.IsNullOrWhiteSpace(ep) ? ep.Trim().ToLowerInvariant()
+    : builder.Environment.IsProduction() ? "disabled" : "log";
+if (emailProvider is not ("disabled" or "log" or "brevo"))
+    throw new InvalidOperationException($"Email:Provider '{emailProvider}' is not supported. Use 'brevo', 'disabled', or 'log' outside Production.");
+if (emailProvider == "brevo" && (string.IsNullOrWhiteSpace(config["Email:Brevo:ApiKey"]) || string.IsNullOrWhiteSpace(config["Email:FromEmail"])))
+    throw new InvalidOperationException("Email:Provider is 'brevo' but Email:Brevo:ApiKey or Email:FromEmail is not set.");
+if (emailProvider != "disabled" && string.IsNullOrWhiteSpace(config["Web:BaseUrl"]))
+    throw new InvalidOperationException("Web:BaseUrl (the student website, e.g. https://learnpath-admin.onrender.com) is needed for links in emails.");
+if (builder.Environment.IsProduction() && emailProvider == "log")
+    throw new InvalidOperationException("The logging email sender is not allowed in Production.");
+builder.Services.Configure<EmailOptions>(config.GetSection("Email"));
+if (emailProvider == "brevo")
+    builder.Services.AddHttpClient<IEmailSender, BrevoEmailSender>(c => { c.BaseAddress = new Uri(BrevoEmailSender.BaseUrl); c.Timeout = TimeSpan.FromSeconds(15); })
+        .RemoveAllLoggers();
+else if (emailProvider == "log")
+{
+    builder.Services.AddSingleton<TestEmailOutbox>(); // read by GET /api/v1/admin/test-emails
+    builder.Services.AddSingleton<IEmailSender, LogEmailSender>();
+}
+else builder.Services.AddSingleton<IEmailSender, DisabledEmailSender>();
 builder.Services.AddSingleton<IVideoUrlSigner, BunnyVideoUrlSigner>();
 builder.Services.AddSingleton<IDocumentUrlSigner, HmacDocumentUrlSigner>();
 

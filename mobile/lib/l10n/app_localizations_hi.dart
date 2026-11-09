@@ -1128,4 +1128,25 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get passwordChangedToast =>
       'पासवर्ड बदल गया। दूसरे डिवाइस से साइन आउट कर दिया गया है।';
+
+  @override
+  String get forgotPassword => 'पासवर्ड भूल गए?';
+
+  @override
+  String get forgotPasswordTitle => 'अपना पासवर्ड रीसेट करें';
+
+  @override
+  String get forgotPasswordBody =>
+      'वह ईमेल डालें जिससे आपने अकाउंट बनाया था। हम नया पासवर्ड चुनने का लिंक भेजेंगे।';
+
+  @override
+  String get sendResetLink => 'रीसेट लिंक भेजें';
+
+  @override
+  String resetLinkSent(Object email) {
+    return 'अगर $email का अकाउंट है, तो हमने नया पासवर्ड चुनने का लिंक भेज दिया है। इनबॉक्स और स्पैम फ़ोल्डर देखें; लिंक 30 मिनट तक काम करेगा।';
+  }
+
+  @override
+  String get backToSignIn => 'साइन इन पर वापस जाएँ';
 }

@@ -47,6 +47,8 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Razorpay:KeySecret", KeySecret);
         builder.UseSetting("Razorpay:WebhookSecret", WebhookSecret);
         builder.UseSetting("Otp:Provider", "log");
+        builder.UseSetting("Email:Provider", "log");
+        builder.UseSetting("Web:BaseUrl", "https://web.test");
         builder.UseSetting("RateLimit:AuthPerMinute", "10000");
         builder.ConfigureServices(s =>
         {

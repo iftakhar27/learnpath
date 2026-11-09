@@ -1987,6 +1987,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password changed. Other devices were signed out.'**
   String get passwordChangedToast;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your password'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email you signed up with. We\'ll send you a link to choose a new password.'**
+  String get forgotPasswordBody;
+
+  /// No description provided for @sendResetLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset link'**
+  String get sendResetLink;
+
+  /// No description provided for @resetLinkSent.
+  ///
+  /// In en, this message translates to:
+  /// **'If an account exists for {email}, we\'ve sent a link to choose a new password. Check your inbox and spam folder; the link works for 30 minutes.'**
+  String resetLinkSent(Object email);
+
+  /// No description provided for @backToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to sign in'**
+  String get backToSignIn;
 }
 
 class _AppLocalizationsDelegate

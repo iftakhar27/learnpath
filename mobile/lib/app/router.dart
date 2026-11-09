@@ -17,7 +17,7 @@ import '../features/tests/test_screens.dart';
 import '../widgets/common.dart';
 
 final _rootKey = GlobalKey<NavigatorState>();
-const _publicRoutes = {'/welcome', '/login', '/register', '/otp'};
+const _publicRoutes = {'/welcome', '/login', '/register', '/otp', '/forgot-password'};
 
 /// Bridges session changes into go_router's redirect.
 class _SessionListenable extends ChangeNotifier {
@@ -50,6 +50,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
       GoRoute(path: '/otp', builder: (_, _) => const OtpScreen()),
+      GoRoute(path: '/forgot-password', builder: (_, s) => ForgotPasswordScreen(email: s.extra is String ? s.extra! as String : null)),
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => _HomeShell(shell: shell),

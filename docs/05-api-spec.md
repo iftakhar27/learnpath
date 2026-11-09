@@ -64,6 +64,15 @@ website exchanges the code with `POST /auth/handoff/redeem {code, deviceSlot:"br
 tokens as a sign-in (the one-browser rule applies: `409 session_active`, retry with `takeOver`; `400 handoff_invalid`
 when used or expired), then opens the course with Razorpay checkout started. Back in the app, the course is refreshed.
 
+## Forgotten passwords
+
+- `POST /auth/password/forgot {email}` → `202` whether or not the email has an account. If it does, an email with a link
+  to `<website>/reset-password?token=…` is sent (single use, 30 minutes; at most one a minute and five an hour).
+- `POST /auth/password/reset {token, newPassword}` → `204`; every device is signed out. `400 reset_invalid` when the link
+  was used or expired.
+- Staff: `POST /admin/users/{id}/reset-password` → `{temporaryPassword}` (shown once); signed-in users change theirs
+  with `POST /auth/change-password` (this device stays signed in, others are signed out).
+
 ## Topic quiz
 
 A short quiz at the end of each topic: up to `Topic.QuizQuestionCount` (default 5, set per topic in the admin portal;
@@ -131,6 +140,7 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/admin/subjects` |
 | `PUT` | `/api/v1/admin/subjects/{id}` |
 | `DELETE` | `/api/v1/admin/subjects/{id}` |
+| `GET` | `/api/v1/admin/test-emails` |
 | `GET` | `/api/v1/admin/test-otp-codes` |
 | `GET` | `/api/v1/admin/tests` |
 | `POST` | `/api/v1/admin/tests` |
@@ -162,6 +172,8 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/auth/logout` |
 | `POST` | `/api/v1/auth/otp/request` |
 | `POST` | `/api/v1/auth/otp/verify` |
+| `POST` | `/api/v1/auth/password/forgot` |
+| `POST` | `/api/v1/auth/password/reset` |
 | `POST` | `/api/v1/auth/refresh` |
 | `POST` | `/api/v1/auth/register` |
 | `GET` | `/api/v1/config` |

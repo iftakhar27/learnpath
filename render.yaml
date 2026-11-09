@@ -65,6 +65,8 @@ services:
         sync: false
       - key: Otp__Msg91__TemplateId                 # MSG91 OTP template id (DLT-approved, contains ##OTP##)
         sync: false
+      # Password reset emails: staging writes them to the Logs (appsettings.Staging.json). To send real email, add these
+      # in the dashboard (Environment): Email__Provider=brevo, Email__FromEmail=<verified sender>, Email__Brevo__ApiKey.
       - key: Branding__ProductName
         value: LearnPath
 

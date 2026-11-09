@@ -3254,6 +3254,84 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/password/forgot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ForgotPasswordRequest"];
+                    "text/json": components["schemas"]["ForgotPasswordRequest"];
+                    "application/*+json": components["schemas"]["ForgotPasswordRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ResetPasswordRequest"];
+                    "text/json": components["schemas"]["ResetPasswordRequest"];
+                    "application/*+json": components["schemas"]["ResetPasswordRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/payments/orders": {
         parameters: {
             query?: never;
@@ -3999,6 +4077,43 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/test-emails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TestEmailDto"][];
+                        "application/json": components["schemas"]["TestEmailDto"][];
+                        "text/json": components["schemas"]["TestEmailDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5189,6 +5304,9 @@ export interface components {
             /** Format: int32 */
             sortOrder?: number;
         };
+        ForgotPasswordRequest: {
+            email: string;
+        };
         GrantEnrollmentRequest: {
             /** Format: uuid */
             courseId: string;
@@ -5682,6 +5800,10 @@ export interface components {
         ReportResolveRequest: {
             status: string;
         };
+        ResetPasswordRequest: {
+            token: string;
+            newPassword: string;
+        };
         ResetPasswordResultDto: {
             temporaryPassword: string;
         };
@@ -5877,6 +5999,13 @@ export interface components {
             sections: string[];
             /** Format: double */
             negativeMarksPerWrong?: number | null;
+        };
+        TestEmailDto: {
+            to: string;
+            subject: string;
+            text: string;
+            /** Format: date-time */
+            sentAt: string;
         };
         TestOtpCodeDto: {
             phone: string;

@@ -315,7 +315,13 @@ export const appMessages = {
     "newPassword": "New password",
     "confirmNewPassword": "Confirm new password",
     "passwordsDontMatch": "The passwords don't match",
-    "passwordChangedToast": "Password changed. Other devices were signed out."
+    "passwordChangedToast": "Password changed. Other devices were signed out.",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Reset your password",
+    "forgotPasswordBody": "Enter the email you signed up with. We'll send you a link to choose a new password.",
+    "sendResetLink": "Send reset link",
+    "resetLinkSent": "If an account exists for {email}, we've sent a link to choose a new password. Check your inbox and spam folder; the link works for 30 minutes.",
+    "backToSignIn": "Back to sign in"
   },
   "hi": {
     "appTagline": "NEET, JEE और बोर्ड परीक्षाओं की तैयारी करें",
@@ -632,6 +638,12 @@ export const appMessages = {
     "newPassword": "नया पासवर्ड",
     "confirmNewPassword": "नए पासवर्ड की पुष्टि करें",
     "passwordsDontMatch": "पासवर्ड मेल नहीं खाते",
-    "passwordChangedToast": "पासवर्ड बदल गया। दूसरे डिवाइस से साइन आउट कर दिया गया है।"
+    "passwordChangedToast": "पासवर्ड बदल गया। दूसरे डिवाइस से साइन आउट कर दिया गया है।",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "forgotPasswordTitle": "अपना पासवर्ड रीसेट करें",
+    "forgotPasswordBody": "वह ईमेल डालें जिससे आपने अकाउंट बनाया था। हम नया पासवर्ड चुनने का लिंक भेजेंगे।",
+    "sendResetLink": "रीसेट लिंक भेजें",
+    "resetLinkSent": "अगर {email} का अकाउंट है, तो हमने नया पासवर्ड चुनने का लिंक भेज दिया है। इनबॉक्स और स्पैम फ़ोल्डर देखें; लिंक 30 मिनट तक काम करेगा।",
+    "backToSignIn": "साइन इन पर वापस जाएँ"
   }
 } as const;

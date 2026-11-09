@@ -183,7 +183,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 validator: (v) => v == null || v.isEmpty ? l.fieldRequired : null,
                 onFieldSubmitted: (_) => _submit(),
               ),
-              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => context.push('/forgot-password', extra: _email.text.trim()),
+                  child: Text(l.forgotPassword),
+                ),
+              ),
+              const SizedBox(height: 8),
               AsyncButton(onPressed: _submit, expand: true, child: Text(l.signIn)),
               const SizedBox(height: 8),
               TextButton(onPressed: () => context.pushReplacement('/register'), child: Text(l.newHereCreateAccount)),
@@ -454,5 +461,71 @@ Future<void> signInConfirmingTakeOver(BuildContext context, Future<void> Functio
       ),
     );
     if (ok == true) await signIn(true);
+  }
+}
+
+/// "Forgot password?": emails a link to choose a new password (it opens on the website). The answer is the same
+/// whether or not the email has an account.
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
+  const ForgotPasswordScreen({super.key, this.email});
+  final String? email;
+
+  @override
+  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+  final _form = GlobalKey<FormState>();
+  late final _email = TextEditingController(text: widget.email ?? '');
+  String? _sentTo;
+
+  @override
+  void dispose() {
+    _email.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return Scaffold(
+      appBar: AppBar(title: Text(l.forgotPasswordTitle)),
+      body: Form(
+        key: _form,
+        child: ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            if (_sentTo case final sent?) ...[
+              Text(l.resetLinkSent(sent), style: Theme.of(context).textTheme.bodyLarge),
+              const SizedBox(height: 24),
+              FilledButton(onPressed: () => context.pop(), child: Text(l.backToSignIn)),
+            ] else ...[
+              Text(l.forgotPasswordBody),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                autofillHints: const [AutofillHints.email],
+                decoration: InputDecoration(labelText: l.email),
+                validator: (v) => (v ?? '').trim().isEmpty
+                    ? l.fieldRequired
+                    : (RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(v!.trim()) ? null : l.invalidEmail),
+              ),
+              const SizedBox(height: 24),
+              AsyncButton(
+                expand: true,
+                onPressed: () async {
+                  if (!_form.currentState!.validate()) return;
+                  final email = _email.text.trim();
+                  await ref.read(apiProvider).forgotPassword(email);
+                  if (mounted) setState(() => _sentTo = email);
+                },
+                child: Text(l.sendResetLink),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -7,7 +7,7 @@ import { apiFetch, apiNotConfigured, apiStarting, applyAccessResult, isEdgeError
  */
 const BLOCKED_PREFIXES = [["auth"], ["payments", "webhooks"]];
 /** Exceptions under a blocked prefix: signed-in actions that return no tokens. */
-const ALLOWED_PATHS = ["auth/change-password"];
+const ALLOWED_PATHS = ["auth/change-password", "auth/password/forgot", "auth/password/reset"];
 const FORWARDED_REQUEST_HEADERS = ["content-type", "accept", "accept-language"];
 const FORWARDED_RESPONSE_HEADERS = ["content-type", "content-disposition", "cache-control"];
 

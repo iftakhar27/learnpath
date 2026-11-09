@@ -217,6 +217,17 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Forgot password by email (9 Nov 2026)
+
+"Forgot password?" on the website's student and admin sign-in pages and on the app's email sign-in emails a link to the
+website's **Choose a new password** page: single use, valid 30 minutes, only its hash stored, at most one email a minute
+and five an hour per account; the answer never reveals whether an email has an account; resetting signs out every
+device. Email goes through Brevo's HTTPS API (`Email:Provider=brevo`; Render's free plan blocks SMTP); staging defaults
+to `log` (emails in the API's Logs and a staff-only test outbox), and Production refuses `log`. The email is in English
+with a Hindi line. **Verified:** 3 backend tests, 2 browser tests (sign-in → forgot → link → new password → sign in →
+link refused the second time; admin sign-in link), 1 app test. **To do by the owner:** a Brevo account and key (steps in
+`10-deploy-render.md`).
+
 ### Password reset by staff, and change password (9 Nov 2026)
 
 There was no way to recover a forgotten password. Now **Admin → Students → (student) → Reset password** sets a

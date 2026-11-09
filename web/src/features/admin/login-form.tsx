@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -45,6 +46,11 @@ export function LoginForm() {
       <Field label="Password" htmlFor="password" error={formState.errors.password?.message}>
         <Input id="password" type="password" autoComplete="current-password" {...register("password", { required: "Enter your password" })} aria-invalid={!!formState.errors.password} />
       </Field>
+      <div className="-mt-2 text-right">
+        <Link href="/forgot-password?admin=1" className="text-sm font-medium text-primary hover:underline">
+          Forgot password?
+        </Link>
+      </div>
       <Button type="submit" className="w-full" loading={formState.isSubmitting}>
         Sign in
       </Button>

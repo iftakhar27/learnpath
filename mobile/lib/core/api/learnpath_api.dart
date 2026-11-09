@@ -110,6 +110,10 @@ class LearnPathApi {
     );
   }
 
+  /// Emails a reset link if the address has an account (the answer is the same either way).
+  Future<void> forgotPassword(String email) =>
+      _send(() => _dio.post('/auth/password/forgot', data: ForgotPasswordRequest(email: email).toJson()));
+
   /// Other devices are signed out; this one stays signed in.
   Future<void> changePassword(String currentPassword, String newPassword) => _send(
     () => _dio.post(

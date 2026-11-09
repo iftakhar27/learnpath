@@ -4304,6 +4304,92 @@
         }
       }
     },
+    "/api/v1/auth/password/forgot": {
+      "post": {
+        "tags": [
+          "PasswordReset"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ForgotPasswordRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ForgotPasswordRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ForgotPasswordRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/password/reset": {
+      "post": {
+        "tags": [
+          "PasswordReset"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResetPasswordRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResetPasswordRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResetPasswordRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/payments/orders": {
       "post": {
         "tags": [
@@ -5142,6 +5228,44 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlanTaskDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/test-emails": {
+      "get": {
+        "tags": [
+          "TestEmails"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestEmailDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestEmailDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestEmailDto"
+                  }
                 }
               }
             }
@@ -8219,6 +8343,18 @@
         },
         "additionalProperties": false
       },
+      "ForgotPasswordRequest": {
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "GrantEnrollmentRequest": {
         "required": [
           "courseId"
@@ -9898,6 +10034,22 @@
         },
         "additionalProperties": false
       },
+      "ResetPasswordRequest": {
+        "required": [
+          "newPassword",
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "ResetPasswordResultDto": {
         "required": [
           "temporaryPassword"
@@ -10583,6 +10735,31 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TestEmailDto": {
+        "required": [
+          "sentAt",
+          "subject",
+          "text",
+          "to"
+        ],
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "sentAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false

@@ -1129,4 +1129,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get passwordChangedToast =>
       'Password changed. Other devices were signed out.';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get forgotPasswordTitle => 'Reset your password';
+
+  @override
+  String get forgotPasswordBody =>
+      'Enter the email you signed up with. We\'ll send you a link to choose a new password.';
+
+  @override
+  String get sendResetLink => 'Send reset link';
+
+  @override
+  String resetLinkSent(Object email) {
+    return 'If an account exists for $email, we\'ve sent a link to choose a new password. Check your inbox and spam folder; the link works for 30 minutes.';
+  }
+
+  @override
+  String get backToSignIn => 'Back to sign in';
 }
