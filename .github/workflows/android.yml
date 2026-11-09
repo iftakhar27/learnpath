@@ -1,5 +1,5 @@
 # Builds the Android app on every push to main that touches the app (or on demand: Actions → Android build → Run
-# workflow). The APK is a workflow artifact, downloadable by signed-in users from the run's page:
+# workflow). If the build fails, the end of its log is reported as error annotations on the run. The APK is a workflow artifact, downloadable by signed-in users from the run's page:
 #   - LearnPath-android-apk: app-release.apk for installing on a phone (signed with the runner's debug key, so an
 #     installed copy from a different build may need uninstalling first)
 name: Android build
@@ -53,7 +53,9 @@ jobs:
 
       - name: Build the APK
         working-directory: mobile
-        run: flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL" --dart-define=WEB_BASE_URL="$WEB_BASE_URL"
+        run: |
+          set -o pipefail
+          flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL" --dart-define=WEB_BASE_URL="$WEB_BASE_URL" 2>&1 | tee ../android-build.log
 
       - name: Upload the APK
         uses: actions/upload-artifact@v4
@@ -61,3 +63,11 @@ jobs:
           name: LearnPath-android-apk
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+
+      - name: Report the end of the build log
+        if: failure()
+        run: |
+          touch android-build.log
+          # Error lines first, then the last lines, as annotations (visible on the run and via the API).
+          grep -E "error:|Error:|ERROR|Exception|FAILURE|What went wrong" -A2 android-build.log | tail -n 15 | while IFS= read -r line; do echo "::error title=build::${line:0:900}"; done
+          tail -n 15 android-build.log | while IFS= read -r line; do echo "::warning title=log tail::${line:0:900}"; done
