@@ -308,5 +308,11 @@
   "backToTopic": "विषय पर वापस जाएँ",
   "buyOnWebsite": "वेबसाइट पर खरीदें · {price}",
   "buyOnWebsiteHint": "सुरक्षित भुगतान के लिए हमारी वेबसाइट खुलेगी। भुगतान के बाद ऐप पर लौटें, कोर्स अपने-आप खुल जाएगा।",
-  "notForSaleInApp": "यह कोर्स ऐप में नहीं खरीदा जा सकता।"
+  "notForSaleInApp": "यह कोर्स ऐप में नहीं खरीदा जा सकता।",
+  "changePassword": "पासवर्ड बदलें",
+  "currentPassword": "मौजूदा पासवर्ड",
+  "newPassword": "नया पासवर्ड",
+  "confirmNewPassword": "नए पासवर्ड की पुष्टि करें",
+  "passwordsDontMatch": "पासवर्ड मेल नहीं खाते",
+  "passwordChangedToast": "पासवर्ड बदल गया। दूसरे डिवाइस से साइन आउट कर दिया गया है।"
 }

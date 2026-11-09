@@ -217,6 +217,17 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Password reset by staff, and change password (9 Nov 2026)
+
+There was no way to recover a forgotten password. Now **Admin → Students → (student) → Reset password** sets a
+temporary password (3 groups of 4 easy-to-read characters, shown once with a Copy button), signs the account out
+everywhere, notifies the student and records it in the audit log. Support and super admins can reset students; only a
+super admin can reset staff; mobile-number accounts have no password. Students change it under **Profile → Change
+password** in the app and on the website; changing it now keeps the current device signed in and signs out the others
+(before, it signed out every device including the current one). **Verified:** 2 backend tests (+1 assertion in the
+session tests), 1 browser test (portal reset → sign in with the temporary password → change it), 1 app test
+(validation, wrong current password, success). A self-service "Forgot password?" by email still needs an email service.
+
 ### Buy on website (9 Nov 2026)
 
 Owner's choice: the app has no checkout; courses are bought on the website. On a paid course the app shows **Buy on

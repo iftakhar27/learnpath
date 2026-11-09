@@ -553,5 +553,11 @@
     }
   },
   "buyOnWebsiteHint": "Opens our website to pay securely. Come back to the app afterwards: the course unlocks by itself.",
-  "notForSaleInApp": "This course can't be bought in the app."
+  "notForSaleInApp": "This course can't be bought in the app.",
+  "changePassword": "Change password",
+  "currentPassword": "Current password",
+  "newPassword": "New password",
+  "confirmNewPassword": "Confirm new password",
+  "passwordsDontMatch": "The passwords don't match",
+  "passwordChangedToast": "Password changed. Other devices were signed out."
 }

@@ -1109,4 +1109,23 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get notForSaleInApp => 'यह कोर्स ऐप में नहीं खरीदा जा सकता।';
+
+  @override
+  String get changePassword => 'पासवर्ड बदलें';
+
+  @override
+  String get currentPassword => 'मौजूदा पासवर्ड';
+
+  @override
+  String get newPassword => 'नया पासवर्ड';
+
+  @override
+  String get confirmNewPassword => 'नए पासवर्ड की पुष्टि करें';
+
+  @override
+  String get passwordsDontMatch => 'पासवर्ड मेल नहीं खाते';
+
+  @override
+  String get passwordChangedToast =>
+      'पासवर्ड बदल गया। दूसरे डिवाइस से साइन आउट कर दिया गया है।';
 }

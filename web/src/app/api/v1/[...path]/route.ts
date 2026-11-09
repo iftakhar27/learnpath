@@ -6,12 +6,15 @@ import { apiFetch, apiNotConfigured, apiStarting, applyAccessResult, isEdgeError
  * Token-issuing endpoints are blocked here so tokens never reach browser JavaScript; use /api/session/* instead.
  */
 const BLOCKED_PREFIXES = [["auth"], ["payments", "webhooks"]];
+/** Exceptions under a blocked prefix: signed-in actions that return no tokens. */
+const ALLOWED_PATHS = ["auth/change-password"];
 const FORWARDED_REQUEST_HEADERS = ["content-type", "accept", "accept-language"];
 const FORWARDED_RESPONSE_HEADERS = ["content-type", "content-disposition", "cache-control"];
 
 async function forward(req: NextRequest, ctx: RouteContext<"/api/v1/[...path]">) {
   const { path } = await ctx.params;
-  if (BLOCKED_PREFIXES.some((p) => p.every((seg, i) => path[i]?.toLowerCase() === seg))) {
+  const allowed = ALLOWED_PATHS.includes(path.join("/").toLowerCase());
+  if (!allowed && BLOCKED_PREFIXES.some((p) => p.every((seg, i) => path[i]?.toLowerCase() === seg))) {
     return problem(404, "not_found", "Not found.");
   }
   if (req.method !== "GET" && req.method !== "HEAD" && !isSameOrigin(req)) {

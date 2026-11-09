@@ -24,8 +24,19 @@ export function StudentDetail() {
   const [grantCourse, setGrantCourse] = useState("");
   const [grantReason, setGrantReason] = useState("");
   const [addRole, setAddRole] = useState("");
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [temporary, setTemporary] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const invalidate = [key, ["admin", "users"]];
+  const resetPassword = useAction(() => unwrap(api.POST("/api/v1/admin/users/{id}/reset-password", { params: { path: { id } } })), {
+    invalidate,
+    onSuccess: (r) => {
+      setConfirmReset(false);
+      setCopied(false);
+      setTemporary(r.temporaryPassword);
+    },
+  });
   const changeStatus = useAction((s: UserStatus) => unwrap(api.POST("/api/v1/admin/users/{id}/status", { params: { path: { id } }, body: { status: s } })), {
     invalidate,
     success: "Account status updated",
@@ -175,6 +186,25 @@ export function StudentDetail() {
             </div>
           </Card>
 
+          <Card title="Password" className="p-0">
+            <div className="space-y-3 p-4">
+              {!user.email ? (
+                <p className="text-xs text-fg-muted">Signs in with a mobile number (one-time codes), so there is no password to reset.</p>
+              ) : isMe ? (
+                <p className="text-xs text-fg-muted">Change your own password from your profile.</p>
+              ) : user.roles.some((r) => r !== "Student") && !can.superAdmin(me?.roles) ? (
+                <p className="text-xs text-fg-muted">Only a super admin can reset a staff account&apos;s password.</p>
+              ) : (
+                <>
+                  <Button variant="secondary" onClick={() => setConfirmReset(true)}>
+                    Reset password
+                  </Button>
+                  <p className="text-xs text-fg-muted">For someone who can&apos;t sign in: sets a temporary password to give them and signs them out everywhere.</p>
+                </>
+              )}
+            </div>
+          </Card>
+
           <Card title="Roles" className="p-0">
             <div className="space-y-3 p-4">
               <div className="flex flex-wrap gap-1.5">
@@ -208,6 +238,50 @@ export function StudentDetail() {
           </Card>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmReset}
+        title="Reset password?"
+        message={<>Set a temporary password for {user.fullName}? They will be signed out of every device and must sign in with the new password.</>}
+        confirmLabel="Reset password"
+        danger
+        loading={resetPassword.isPending}
+        onCancel={() => setConfirmReset(false)}
+        onConfirm={() => resetPassword.mutate(undefined)}
+      />
+
+      <Modal
+        open={temporary !== null}
+        onClose={() => setTemporary(null)}
+        title="Temporary password"
+        footer={
+          <Button onClick={() => setTemporary(null)}>
+            Done
+          </Button>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-sm">
+            Give this to {user.fullName} privately. They sign in with <strong>{user.email}</strong> and this password, then change it in the app
+            under <strong>Profile → Change password</strong>.
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 rounded-lg bg-surface-muted px-3 py-2 text-center font-mono text-lg tracking-wider" aria-label="Temporary password">
+              {temporary}
+            </code>
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                await navigator.clipboard.writeText(temporary ?? "").catch(() => undefined);
+                setCopied(true);
+              }}
+            >
+              {copied ? "Copied" : "Copy"}
+            </Button>
+          </div>
+          <p className="text-xs text-fg-muted">It won&apos;t be shown again. If it&apos;s lost, reset the password again.</p>
+        </div>
+      </Modal>
 
       <ConfirmDialog
         open={status !== null}

@@ -8,7 +8,9 @@ import { useT, type MessageKey } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/dialog";
 import { PageLoading } from "@/components/ui/feedback";
+import { Field, Input } from "@/components/ui/field";
 import { Icon, type IconName } from "@/components/ui/icons";
+import { useToast } from "@/components/ui/toast";
 import { StudentError } from "../errors";
 import { LanguageSwitch } from "../language-switch";
 import { useChangeLanguage, useProfile } from "../profile";
@@ -89,6 +91,9 @@ export function ProfilePage() {
         <LanguageSwitch onChange={changeLanguage} />
       </section>
 
+      {/* Mobile-number accounts sign in with one-time codes and have no password. */}
+      {p.email && <ChangePassword />}
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="secondary" onClick={() => void signOut()}>
           {t("signOut")}
@@ -123,5 +128,92 @@ export function ProfilePage() {
         </div>
       </Modal>
     </div>
+  );
+}
+
+/** Replace the password (e.g. a temporary one from support). Other devices are signed out; this one stays signed in. */
+function ChangePassword() {
+  const t = useT();
+  const toast = useToast();
+  const [open, setOpen] = useState(false);
+  const [values, setValues] = useState({ current: "", next: "", confirm: "" });
+  const [touched, setTouched] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+  const problems = {
+    current: !values.current ? t("fieldRequired") : null,
+    next: !values.next ? t("fieldRequired") : values.next.length < 8 ? t("passwordTooShort") : null,
+    confirm: values.confirm !== values.next ? t("passwordsDontMatch") : null,
+  };
+  const close = () => {
+    setOpen(false);
+    setValues({ current: "", next: "", confirm: "" });
+    setTouched(false);
+    setError(null);
+  };
+  const save = async () => {
+    setTouched(true);
+    if (problems.current || problems.next || problems.confirm) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await unwrap(api.POST("/api/v1/auth/change-password", { body: { currentPassword: values.current, newPassword: values.next } }));
+      close();
+      toast(t("passwordChangedToast"));
+    } catch (e) {
+      setError(e);
+    } finally {
+      setSaving(false);
+    }
+  };
+  const field = (key: keyof typeof values, label: string, autoComplete: string) => (
+    <Field label={label} error={touched ? (problems[key] ?? undefined) : undefined}>
+      <Input
+        type="password"
+        autoComplete={autoComplete}
+        value={values[key]}
+        aria-invalid={touched && !!problems[key]}
+        onChange={(e) => setValues((v) => ({ ...v, [key]: e.target.value }))}
+      />
+    </Field>
+  );
+
+  return (
+    <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-5">
+      <span className="font-medium">{t("password")}</span>
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        {t("changePassword")}
+      </Button>
+      <Modal
+        open={open}
+        onClose={close}
+        title={t("changePassword")}
+        closeLabel={t("cancel")}
+        footer={
+          <>
+            <Button variant="secondary" onClick={close}>
+              {t("cancel")}
+            </Button>
+            <Button onClick={save} loading={saving}>
+              {t("save")}
+            </Button>
+          </>
+        }
+      >
+        <form
+          className="space-y-3"
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            void save();
+          }}
+        >
+          <StudentError error={error} />
+          {field("current", t("currentPassword"), "current-password")}
+          {field("next", t("newPassword"), "new-password")}
+          {field("confirm", t("confirmNewPassword"), "new-password")}
+        </form>
+      </Modal>
+    </section>
   );
 }

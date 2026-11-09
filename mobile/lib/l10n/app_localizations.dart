@@ -1951,6 +1951,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This course can\'t be bought in the app.'**
   String get notForSaleInApp;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get changePassword;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get currentPassword;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
+  /// No description provided for @confirmNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get confirmNewPassword;
+
+  /// No description provided for @passwordsDontMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The passwords don\'t match'**
+  String get passwordsDontMatch;
+
+  /// No description provided for @passwordChangedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed. Other devices were signed out.'**
+  String get passwordChangedToast;
 }
 
 class _AppLocalizationsDelegate

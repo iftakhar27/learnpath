@@ -107,13 +107,17 @@ public partial class SessionService(AppDbContext db, TimeProvider clock, IMemory
         foreach (var s in sessions) cache.Remove(CacheKey(s.Id));
     }
 
-    /// <summary>Ends every session of a user (password change, suspected token theft).</summary>
-    public async Task EndAllAsync(Guid userId, string reason, CancellationToken ct)
+    /// <summary>
+    /// Ends every session of a user (password change or reset, suspected token theft), except <paramref name="keep"/>:
+    /// the device that changed its own password stays signed in.
+    /// </summary>
+    public async Task EndAllAsync(Guid userId, string reason, CancellationToken ct, Guid? keep = null)
     {
         var now = clock.GetUtcNow();
-        var open = await db.UserSessions.Where(s => s.UserId == userId && s.EndedAt == null).ToListAsync(ct);
+        var open = await db.UserSessions.Where(s => s.UserId == userId && s.EndedAt == null && s.Id != keep).ToListAsync(ct);
         await EndAsync(open, reason, now, ct);
-        await db.RefreshTokens.Where(t => t.UserId == userId && t.RevokedAt == null).ExecuteUpdateAsync(x => x.SetProperty(t => t.RevokedAt, now), ct);
+        await db.RefreshTokens.Where(t => t.UserId == userId && t.RevokedAt == null && (keep == null || t.SessionId != keep))
+            .ExecuteUpdateAsync(x => x.SetProperty(t => t.RevokedAt, now), ct);
     }
 
     /// <summary>Whether an access token's session may still be used (cached briefly; replaced sessions show as such).</summary>

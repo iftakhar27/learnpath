@@ -309,7 +309,13 @@ export const appMessages = {
     "backToTopic": "Back to topic",
     "buyOnWebsite": "Buy on website · {price}",
     "buyOnWebsiteHint": "Opens our website to pay securely. Come back to the app afterwards: the course unlocks by itself.",
-    "notForSaleInApp": "This course can't be bought in the app."
+    "notForSaleInApp": "This course can't be bought in the app.",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "passwordsDontMatch": "The passwords don't match",
+    "passwordChangedToast": "Password changed. Other devices were signed out."
   },
   "hi": {
     "appTagline": "NEET, JEE और बोर्ड परीक्षाओं की तैयारी करें",
@@ -620,6 +626,12 @@ export const appMessages = {
     "backToTopic": "विषय पर वापस जाएँ",
     "buyOnWebsite": "वेबसाइट पर खरीदें · {price}",
     "buyOnWebsiteHint": "सुरक्षित भुगतान के लिए हमारी वेबसाइट खुलेगी। भुगतान के बाद ऐप पर लौटें, कोर्स अपने-आप खुल जाएगा।",
-    "notForSaleInApp": "यह कोर्स ऐप में नहीं खरीदा जा सकता।"
+    "notForSaleInApp": "यह कोर्स ऐप में नहीं खरीदा जा सकता।",
+    "changePassword": "पासवर्ड बदलें",
+    "currentPassword": "मौजूदा पासवर्ड",
+    "newPassword": "नया पासवर्ड",
+    "confirmNewPassword": "नए पासवर्ड की पुष्टि करें",
+    "passwordsDontMatch": "पासवर्ड मेल नहीं खाते",
+    "passwordChangedToast": "पासवर्ड बदल गया। दूसरे डिवाइस से साइन आउट कर दिया गया है।"
   }
 } as const;

@@ -132,6 +132,7 @@ public class SessionTests(ApiFactory api)
         var change = await As(phone).PostAsJsonAsync("/api/v1/auth/change-password", new { currentPassword = Password, newPassword = "N3w-Passw0rd!" });
         Assert.Equal(HttpStatusCode.NoContent, change.StatusCode);
         Assert.Equal((HttpStatusCode.Unauthorized, "session_ended"), await Profile(As(browser)));
+        Assert.Equal((HttpStatusCode.OK, null), await Profile(As(phone))); // the device that changed it stays signed in
     }
 
     [Fact]

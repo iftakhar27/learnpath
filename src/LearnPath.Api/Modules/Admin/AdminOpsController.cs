@@ -2,7 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using LearnPath.Api.Data;
 using LearnPath.Api.Domain;
 using LearnPath.Api.Infrastructure;
+using System.Security.Cryptography;
 using LearnPath.Api.Modules.Catalog;
+using LearnPath.Api.Modules.Identity;
 using LearnPath.Api.Modules.Notifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,11 +21,12 @@ public record GrantEnrollmentRequest([Required] Guid CourseId, [MaxLength(500)] 
 public record TicketResponseRequest([Required, MaxLength(4000)] string Response, [RegularExpression("^(InProgress|Resolved|Closed)$")] string Status = "Resolved");
 public record ReportResolveRequest([Required, RegularExpression("^(Fixed|Rejected)$")] string Status);
 public record RoleRequest([Required] string Role);
+public record ResetPasswordResultDto(string TemporaryPassword);
 public record AnnouncementRequest([Required, MaxLength(200)] string Title, [Required, MaxLength(2000)] string Body, Guid? CourseId);
 
 [ApiController]
 [Route("api/v1/admin")]
-public class AdminOpsController(AppDbContext db, AuditService audit, EntitlementService entitlements, TimeProvider clock) : ControllerBase
+public class AdminOpsController(AppDbContext db, AuditService audit, EntitlementService entitlements, SessionService sessions, TimeProvider clock) : ControllerBase
 {
     [HttpGet("dashboard")]
     [Authorize(Policy = Policies.StaffRead)]
@@ -101,6 +104,43 @@ public class AdminOpsController(AppDbContext db, AuditService audit, Entitlement
         audit.Record(User.UserId(), "user.status", "User", id, req);
         await db.SaveChangesAsync(ct);
         return NoContent();
+    }
+
+    /// <summary>
+    /// Sets a new temporary password (shown to staff once, to pass to the person) and signs the account out everywhere.
+    /// Support can reset students; only a super admin can reset staff accounts. Accounts that sign in by mobile number
+    /// have no password to reset.
+    /// </summary>
+    [HttpPost("users/{id:guid}/reset-password")]
+    [Authorize(Policy = Policies.SupportOps)]
+    public async Task<ResetPasswordResultDto> ResetPassword(Guid id, CancellationToken ct)
+    {
+        if (id == User.UserId()) throw AppException.BadRequest("self_change", "Change your own password from your profile instead.");
+        var u = await db.Users.Include(x => x.Roles).FirstOrDefaultAsync(x => x.Id == id, ct) ?? throw AppException.NotFound("User");
+        if (u.Email is null) throw AppException.BadRequest("no_email", "This account signs in with a mobile number and has no password.");
+        if (u.Roles.Any(r => Roles.Staff.Contains(r.Role)) && !User.IsInRole(Roles.SuperAdmin))
+            throw AppException.Forbidden("Only a super admin can reset a staff account's password.");
+
+        var temporary = TemporaryPassword();
+        u.PasswordHash = BCrypt.Net.BCrypt.HashPassword(temporary, workFactor: 11);
+        var now = clock.GetUtcNow();
+        db.Notifications.Add(new Notification
+        {
+            UserId = id, Type = "account", Title = "Your password was reset",
+            Body = "Support set a temporary password for you. Change it under Profile → Change password.", Link = "/profile", CreatedAt = now,
+        });
+        audit.Record(User.UserId(), "user.password_reset", "User", id);
+        await db.SaveChangesAsync(ct);
+        await sessions.EndAllAsync(id, SessionEndReasons.PasswordReset, ct);
+        return new ResetPasswordResultDto(temporary);
+    }
+
+    /// <summary>Easy to read out or type: 3 groups of 4 from letters and digits that can't be confused (no 0/O, 1/l/I).</summary>
+    internal static string TemporaryPassword()
+    {
+        const string chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+        var groups = Enumerable.Range(0, 3).Select(_ => new string(Enumerable.Range(0, 4).Select(_ => chars[RandomNumberGenerator.GetInt32(chars.Length)]).ToArray()));
+        return string.Join('-', groups);
     }
 
     [HttpPost("users/{id:guid}/roles")]

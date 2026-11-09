@@ -157,6 +157,8 @@ class ProfileScreen extends ConsumerWidget {
           link(Icons.forum_outlined, l.doubtsTitle, '/doubts'),
           link(Icons.receipt_long_outlined, l.myPurchases, '/orders'),
           link(Icons.support_agent_rounded, l.helpSupport, '/support'),
+          // Mobile-number accounts sign in with one-time codes and have no password.
+          if (p.email != null) link(Icons.password_rounded, l.changePassword, '/change-password'),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(l.privacyPolicy),
@@ -652,6 +654,80 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ],
                     ),
             ),
+    );
+  }
+}
+
+// ---------------- Change password ----------------
+
+class ChangePasswordScreen extends ConsumerStatefulWidget {
+  const ChangePasswordScreen({super.key});
+
+  @override
+  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+}
+
+class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
+  final _form = GlobalKey<FormState>();
+  final _current = TextEditingController();
+  final _next = TextEditingController();
+  final _confirm = TextEditingController();
+
+  @override
+  void dispose() {
+    _current.dispose();
+    _next.dispose();
+    _confirm.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return Scaffold(
+      appBar: AppBar(title: Text(l.changePassword)),
+      body: Form(
+        key: _form,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            TextFormField(
+              controller: _current,
+              obscureText: true,
+              autofillHints: const [AutofillHints.password],
+              decoration: InputDecoration(labelText: l.currentPassword),
+              validator: (v) => (v ?? '').isEmpty ? l.fieldRequired : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _next,
+              obscureText: true,
+              autofillHints: const [AutofillHints.newPassword],
+              decoration: InputDecoration(labelText: l.newPassword),
+              validator: (v) => (v ?? '').isEmpty ? l.fieldRequired : (v!.length < 8 ? l.passwordTooShort : null),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _confirm,
+              obscureText: true,
+              decoration: InputDecoration(labelText: l.confirmNewPassword),
+              validator: (v) => v != _next.text ? l.passwordsDontMatch : null,
+            ),
+            const SizedBox(height: 24),
+            AsyncButton(
+              expand: true,
+              onPressed: () async {
+                if (!_form.currentState!.validate()) return;
+                await ref.read(apiProvider).changePassword(_current.text, _next.text);
+                if (!context.mounted) return;
+                showSnack(context, l.passwordChangedToast);
+                context.pop();
+              },
+              child: Text(l.changePassword),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

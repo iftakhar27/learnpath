@@ -1110,4 +1110,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notForSaleInApp => 'This course can\'t be bought in the app.';
+
+  @override
+  String get changePassword => 'Change password';
+
+  @override
+  String get currentPassword => 'Current password';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get confirmNewPassword => 'Confirm new password';
+
+  @override
+  String get passwordsDontMatch => 'The passwords don\'t match';
+
+  @override
+  String get passwordChangedToast =>
+      'Password changed. Other devices were signed out.';
 }

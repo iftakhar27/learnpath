@@ -35,6 +35,10 @@ the API, so login tokens stay in httpOnly cookies and the API needs no CORS sett
 3. Open `https://<admin-service>.onrender.com/admin` and sign in with `Seed__AdminEmail` / `Seed__AdminPassword`.
    To give someone else access, have them register (in the app), then open them under **Students** and add a role
    (e.g. Teacher or ContentAdmin) instead of sharing the admin login.
+4. **Forgotten passwords:** open the person under **Students** → **Reset password**. A temporary password is shown once
+   (give it to them privately); they're signed out everywhere, sign in with it and change it in the app or on the
+   website under **Profile → Change password**. Support and super admins can reset students; only a super admin can
+   reset staff. Accounts made with a mobile number have no password (they sign in with a one-time code).
 
 Notes: the web server passes each visitor's address to the API (shared key `Bff__SharedKey` → `BFF_SHARED_KEY`, set
 by the Blueprint; **sync the Blueprint once** so both services get it). Without it, every website sign-in would share

@@ -110,6 +110,14 @@ class LearnPathApi {
     );
   }
 
+  /// Other devices are signed out; this one stays signed in.
+  Future<void> changePassword(String currentPassword, String newPassword) => _send(
+    () => _dio.post(
+      '/auth/change-password',
+      data: ChangePasswordRequest(currentPassword: currentPassword, newPassword: newPassword).toJson(),
+    ),
+  );
+
   Future<void> logout(String refreshToken) => _send(
     () => _dio.post(
       '/auth/logout',

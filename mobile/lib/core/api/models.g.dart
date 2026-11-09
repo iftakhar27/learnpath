@@ -4049,6 +4049,18 @@ class ReportResolveRequest {
 }
 
 @immutable
+class ResetPasswordResultDto {
+  const ResetPasswordResultDto({required this.temporaryPassword});
+
+  factory ResetPasswordResultDto.fromJson(Map<String, dynamic> json) =>
+      ResetPasswordResultDto(temporaryPassword: json['temporaryPassword'] as String);
+
+  final String temporaryPassword;
+
+  Map<String, dynamic> toJson() => {'temporaryPassword': temporaryPassword};
+}
+
+@immutable
 class ResourceDto {
   const ResourceDto({
     required this.id,

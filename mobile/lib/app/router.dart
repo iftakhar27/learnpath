@@ -127,6 +127,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(parentNavigatorKey: _rootKey, path: '/bookmarks', builder: (_, _) => const BookmarksScreen()),
       GoRoute(parentNavigatorKey: _rootKey, path: '/orders', builder: (_, _) => const OrdersScreen()),
       GoRoute(parentNavigatorKey: _rootKey, path: '/support', builder: (_, _) => const SupportScreen()),
+      GoRoute(parentNavigatorKey: _rootKey, path: '/change-password', builder: (_, _) => const ChangePasswordScreen()),
       GoRoute(parentNavigatorKey: _rootKey, path: '/search', builder: (_, _) => const SearchScreen()),
       GoRoute(parentNavigatorKey: _rootKey, path: '/doubts', builder: (_, _) => const DoubtsScreen()),
       GoRoute(

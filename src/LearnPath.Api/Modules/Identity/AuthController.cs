@@ -193,7 +193,9 @@ public partial class AuthController(AppDbContext db, TokenService tokens, Sessio
             throw new AppException(400, "invalid_credentials", "Current password is incorrect.");
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword, workFactor: 11);
         await db.SaveChangesAsync(ct);
-        await sessions.EndAllAsync(user.Id, SessionEndReasons.PasswordChanged, ct);
+        // Other devices are signed out; this one stays signed in.
+        Guid? current = Guid.TryParse(User.FindFirst(SessionClaims.SessionId)?.Value, out var sid) ? sid : null;
+        await sessions.EndAllAsync(user.Id, SessionEndReasons.PasswordChanged, ct, keep: current);
         return NoContent();
     }
 

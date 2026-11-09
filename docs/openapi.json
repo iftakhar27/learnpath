@@ -1539,6 +1539,46 @@
         }
       }
     },
+    "/api/v1/admin/users/{id}/reset-password": {
+      "post": {
+        "tags": [
+          "AdminOps"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetPasswordResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetPasswordResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetPasswordResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/users/{id}/roles": {
       "post": {
         "tags": [
@@ -9853,6 +9893,18 @@
         "type": "object",
         "properties": {
           "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResetPasswordResultDto": {
+        "required": [
+          "temporaryPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "temporaryPassword": {
             "type": "string"
           }
         },

@@ -63,6 +63,8 @@ public static class SessionEndReasons
     /// <summary>The account was signed in on another device of the same kind.</summary>
     public const string Replaced = "replaced";
     public const string PasswordChanged = "password_changed";
+    /// <summary>Support set a temporary password.</summary>
+    public const string PasswordReset = "password_reset";
     /// <summary>A rotated refresh token was used again (possible theft): every session was ended.</summary>
     public const string Security = "security";
 }

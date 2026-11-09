@@ -146,6 +146,7 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `GET` | `/api/v1/admin/users` |
 | `GET` | `/api/v1/admin/users/{id}` |
 | `POST` | `/api/v1/admin/users/{id}/enrollments` |
+| `POST` | `/api/v1/admin/users/{id}/reset-password` |
 | `POST` | `/api/v1/admin/users/{id}/roles` |
 | `DELETE` | `/api/v1/admin/users/{id}/roles/{role}` |
 | `POST` | `/api/v1/admin/users/{id}/status` |
