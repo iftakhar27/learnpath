@@ -7,10 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import { isLang } from "@/lib/i18n/current";
 import { useLanguage, useT, type MessageKey } from "@/lib/i18n";
+import { buttonClass } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/feedback";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { LanguageSwitch } from "./language-switch";
-import { SideMenu } from "./side-menu";
+import { GuestSideMenu, SideMenu } from "./side-menu";
+import { GuestProvider, markGuest } from "./guest";
 import { StudentError } from "./errors";
 import { useChangeLanguage, useProfile } from "./profile";
 
@@ -33,8 +35,91 @@ export const notificationsKey = ["student", "notifications"] as const;
 /** How often the bell re-checks while the tab is visible (also on focus, and when notifications are read). */
 const UNREAD_POLL_MS = 30_000;
 
+/** Frame for student pages: the signed-in shell, or a lighter one for guests browsing the public pages. */
+export function StudentShell({ children, guest = false }: { children: ReactNode; guest?: boolean }) {
+  return guest ? <GuestShell>{children}</GuestShell> : <SignedInShell>{children}</SignedInShell>;
+}
+
+/** Guests: the catalogue, course pages and NCERT subjects, with sign in / create account always in reach. */
+function GuestShell({ children }: { children: ReactNode }) {
+  const t = useT();
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  useEffect(() => {
+    markGuest(true);
+    return () => markGuest(false);
+  }, []);
+  const next = encodeURIComponent(pathname);
+
+  return (
+    <GuestProvider value={true}>
+      <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
+          {t("skipToContent")}
+        </a>
+        <header className="sticky top-0 z-30 border-b border-border bg-surface/95 pt-[env(safe-area-inset-top)] backdrop-blur">
+          <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label={t("openMenu")}
+              aria-haspopup="dialog"
+              aria-expanded={menuOpen}
+              className="-ml-2 -mr-2 rounded-lg p-2 text-fg-muted hover:bg-surface-muted hover:text-fg"
+            >
+              <Icon name="menu" />
+            </button>
+            <Link href="/" className="text-lg font-semibold">
+              {brand}
+            </Link>
+            <nav aria-label={t("primaryNav")} className="hidden md:block">
+              <Link
+                href="/learn"
+                aria-current={pathname === "/learn" ? "page" : undefined}
+                className={`rounded-lg px-3 py-2 text-sm font-medium ${pathname === "/learn" ? "bg-primary-soft text-primary" : "text-fg-muted hover:bg-surface-muted hover:text-fg"}`}
+              >
+                {t("menuSubjectsCourses")}
+              </Link>
+            </nav>
+            <div className="ml-auto flex items-center gap-2">
+              <div className="hidden sm:block">
+                <LanguageSwitch compact />
+              </div>
+              <Link href={`/login?next=${next}`} className="hidden rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-surface-muted md:block">
+                {t("signIn")}
+              </Link>
+              {/* Phones have these in the bar at the bottom. */}
+              <span className="hidden md:block">
+                <Link href={`/register?next=${next}`} className={buttonClass("primary", "sm")}>
+                  {t("createFreeAccount")}
+                </Link>
+              </span>
+            </div>
+          </div>
+        </header>
+        <GuestSideMenu open={menuOpen} onClose={closeMenu} />
+        <main id="main" className="mx-auto max-w-6xl px-4 py-6">
+          <p role="note" className="mb-6 rounded-xl bg-primary-soft px-4 py-3 text-sm">
+            <span className="font-semibold">{t("guestTitle")}.</span> {t("guestBody")}
+          </p>
+          {children}
+        </main>
+        <div className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-2 gap-2 border-t border-border bg-surface px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 md:hidden">
+          <Link href={`/login?next=${next}`} className={buttonClass("secondary")}>
+            {t("signIn")}
+          </Link>
+          <Link href={`/register?next=${next}`} className={buttonClass("primary")}>
+            {t("createFreeAccount")}
+          </Link>
+        </div>
+      </div>
+    </GuestProvider>
+  );
+}
+
 /** Frame for signed-in student pages: top bar (menu, desktop nav), bottom tabs on phones, onboarding and language sync. */
-export function StudentShell({ children }: { children: ReactNode }) {
+function SignedInShell({ children }: { children: ReactNode }) {
   const t = useT();
   const pathname = usePathname();
   const router = useRouter();

@@ -137,6 +137,7 @@ class LearnPathApi {
   Future<void> requestAccountDeletion() => _send(() => _dio.post('/student/profile/delete-request'));
 
   // ---- Catalog & learning ----
+  Future<AppConfigDto> appConfig() => _call(() => _dio.get('/app-config'), (d) => AppConfigDto.fromJson(_map(d)));
   Future<List<ExamDto>> exams() => _call(() => _dio.get('/exams'), (d) => _list(d, ExamDto.fromJson));
 
   Future<PagedResultOfCourseSummaryDto> courses({String? q, String? examId, bool? free, int page = 1}) => _call(

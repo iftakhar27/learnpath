@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 import { ApiError } from "@/lib/api/client";
 import { ToastProvider } from "@/components/ui/toast";
 import { useWakeApi } from "@/lib/api/warm-up";
+import { isGuestNow } from "@/features/student/guest";
 
 const PUBLIC_PATHS = ["/", "/login", "/register", "/admin/login"];
 
@@ -14,9 +15,10 @@ function onAuthError(error: unknown) {
   if (error instanceof ApiError && error.status === 401 && !PUBLIC_PATHS.includes(pathname)) {
     const login = pathname.startsWith("/admin") ? "/admin/login" : "/login";
     // "replaced": the account was signed in on another device, so say that rather than "session ended".
-    const why = error.code === "session_replaced" ? "replaced" : "expired";
+    // A guest never had a session: just ask them to sign in.
+    const why = isGuestNow() && !pathname.startsWith("/admin") ? "" : error.code === "session_replaced" ? "&replaced=1" : "&expired=1";
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload clears every cached query after a session change
-    window.location.assign(`${login}?next=${encodeURIComponent(pathname + search)}&${why}=1`);
+    window.location.assign(`${login}?next=${encodeURIComponent(pathname + search)}${why}`);
   }
 }
 

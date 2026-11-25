@@ -12,6 +12,7 @@ import '../../core/config.dart';
 import '../home/app_drawer.dart';
 import '../home/home_screen.dart';
 import '../payments/buy_on_website.dart';
+import '../support/whatsapp.dart' show shareCourseOnWhatsApp;
 import '../doubts/doubt_screens.dart';
 import 'quiz_screen.dart';
 import 'subjects.dart';
@@ -174,8 +175,19 @@ class CourseScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
     final detail = ref.watch(courseProvider(courseId));
+    final guest = ref.watch(sessionProvider) is Guest;
     return Scaffold(
-      appBar: AppBar(title: Text(detail.value?.course.title ?? '')),
+      appBar: AppBar(
+        title: Text(detail.value?.course.title ?? ''),
+        actions: [
+          if (detail.value case final d?)
+            IconButton(
+              tooltip: l.shareOnWhatsApp,
+              icon: const Icon(Icons.share_outlined),
+              onPressed: () => shareCourseOnWhatsApp(context, ref, d.course),
+            ),
+        ],
+      ),
       body: AsyncView(
         value: detail,
         onRetry: () => ref.invalidate(courseProvider(courseId)),
@@ -202,7 +214,9 @@ class CourseScreen extends ConsumerWidget {
                     LinearProgressIndicator(value: d.completionPercent / 100, minHeight: 8, borderRadius: BorderRadius.circular(4)),
                     const SizedBox(height: 4),
                     Text(l.percentComplete(d.completionPercent)),
-                  ] else if (d.course.isFree)
+                  ] else if (d.course.isFree && guest)
+                    FilledButton(onPressed: () => context.push('/register'), child: Text(l.signUpToStart))
+                  else if (d.course.isFree)
                     AsyncButton(
                       expand: true,
                       onPressed: () async {

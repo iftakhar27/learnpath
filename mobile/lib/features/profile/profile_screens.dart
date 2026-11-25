@@ -14,6 +14,7 @@ import '../home/app_drawer.dart';
 import '../home/home_screen.dart';
 import '../onboarding/onboarding_screen.dart';
 import '../practice/practice_screens.dart';
+import '../support/whatsapp.dart';
 
 final studyPlanProvider = FutureProvider.autoDispose<StudyPlanDto>((ref) => ref.watch(apiProvider).studyPlan());
 final planHistoryProvider = FutureProvider.autoDispose<List<PlanDayDto>>((ref) => ref.watch(apiProvider).planHistory());
@@ -562,10 +563,16 @@ class SupportScreen extends ConsumerWidget {
         value: tickets,
         onRetry: () => ref.invalidate(ticketsProvider),
         data: (list) => list.isEmpty
-            ? EmptyState(icon: Icons.support_agent_rounded, message: l.ticketsEmpty)
+            ? Column(
+                children: [
+                  const WhatsAppTiles(share: false),
+                  Expanded(child: EmptyState(icon: Icons.support_agent_rounded, message: l.ticketsEmpty)),
+                ],
+              )
             : ListView(
                 padding: const EdgeInsets.only(bottom: 96),
                 children: [
+                  const WhatsAppTiles(share: false),
                   for (final t in list)
                     Card(
                       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),

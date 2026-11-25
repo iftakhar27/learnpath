@@ -26,6 +26,8 @@ const paths = {
   moon: "M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z",
   logout: "M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10",
   external: "M14 4h6v6M20 4l-9 9M18 14v6H4V6h6",
+  share: "M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm12 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.6 13.5l6.8 4M15.4 6.5l-6.8 4",
+  login: "M10 4H5v16h5M14 8l4 4-4 4M18 12H8",
 } as const;
 
 export type IconName = keyof typeof paths;

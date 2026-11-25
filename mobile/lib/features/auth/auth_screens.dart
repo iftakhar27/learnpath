@@ -109,7 +109,14 @@ class WelcomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Align(alignment: Alignment.centerRight, child: LanguageToggle()),
+              Row(
+                children: [
+                  // A guest who tapped something that needs an account can go back to browsing.
+                  if (session is Guest && context.canPop()) const BackButton(),
+                  const Spacer(),
+                  const LanguageToggle(),
+                ],
+              ),
               const Spacer(),
               const Center(child: _Logo(size: 80)),
               const SizedBox(height: 24),
@@ -120,6 +127,10 @@ class WelcomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(l.appTagline, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
+              if (session is Guest) ...[
+                const SizedBox(height: 16),
+                Text(l.guestLockedBody, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
+              ],
               if (session is SignedOut && session.expired) ...[
                 const SizedBox(height: 16),
                 Text(
@@ -134,6 +145,15 @@ class WelcomeScreen extends ConsumerWidget {
               OutlinedButton.icon(onPressed: () => context.push('/login'), icon: const Icon(Icons.mail_outline_rounded), label: Text(l.continueWithEmail)),
               const SizedBox(height: 8),
               TextButton(onPressed: () => context.push('/register'), child: Text(l.createAccount)),
+              if (session is SignedOut)
+                TextButton.icon(
+                  onPressed: () async {
+                    await ref.read(sessionProvider.notifier).browseAsGuest();
+                    if (context.mounted) context.go('/home');
+                  },
+                  icon: const Icon(Icons.explore_outlined),
+                  label: Text(l.exploreAsGuest),
+                ),
             ],
           ),
         ),

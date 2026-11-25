@@ -7,6 +7,7 @@ import '../core/providers.dart';
 import '../features/auth/auth_screens.dart';
 import '../features/doubts/doubt_screens.dart';
 import '../features/home/app_drawer.dart';
+import '../features/home/guest_screens.dart';
 import '../features/home/home_screen.dart';
 import '../features/intro/intro_screen.dart';
 import '../features/learn/learn_screens.dart';
@@ -23,6 +24,15 @@ import '../widgets/common.dart';
 
 final _rootKey = GlobalKey<NavigatorState>();
 const _publicRoutes = {'/welcome', '/login', '/register', '/otp', '/forgot-password'};
+
+/// What guests can open: the tabs (practice, tests and profile show a sign-up prompt there) and public content.
+/// Anything else (lessons, practice, tests, plans…) sends them to sign up.
+bool _guestCanOpen(String loc) =>
+    _publicRoutes.contains(loc) ||
+    const {'/home', '/learn', '/practice', '/tests', '/profile', '/search'}.contains(loc) ||
+    loc.startsWith('/course/') ||
+    loc.startsWith('/subject/') ||
+    loc.startsWith('/ncert/');
 
 /// Bridges session changes into go_router's redirect.
 class _SessionListenable extends ChangeNotifier {
@@ -50,6 +60,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         SignedOut() when introSeen == null => loc == '/splash' ? null : '/splash',
         SignedOut() when introSeen == false => loc == '/intro' ? null : '/intro',
         SignedOut() => _publicRoutes.contains(loc) ? null : '/welcome',
+        Guest() when loc == '/splash' || loc == '/intro' => '/home',
+        Guest() => _guestCanOpen(loc) ? null : '/welcome',
         SignedIn(:final profile) when !profile.onboardingComplete => loc == '/onboarding' ? null : '/onboarding',
         SignedIn() => (loc == '/splash' || loc == '/intro' || loc == '/onboarding' || _publicRoutes.contains(loc)) ? '/home' : null,
       };
@@ -67,19 +79,48 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, shell) => _HomeShell(shell: shell),
         branches: [
           StatefulShellBranch(
-            routes: [GoRoute(path: '/home', builder: (_, _) => const HomeScreen())],
+            routes: [GoRoute(path: '/home', builder: (_, _) => const GuestOr(guest: GuestHomeScreen(), child: HomeScreen()))],
           ),
           StatefulShellBranch(
             routes: [GoRoute(path: '/learn', builder: (_, _) => const CatalogScreen())],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: '/practice', builder: (_, _) => const PracticeHomeScreen())],
+            routes: [
+              GoRoute(
+                path: '/practice',
+                builder: (context, _) => GuestOr(
+                  guest: GuestGateScreen(title: context.l10n.tabPractice, icon: Icons.edit_note_rounded, body: context.l10n.guestPracticeBody),
+                  child: const PracticeHomeScreen(),
+                ),
+              ),
+            ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: '/tests', builder: (_, _) => const TestsScreen())],
+            routes: [
+              GoRoute(
+                path: '/tests',
+                builder: (context, _) => GuestOr(
+                  guest: GuestGateScreen(title: context.l10n.testsTitle, icon: Icons.timer_outlined, body: context.l10n.guestTestsBody),
+                  child: const TestsScreen(),
+                ),
+              ),
+            ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen())],
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, _) => GuestOr(
+                  guest: GuestGateScreen(
+                    title: context.l10n.tabProfile,
+                    icon: Icons.person_outline_rounded,
+                    body: context.l10n.guestProfileBody,
+                    settings: true,
+                  ),
+                  child: const ProfileScreen(),
+                ),
+              ),
+            ],
           ),
         ],
       ),

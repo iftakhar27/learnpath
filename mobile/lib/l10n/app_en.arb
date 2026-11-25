@@ -806,5 +806,54 @@
   "reviseAll": "Revise all cards",
   "studyNow": "Study now",
   "studyAgain": "Study again",
-  "allDecks": "All decks"
+  "allDecks": "All decks",
+  "exploreAsGuest": "Explore without an account",
+  "guestTitle": "You're exploring as a guest",
+  "guestBody": "Browse subjects, chapters and courses. Create a free account to watch lessons, practise, take tests and track your progress.",
+  "guestDrawerBody": "Browse freely. A free account saves your progress.",
+  "createFreeAccount": "Create free account",
+  "coursesToExplore": "Courses to explore",
+  "guestLockedTitle": "Create a free account to continue",
+  "guestLockedBody": "Create a free account to watch lessons, practise and take tests. It takes a minute.",
+  "guestPracticeBody": "Practise questions with instant solutions, revise with flash cards and go back over your mistakes.",
+  "guestTestsBody": "Take timed mock tests, make your own test from any chapters and see exactly where to improve.",
+  "guestProfileBody": "Save your progress, get a daily study plan and carry on from any device.",
+  "signUpToStart": "Sign up free to start",
+  "whatsAppChat": "Chat with us on WhatsApp",
+  "whatsAppChannel": "Join our WhatsApp channel",
+  "inviteFriends": "Invite friends on WhatsApp",
+  "shareOnWhatsApp": "Share on WhatsApp",
+  "whatsAppHello": "Hi! I have a question about {brand}.",
+  "@whatsAppHello": {
+    "placeholders": {
+      "brand": {
+        "type": "String"
+      }
+    }
+  },
+  "shareAppMessage": "I'm preparing for NEET, JEE and Boards with {brand}: videos, practice, mock tests and flash cards. Have a look: {url}",
+  "@shareAppMessage": {
+    "placeholders": {
+      "brand": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "shareCourseMessage": "Have a look at “{course}” on {brand}: {url}",
+  "@shareCourseMessage": {
+    "placeholders": {
+      "course": {
+        "type": "String"
+      },
+      "brand": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      }
+    }
+  }
 }

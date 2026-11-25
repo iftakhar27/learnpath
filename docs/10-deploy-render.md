@@ -129,6 +129,18 @@ To send real emails (Render's free plan blocks outgoing SMTP, so this uses Brevo
 Links point to `Web:BaseUrl` (staging: `https://learnpath-admin.onrender.com`, in `appsettings.Staging.json`; set
 `Web__BaseUrl` in Render if the website moves).
 
+## WhatsApp links
+
+"Chat with us on WhatsApp" and "Join our WhatsApp channel" (website menu, Help, landing page; app menu, Help, guest
+Profile) appear once these are set. Sharing on WhatsApp works without them.
+
+1. **Render → learnpath-api → Environment:** add `Contact__WhatsAppNumber` = the number students should message, with
+   the country code (e.g. `+91 98765 43210`; spaces and dashes are fine). Use a WhatsApp Business number if you can.
+2. Optional: `Contact__WhatsAppChannelUrl` = your channel's link (`https://whatsapp.com/channel/...`) or a group invite
+   (`https://chat.whatsapp.com/...`). Other addresses are ignored.
+3. **Save and deploy.** The apps pick the links up within a few minutes (no new app release needed). A value that isn't
+   a phone number or a WhatsApp link is ignored and logged as a warning.
+
 ## Video lessons
 
 On staging the sample lessons play a **public demo stream** (Big Buck Bunny, an open-licence film, from Mux's public

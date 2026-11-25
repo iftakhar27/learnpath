@@ -1533,6 +1533,27 @@ class AnswerResponse {
 }
 
 @immutable
+class AppConfigDto {
+  const AppConfigDto({this.whatsAppNumber, this.whatsAppChannelUrl, this.websiteUrl});
+
+  factory AppConfigDto.fromJson(Map<String, dynamic> json) => AppConfigDto(
+    whatsAppNumber: json['whatsAppNumber'] == null ? null : json['whatsAppNumber'] as String,
+    whatsAppChannelUrl: json['whatsAppChannelUrl'] == null ? null : json['whatsAppChannelUrl'] as String,
+    websiteUrl: json['websiteUrl'] == null ? null : json['websiteUrl'] as String,
+  );
+
+  final String? whatsAppNumber;
+  final String? whatsAppChannelUrl;
+  final String? websiteUrl;
+
+  Map<String, dynamic> toJson() => {
+    'whatsAppNumber': ?whatsAppNumber,
+    'whatsAppChannelUrl': ?whatsAppChannelUrl,
+    'websiteUrl': ?websiteUrl,
+  };
+}
+
+@immutable
 class AskDoubtRequest {
   const AskDoubtRequest({required this.text, this.topicId, this.resourceId, this.questionId});
 

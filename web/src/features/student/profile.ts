@@ -4,14 +4,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { useLanguage, type Lang } from "@/lib/i18n";
+import { useIsGuest } from "./guest";
 
 export type Profile = components["schemas"]["ProfileDto"];
 export type ProfileUpdate = components["schemas"]["UpdateProfileRequest"];
 
 export const profileKey = ["student", "profile"] as const;
 
+/** The signed-in student's profile; guests have none, so it isn't asked for. */
 export function useProfile() {
-  return useQuery({ queryKey: profileKey, queryFn: () => unwrap(api.GET("/api/v1/student/profile")), staleTime: 5 * 60_000 });
+  const guest = useIsGuest();
+  return useQuery({ queryKey: profileKey, queryFn: () => unwrap(api.GET("/api/v1/student/profile")), staleTime: 5 * 60_000, enabled: !guest });
 }
 
 export function useUpdateProfile() {

@@ -51,10 +51,13 @@ class _BuyOnWebsiteButtonState extends ConsumerState<BuyOnWebsiteButton> {
 
   Future<void> _open() async {
     String? code;
-    try {
-      code = (await ref.read(apiProvider).createHandoff()).code;
-    } catch (_) {
-      // Still open the website; the student signs in there.
+    // Guests have no account to carry over: the website asks them to sign in or sign up at checkout.
+    if (ref.read(sessionProvider) is! Guest) {
+      try {
+        code = (await ref.read(apiProvider).createHandoff()).code;
+      } catch (_) {
+        // Still open the website; the student signs in there.
+      }
     }
     final opened = await ref.read(openUrlProvider)(websiteBuyUri(widget.course.id, code: code));
     if (!opened && mounted) showSnack(context, context.l10n.errorGeneric, error: true);

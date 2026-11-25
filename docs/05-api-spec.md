@@ -107,6 +107,15 @@ when used or expired), then opens the course with Razorpay checkout started. Bac
   `front | back` (or tab-separated), optional `| front in Hindi | back in Hindi`, `#` comments; returns `{added,
   problems:[{line, reason}]}` (missing back, too long, already in the deck). Up to 500 lines.
 
+## App settings and WhatsApp
+
+- `GET /app-config` (public, cached 5 minutes) → `{whatsAppNumber, whatsAppChannelUrl, websiteUrl}`. Set on the server:
+  `Contact__WhatsAppNumber` (country code included; returned as digits for `https://wa.me/<number>`) and
+  `Contact__WhatsAppChannelUrl` (https on whatsapp.com, chat.whatsapp.com or wa.me only). Unset or invalid values come
+  back as `null` and the apps hide those links. Sharing (`https://wa.me/?text=…`) needs no setting.
+- Signed-out visitors can use the public endpoints: `/exams`, `/courses`, `/courses/{id}/syllabus`, `/library/*` and
+  `/search`; the apps' guest browsing is built on these.
+
 ## Forgotten passwords
 
 - `POST /auth/password/forgot {email}` → `202` whether or not the email has an account. If it does, an email with a link
@@ -210,6 +219,7 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/admin/users/{id}/roles` |
 | `DELETE` | `/api/v1/admin/users/{id}/roles/{role}` |
 | `POST` | `/api/v1/admin/users/{id}/status` |
+| `GET` | `/api/v1/app-config` |
 | `GET` | `/api/v1/attempts` |
 | `GET` | `/api/v1/attempts/{attemptId}` |
 | `PUT` | `/api/v1/attempts/{attemptId}/answers` |

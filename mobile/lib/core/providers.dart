@@ -136,6 +136,12 @@ class SignedOut extends SessionState {
   final bool replaced;
 }
 
+/// Browsing without an account: public subjects, courses and chapters; studying asks them to sign up. Remembered on
+/// this phone until they sign in.
+class Guest extends SessionState {
+  const Guest();
+}
+
 /// Tokens exist but the API could not be reached to confirm them.
 class SessionUnreachable extends SessionState {
   const SessionUnreachable();
@@ -156,10 +162,12 @@ class SessionController extends Notifier<SessionState> {
   TokenStore get _store => ref.read(tokenStoreProvider);
   LearnPathApi get _api => ref.read(apiProvider);
 
+  static const _guestKey = 'guest';
+
   Future<void> restore() async {
     state = const SessionLoading();
     if (await _store.read() == null) {
-      state = const SignedOut();
+      state = await _store.readPreference(_guestKey) == '1' ? const Guest() : const SignedOut();
       return;
     }
     await _loadProfile();
@@ -182,7 +190,14 @@ class SessionController extends Notifier<SessionState> {
 
   Future<void> _signedIn(AuthTokens tokens) async {
     await _store.save(StoredTokens(accessToken: tokens.accessToken, refreshToken: tokens.refreshToken));
+    await _store.writePreference(_guestKey, '0');
     await _loadProfile();
+  }
+
+  /// "Explore without an account".
+  Future<void> browseAsGuest() async {
+    await _store.writePreference(_guestKey, '1');
+    state = const Guest();
   }
 
   Future<void> login(String email, String password, {bool takeOver = false}) async => _signedIn(await _api.login(email, password, takeOver: takeOver));
@@ -205,6 +220,7 @@ class SessionController extends Notifier<SessionState> {
       }
     }
     await _store.clear();
+    await _store.writePreference(_guestKey, '0');
     state = const SignedOut();
   }
 

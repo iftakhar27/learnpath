@@ -3209,6 +3209,35 @@
         }
       }
     },
+    "/api/v1/app-config": {
+      "get": {
+        "tags": [
+          "AppConfig"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppConfigDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppConfigDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppConfigDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/register": {
       "post": {
         "tags": [
@@ -8165,6 +8194,24 @@
           "numericValue": {
             "type": "number",
             "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppConfigDto": {
+        "type": "object",
+        "properties": {
+          "whatsAppNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "whatsAppChannelUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "websiteUrl": {
+            "type": "string",
             "nullable": true
           }
         },

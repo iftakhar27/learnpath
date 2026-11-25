@@ -5,19 +5,23 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import { useT } from "@/lib/i18n";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClass } from "@/components/ui/button";
 import { PageLoading } from "@/components/ui/feedback";
 import { Icon } from "@/components/ui/icons";
 import { useToast } from "@/components/ui/toast";
 import { BuyButton } from "../checkout";
 import { StudentError } from "../errors";
+import { useIsGuest } from "../guest";
 import { routes } from "../routes";
-import { ProgressBar } from "../ui";
+import { ProgressBar, useFormat } from "../ui";
+import { ShareCourseOnWhatsApp } from "../whatsapp";
 
 export const courseKey = (id: string) => ["student", "course", id] as const;
 
 export function CoursePage() {
   const t = useT();
+  const f = useFormat();
+  const guest = useIsGuest();
   const toast = useToast();
   const qc = useQueryClient();
   const { courseId } = useParams<{ courseId: string }>();
@@ -45,10 +49,26 @@ export function CoursePage() {
         {t("tabLearn")}
       </Link>
       <section className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
-        <h1 className="text-2xl font-semibold">{course.title}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h1 className="text-2xl font-semibold">{course.title}</h1>
+          <ShareCourseOnWhatsApp courseId={course.id} title={course.title} />
+        </div>
         {course.description && <p className="mt-2 max-w-3xl text-fg-muted">{course.description}</p>}
         <div className="mt-5">
-          {course.isFree && !course.enrolled ? (
+          {guest ? (
+            // Guests: free courses need a (free) account to join; paid ones open checkout once signed in.
+            <div className="space-y-2">
+              {!course.isFree && <p className="text-sm text-fg-muted">{course.accessDays ? t("accessDays", { days: course.accessDays }) : t("lifetimeAccess")}</p>}
+              <div className="flex flex-wrap gap-2">
+                <Link href={`/register?next=${encodeURIComponent(course.isFree ? routes.course(course.id) : `${routes.course(course.id)}?buy=1`)}`} className={buttonClass("primary")}>
+                  {course.isFree ? t("signUpToStart") : t("buyFor", { price: f.rupees(course.priceInPaise) })}
+                </Link>
+                <Link href={`/login?next=${encodeURIComponent(course.isFree ? routes.course(course.id) : `${routes.course(course.id)}?buy=1`)}`} className={buttonClass("secondary")}>
+                  {t("signIn")}
+                </Link>
+              </div>
+            </div>
+          ) : course.isFree && !course.enrolled ? (
             // Free content is open to everyone, but joining adds the course to the plan and "My courses".
             <div className="space-y-2">
               <Button onClick={() => enroll.mutate()} loading={enroll.isPending}>

@@ -1507,4 +1507,73 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get allDecks => 'सभी डेक';
+
+  @override
+  String get exploreAsGuest => 'बिना खाते के देखें';
+
+  @override
+  String get guestTitle => 'आप मेहमान के रूप में देख रहे हैं';
+
+  @override
+  String get guestBody =>
+      'विषय, अध्याय और कोर्स देखें। लेसन देखने, अभ्यास करने, टेस्ट देने और अपनी प्रगति देखने के लिए मुफ़्त खाता बनाएं।';
+
+  @override
+  String get guestDrawerBody =>
+      'आराम से देखें। मुफ़्त खाते में आपकी प्रगति सहेजी जाती है।';
+
+  @override
+  String get createFreeAccount => 'मुफ़्त खाता बनाएं';
+
+  @override
+  String get coursesToExplore => 'देखने लायक कोर्स';
+
+  @override
+  String get guestLockedTitle => 'आगे बढ़ने के लिए मुफ़्त खाता बनाएं';
+
+  @override
+  String get guestLockedBody =>
+      'लेसन देखने, अभ्यास करने और टेस्ट देने के लिए मुफ़्त खाता बनाएं। बस एक मिनट लगता है।';
+
+  @override
+  String get guestPracticeBody =>
+      'तुरंत हल के साथ प्रश्नों का अभ्यास करें, फ्लैश कार्ड से दोहराएं और अपनी गलतियां फिर से देखें।';
+
+  @override
+  String get guestTestsBody =>
+      'समय वाले मॉक टेस्ट दें, किसी भी अध्याय से अपना टेस्ट बनाएं और देखें कि कहां सुधार करना है।';
+
+  @override
+  String get guestProfileBody =>
+      'अपनी प्रगति सहेजें, रोज़ की पढ़ाई की योजना पाएं और किसी भी डिवाइस पर वहीं से जारी रखें।';
+
+  @override
+  String get signUpToStart => 'शुरू करने के लिए मुफ़्त साइन अप करें';
+
+  @override
+  String get whatsAppChat => 'WhatsApp पर हमसे बात करें';
+
+  @override
+  String get whatsAppChannel => 'हमारे WhatsApp चैनल से जुड़ें';
+
+  @override
+  String get inviteFriends => 'WhatsApp पर दोस्तों को बुलाएं';
+
+  @override
+  String get shareOnWhatsApp => 'WhatsApp पर शेयर करें';
+
+  @override
+  String whatsAppHello(String brand) {
+    return 'नमस्ते! मेरा $brand के बारे में एक सवाल है।';
+  }
+
+  @override
+  String shareAppMessage(String brand, String url) {
+    return 'मैं $brand के साथ NEET, JEE और बोर्ड की तैयारी कर रहा/रही हूँ: वीडियो, अभ्यास, मॉक टेस्ट और फ्लैश कार्ड। देखें: $url';
+  }
+
+  @override
+  String shareCourseMessage(String course, String brand, String url) {
+    return '$brand पर “$course” देखें: $url';
+  }
 }

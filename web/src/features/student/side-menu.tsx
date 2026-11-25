@@ -7,11 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import { useT, type MessageKey } from "@/lib/i18n";
 import type { components } from "@/lib/api/schema";
+import { buttonClass } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { signOut } from "./account/profile";
 import { LanguageSwitch } from "./language-switch";
 import { useChangeLanguage } from "./profile";
 import { NightModeSwitch } from "./theme-switch";
+import { WhatsAppMenuLinks } from "./whatsapp";
 
 type Item = { href: string; label: MessageKey; icon: IconName };
 const STUDY: Item[] = [
@@ -33,15 +35,11 @@ const HELP: Item[] = [
 ];
 const privacyUrl = process.env.NEXT_PUBLIC_PRIVACY_URL ?? "https://example.com/privacy";
 
-/** The side menu (same sections as the app's): every page one click away, plus night mode, language and sign out. */
-export function SideMenu({ open, onClose, profile, unread }: { open: boolean; onClose: () => void; profile: components["schemas"]["ProfileDto"]; unread: number }) {
+/** The slide-in panel both menus use: a modal dialog that closes on Esc, a backdrop click or navigation. */
+function MenuDialog({ open, onClose, children }: { open: boolean; onClose: () => void; children: ReactNode }) {
   const t = useT();
   const pathname = usePathname();
-  const changeLanguage = useChangeLanguage();
   const ref = useRef<HTMLDialogElement>(null);
-  const exams = useQuery({ queryKey: ["exams"], queryFn: () => unwrap(api.GET("/api/v1/exams")), enabled: open });
-  const exam = exams.data?.find((e) => e.id === profile.targetExamId)?.name;
-
   useLayoutEffect(() => {
     const d = ref.current;
     if (!d) return;
@@ -60,6 +58,33 @@ export function SideMenu({ open, onClose, profile, unread }: { open: boolean; on
     }
   }, [pathname, onClose]);
 
+  return (
+    <dialog
+      ref={ref}
+      aria-label={t("menuTitle")}
+      onClose={onClose}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
+      // A click on the backdrop lands on the <dialog> itself.
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-y-0 left-0 right-auto m-0 h-dvh max-h-dvh w-80 max-w-[85vw] border-r border-border bg-surface p-0 text-fg shadow-xl transition-transform duration-200 starting:open:-translate-x-full"
+    >
+      {open && (
+        <nav aria-label={t("menuTitle")} className="flex min-h-full flex-col pb-[env(safe-area-inset-bottom)]">
+          {children}
+        </nav>
+      )}
+    </dialog>
+  );
+}
+
+function useMenuParts(onClose: () => void) {
+  const t = useT();
+  const pathname = usePathname();
   const on = (href: string) => pathname === href || (href !== "/tests" && pathname.startsWith(href + "/")) || (href === "/tests" && pathname.startsWith("/tests/") && !pathname.startsWith("/tests/custom"));
   const link = (item: Item, extra?: ReactNode) => (
     <li key={item.href}>
@@ -81,79 +106,119 @@ export function SideMenu({ open, onClose, profile, unread }: { open: boolean; on
       {children}
     </section>
   );
+  const closeButton = (
+    <button type="button" onClick={onClose} aria-label={t("closeMenu")} className="rounded-lg p-1.5 text-fg-muted hover:bg-surface hover:text-fg">
+      <Icon name="x" />
+    </button>
+  );
+  return { link, section, closeButton };
+}
+
+/** The side menu (same sections as the app's): every page one click away, plus night mode, language and sign out. */
+export function SideMenu({ open, onClose, profile, unread }: { open: boolean; onClose: () => void; profile: components["schemas"]["ProfileDto"]; unread: number }) {
+  const t = useT();
+  const changeLanguage = useChangeLanguage();
+  const exams = useQuery({ queryKey: ["exams"], queryFn: () => unwrap(api.GET("/api/v1/exams")), enabled: open });
+  const exam = exams.data?.find((e) => e.id === profile.targetExamId)?.name;
+  const { link, section, closeButton } = useMenuParts(onClose);
 
   return (
-    <dialog
-      ref={ref}
-      aria-label={t("menuTitle")}
-      onClose={onClose}
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
-      // A click on the backdrop lands on the <dialog> itself.
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      className="fixed inset-y-0 left-0 right-auto m-0 h-dvh max-h-dvh w-80 max-w-[85vw] border-r border-border bg-surface p-0 text-fg shadow-xl transition-transform duration-200 starting:open:-translate-x-full"
-    >
-      {open && (
-        <nav aria-label={t("menuTitle")} className="flex min-h-full flex-col pb-[env(safe-area-inset-bottom)]">
-          <div className="flex items-start gap-3 bg-primary-soft px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))]">
-            <Link href="/profile" onClick={onClose} className="flex min-w-0 flex-1 items-center gap-3 rounded-lg">
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-primary-fg" aria-hidden>
-                {profile.fullName.trim().charAt(0).toUpperCase()}
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate font-semibold">{profile.fullName}</span>
-                <span className="line-clamp-2 text-sm text-fg-muted">{exam ? t("preparingFor", { exam, year: profile.targetYear ?? "" }) : (profile.email ?? profile.phone)}</span>
-              </span>
-            </Link>
-            <button type="button" onClick={onClose} aria-label={t("closeMenu")} className="rounded-lg p-1.5 text-fg-muted hover:bg-surface hover:text-fg">
-              <Icon name="x" />
-            </button>
-          </div>
-          {section("menuStudy", <ul>{STUDY.map((i) => link(i))}</ul>)}
-          {section(
-            "menuHelp",
-            <ul>
-              {HELP.map((i) =>
-                link(
-                  i,
-                  i.href === "/notifications" && unread > 0 ? (
-                    <span className="min-w-5 rounded-full bg-danger px-1.5 text-center text-xs font-semibold leading-5 text-white" aria-label={t("unreadCount", { count: unread })}>
-                      {unread > 99 ? "99+" : unread}
-                    </span>
-                  ) : undefined,
-                ),
-              )}
-            </ul>,
-          )}
-          {section(
-            "menuSettings",
-            <>
-              <NightModeSwitch />
-              <div className="flex items-center gap-3 px-3 py-2">
-                <Icon name="globe" className="text-fg-muted" />
-                <span className="flex-1 font-medium">{t("language")}</span>
-                <LanguageSwitch compact onChange={changeLanguage} />
-              </div>
-              <ul>{link({ href: "/profile/preferences", label: "editPreferences", icon: "target" })}</ul>
-              <a href={privacyUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium hover:bg-surface-muted">
-                <Icon name="doc" className="text-fg-muted" />
-                <span className="flex-1">{t("privacyPolicy")}</span>
-                <Icon name="external" size={16} className="text-fg-muted" />
-              </a>
-            </>,
-          )}
-          <div className="mt-auto border-t border-border px-3 py-3">
-            <button type="button" onClick={() => void signOut()} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left font-medium hover:bg-surface-muted">
-              <Icon name="logout" className="text-fg-muted" />
-              {t("signOut")}
-            </button>
-          </div>
-        </nav>
+    <MenuDialog open={open} onClose={onClose}>
+      <div className="flex items-start gap-3 bg-primary-soft px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))]">
+        <Link href="/profile" onClick={onClose} className="flex min-w-0 flex-1 items-center gap-3 rounded-lg">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-primary-fg" aria-hidden>
+            {profile.fullName.trim().charAt(0).toUpperCase()}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate font-semibold">{profile.fullName}</span>
+            <span className="line-clamp-2 text-sm text-fg-muted">{exam ? t("preparingFor", { exam, year: profile.targetYear ?? "" }) : (profile.email ?? profile.phone)}</span>
+          </span>
+        </Link>
+        {closeButton}
+      </div>
+      {section("menuStudy", <ul>{STUDY.map((i) => link(i))}</ul>)}
+      {section(
+        "menuHelp",
+        <>
+          <ul>
+            {HELP.map((i) =>
+              link(
+                i,
+                i.href === "/notifications" && unread > 0 ? (
+                  <span className="min-w-5 rounded-full bg-danger px-1.5 text-center text-xs font-semibold leading-5 text-white" aria-label={t("unreadCount", { count: unread })}>
+                    {unread > 99 ? "99+" : unread}
+                  </span>
+                ) : undefined,
+              ),
+            )}
+          </ul>
+          <WhatsAppMenuLinks onNavigate={onClose} />
+        </>,
       )}
-    </dialog>
+      {section(
+        "menuSettings",
+        <>
+          <NightModeSwitch />
+          <div className="flex items-center gap-3 px-3 py-2">
+            <Icon name="globe" className="text-fg-muted" />
+            <span className="flex-1 font-medium">{t("language")}</span>
+            <LanguageSwitch compact onChange={changeLanguage} />
+          </div>
+          <ul>{link({ href: "/profile/preferences", label: "editPreferences", icon: "target" })}</ul>
+          <a href={privacyUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium hover:bg-surface-muted">
+            <Icon name="doc" className="text-fg-muted" />
+            <span className="flex-1">{t("privacyPolicy")}</span>
+            <Icon name="external" size={16} className="text-fg-muted" />
+          </a>
+        </>,
+      )}
+      <div className="mt-auto border-t border-border px-3 py-3">
+        <button type="button" onClick={() => void signOut()} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left font-medium hover:bg-surface-muted">
+          <Icon name="logout" className="text-fg-muted" />
+          {t("signOut")}
+        </button>
+      </div>
+    </MenuDialog>
+  );
+}
+
+/** The menu for guests: what they can browse, WhatsApp, settings, and the way in. */
+export function GuestSideMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const t = useT();
+  const pathname = usePathname();
+  const next = encodeURIComponent(pathname);
+  const { link, section, closeButton } = useMenuParts(onClose);
+  return (
+    <MenuDialog open={open} onClose={onClose}>
+      <div className="flex items-start gap-3 bg-primary-soft px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))]">
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold">{t("guestTitle")}</p>
+          <p className="mt-1 text-sm text-fg-muted">{t("guestDrawerBody")}</p>
+          <Link href={`/register?next=${next}`} onClick={onClose} className={buttonClass("primary", "sm", "mt-3")}>
+            {t("createFreeAccount")}
+          </Link>
+        </div>
+        {closeButton}
+      </div>
+      {section("menuStudy", <ul>{link({ href: "/learn", label: "menuSubjectsCourses", icon: "book" })}</ul>)}
+      {section("menuHelp", <WhatsAppMenuLinks onNavigate={onClose} />)}
+      {section(
+        "menuSettings",
+        <>
+          <NightModeSwitch />
+          <div className="flex items-center gap-3 px-3 py-2">
+            <Icon name="globe" className="text-fg-muted" />
+            <span className="flex-1 font-medium">{t("language")}</span>
+            <LanguageSwitch compact />
+          </div>
+        </>,
+      )}
+      <div className="mt-auto border-t border-border px-3 py-3">
+        <Link href={`/login?next=${next}`} onClick={onClose} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-medium hover:bg-surface-muted">
+          <Icon name="login" className="text-fg-muted" />
+          {t("signIn")}
+        </Link>
+      </div>
+    </MenuDialog>
   );
 }

@@ -217,6 +217,43 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Guest browsing and WhatsApp links (25 Nov 2026)
+
+- **Guest browsing (app and website):** look around without an account.
+  - **App:** "Explore without an account" on the welcome screen.
+    - Home shows a guest card (create free account / sign in), the NCERT subject grid, courses to explore, and WhatsApp.
+    - Learn, course pages, subject books and chapters work as normal.
+    - Practice, Tests and Profile explain what a free account adds. Profile keeps language, night mode, WhatsApp and the
+      privacy policy.
+    - Anything else (a lesson, practice, a test, flash cards) opens the sign-up screen, with Back to keep browsing.
+    - The guest side menu has browse, WhatsApp, settings and sign in.
+    - Guest mode is remembered until the student signs in or signs out. Paid courses open the website without a
+      sign-in code.
+  - **Website:** the course catalogue (`/learn`), course pages and NCERT subject pages (`/library/...`) are public.
+    - Guests get a light shell: a banner, Sign in / Create free account in the header (a bar on phones), and a guest
+      menu.
+    - Joining or buying sends them to sign up or sign in and back (to checkout for paid courses).
+    - Lessons, practice and tests still need sign-in, and a guest asked to sign in isn't told their "session expired".
+    - The landing page has "Explore without an account".
+- **WhatsApp:**
+  - "Chat with us on WhatsApp" opens a chat with a ready message, and "Join our WhatsApp channel" opens the channel.
+    Both are set on the server (`Contact__WhatsAppNumber`, `Contact__WhatsAppChannelUrl`; see 10-deploy-render), so
+    they change without an app release.
+  - The server only accepts a phone number and WhatsApp links, so a typo can't send students to another site.
+  - They appear in the side menu (both apps), Help & support, the guest home and Profile (app), and on the landing page
+    (website, a round chat button and a channel link).
+  - "Share on WhatsApp" for courses (with the course's website link) and "Invite friends on WhatsApp" work without
+    settings.
+- **Verified:**
+  - 2 backend tests (settings checked and normalised), 2 browser tests (guest browsing end to end; signed-in WhatsApp
+    links) and 1 app test (the whole guest flow with WhatsApp links).
+  - Screenshots of the guest screens on phone in light and dark.
+  - Found and fixed along the way:
+    - Next.js's Cache Components needs the session check inside the loading boundary.
+    - "Create free account" appeared twice on phones.
+    - The WhatsApp button covered the landing page's last line.
+  - All suites green: 123 backend, 47 browser, 37 app.
+
 ### Custom test generator and flash cards (25 Nov 2026)
 
 - **Custom test generator (app and website):** Tests → "Create a custom test".

@@ -5,18 +5,21 @@ import { useT } from "@/lib/i18n";
 import { buttonClass } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { LanguageSwitch } from "./language-switch";
+import { useAppConfig, WhatsAppFloatingButton } from "./whatsapp";
 
 const brand = process.env.NEXT_PUBLIC_BRAND_NAME ?? "LearnPath";
 
 export function Landing() {
   const t = useT();
+  const config = useAppConfig();
   const features: { icon: IconName; text: string }[] = [
     { icon: "play", text: t("landingFeatureLearn") },
     { icon: "pencil", text: t("landingFeaturePractice") },
     { icon: "clipboard", text: t("landingFeatureTests") },
   ];
   return (
-    <div className="flex min-h-dvh flex-col">
+    // Room at the bottom so the last lines can scroll clear of the WhatsApp button.
+    <div className="flex min-h-dvh flex-col pb-20">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-4">
         <span className="text-lg font-semibold">{brand}</span>
         <div className="flex items-center gap-3">
@@ -38,6 +41,11 @@ export function Landing() {
             {t("signIn")}
           </Link>
         </div>
+        <Link href="/learn" className="mt-4 inline-flex w-fit items-center gap-1.5 font-medium text-primary hover:underline">
+          <Icon name="book" size={18} />
+          {t("exploreAsGuest")}
+          <Icon name="chevronRight" size={16} />
+        </Link>
         <ul className="mt-12 grid gap-4 sm:grid-cols-3">
           {features.map((f) => (
             <li key={f.icon} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
@@ -49,11 +57,17 @@ export function Landing() {
           ))}
         </ul>
       </main>
-      <footer className="mx-auto w-full max-w-5xl px-4 py-6 text-sm text-fg-muted">
+      <footer className="mx-auto flex w-full max-w-5xl flex-wrap gap-x-6 gap-y-2 px-4 py-6 pr-20 text-sm text-fg-muted">
+        {config.data?.whatsAppChannelUrl && (
+          <a href={config.data.whatsAppChannelUrl} target="_blank" rel="noreferrer" className="hover:underline">
+            {t("whatsAppChannel")}
+          </a>
+        )}
         <Link href="/admin" className="hover:underline">
           {t("staffPortal")}
         </Link>
       </footer>
+      <WhatsAppFloatingButton />
     </div>
   );
 }

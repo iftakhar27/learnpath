@@ -59,6 +59,10 @@ services:
         sync: false
       - key: Razorpay__WebhookSecret                # the secret you enter for the webhook in Razorpay's dashboard
         sync: false
+      - key: Contact__WhatsAppNumber                # optional: WhatsApp number with country code, e.g. +91 98765 43210
+        sync: false
+      - key: Contact__WhatsAppChannelUrl            # optional: https://whatsapp.com/channel/... or a chat.whatsapp.com invite link
+        sync: false
       - key: Otp__Provider                          # log (codes on the admin Dashboard) or msg91 (real SMS); set in Render
         sync: false
       - key: Otp__Msg91__AuthKey                    # MSG91 auth key (only for Otp__Provider=msg91)

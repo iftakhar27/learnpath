@@ -10,6 +10,7 @@ import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../auth/auth_screens.dart' show LanguageToggle;
 import '../onboarding/onboarding_screen.dart' show examsProvider;
+import '../support/whatsapp.dart';
 import 'notification_bell.dart';
 
 /// Opens the side menu from a tab screen's app bar. The menu belongs to the outer (tab bar) scaffold so that it covers
@@ -40,6 +41,7 @@ class AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (ref.watch(sessionProvider) is Guest) return const _GuestDrawer();
     final l = context.l10n;
     final p = ref.watch(profileProvider);
     final scheme = Theme.of(context).colorScheme;
@@ -151,6 +153,7 @@ class AppDrawer extends ConsumerWidget {
           ),
           page(Icons.receipt_long_outlined, l.myPurchases, '/orders'),
           page(Icons.support_agent_rounded, l.helpSupport, '/support'),
+          WhatsAppTiles(beforeOpen: close),
           const Divider(indent: 16, endIndent: 16),
           heading(l.menuSettings),
           SwitchListTile(
@@ -182,6 +185,74 @@ class AppDrawer extends ConsumerWidget {
               unawaited(ref.read(sessionProvider.notifier).logout());
             },
           ),
+          SizedBox(height: MediaQuery.paddingOf(context).bottom + 8),
+        ],
+      ),
+    );
+  }
+}
+
+/// The side menu while exploring without an account: what can be browsed, settings, and the way in.
+class _GuestDrawer extends ConsumerWidget {
+  const _GuestDrawer();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = context.l10n;
+    final scheme = Theme.of(context).colorScheme;
+    final here = GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    void close() => Scaffold.of(context).closeDrawer();
+    void go(String route) {
+      close();
+      if (here != route) context.go(route);
+    }
+
+    void push(String route) {
+      close();
+      unawaited(context.push(route));
+    }
+
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          Container(
+            color: scheme.primaryContainer,
+            padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 20, 20, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l.guestTitle,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: scheme.onPrimaryContainer, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                Text(l.guestDrawerBody, style: TextStyle(color: scheme.onPrimaryContainer)),
+                const SizedBox(height: 12),
+                FilledButton(onPressed: () => push('/register'), child: Text(l.createFreeAccount)),
+              ],
+            ),
+          ),
+          ListTile(leading: const Icon(Icons.home_outlined), title: Text(l.tabHome), selected: here == '/home', onTap: () => go('/home')),
+          ListTile(
+            leading: const Icon(Icons.menu_book_outlined),
+            title: Text(l.menuSubjectsCourses),
+            selected: here == '/learn',
+            onTap: () => go('/learn'),
+          ),
+          const Divider(indent: 16, endIndent: 16),
+          WhatsAppTiles(beforeOpen: close),
+          const Divider(indent: 16, endIndent: 16),
+          SwitchListTile(
+            secondary: Icon(dark ? Icons.dark_mode_rounded : Icons.dark_mode_outlined),
+            title: Text(l.nightMode),
+            value: dark,
+            onChanged: (on) => ref.read(themeModeProvider.notifier).set(on ? ThemeMode.dark : ThemeMode.light),
+          ),
+          ListTile(leading: const Icon(Icons.translate_rounded), title: Text(l.language), trailing: const LanguageToggle()),
+          const Divider(indent: 16, endIndent: 16),
+          ListTile(leading: const Icon(Icons.login_rounded), title: Text(l.signIn), onTap: () => push('/welcome')),
           SizedBox(height: MediaQuery.paddingOf(context).bottom + 8),
         ],
       ),

@@ -1508,4 +1508,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allDecks => 'All decks';
+
+  @override
+  String get exploreAsGuest => 'Explore without an account';
+
+  @override
+  String get guestTitle => 'You\'re exploring as a guest';
+
+  @override
+  String get guestBody =>
+      'Browse subjects, chapters and courses. Create a free account to watch lessons, practise, take tests and track your progress.';
+
+  @override
+  String get guestDrawerBody =>
+      'Browse freely. A free account saves your progress.';
+
+  @override
+  String get createFreeAccount => 'Create free account';
+
+  @override
+  String get coursesToExplore => 'Courses to explore';
+
+  @override
+  String get guestLockedTitle => 'Create a free account to continue';
+
+  @override
+  String get guestLockedBody =>
+      'Create a free account to watch lessons, practise and take tests. It takes a minute.';
+
+  @override
+  String get guestPracticeBody =>
+      'Practise questions with instant solutions, revise with flash cards and go back over your mistakes.';
+
+  @override
+  String get guestTestsBody =>
+      'Take timed mock tests, make your own test from any chapters and see exactly where to improve.';
+
+  @override
+  String get guestProfileBody =>
+      'Save your progress, get a daily study plan and carry on from any device.';
+
+  @override
+  String get signUpToStart => 'Sign up free to start';
+
+  @override
+  String get whatsAppChat => 'Chat with us on WhatsApp';
+
+  @override
+  String get whatsAppChannel => 'Join our WhatsApp channel';
+
+  @override
+  String get inviteFriends => 'Invite friends on WhatsApp';
+
+  @override
+  String get shareOnWhatsApp => 'Share on WhatsApp';
+
+  @override
+  String whatsAppHello(String brand) {
+    return 'Hi! I have a question about $brand.';
+  }
+
+  @override
+  String shareAppMessage(String brand, String url) {
+    return 'I\'m preparing for NEET, JEE and Boards with $brand: videos, practice, mock tests and flash cards. Have a look: $url';
+  }
+
+  @override
+  String shareCourseMessage(String course, String brand, String url) {
+    return 'Have a look at “$course” on $brand: $url';
+  }
 }

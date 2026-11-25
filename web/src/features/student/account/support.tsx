@@ -11,6 +11,7 @@ import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { StudentError } from "../errors";
 import { Muted, PageTitle, Section, useFormat } from "../ui";
+import { WhatsAppChatCard } from "../whatsapp";
 
 const CATEGORIES: [string, MessageKey][] = [
   ["payment", "categoryPayment"],
@@ -44,6 +45,7 @@ export function SupportPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <PageTitle>{t("helpSupport")}</PageTitle>
+      <WhatsAppChatCard />
       <Section title={t("newTicket")}>
         <form onSubmit={submit} className="space-y-4" noValidate>
           <StudentError error={error} />

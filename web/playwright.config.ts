@@ -19,7 +19,15 @@ export default defineConfig({
     {
       command: `dotnet run --project ../src/LearnPath.Api --no-launch-profile --urls ${API_URL}`,
       url: `${API_URL}/health`,
-      env: { ASPNETCORE_ENVIRONMENT: "Development", ConnectionStrings__Default: DB, RateLimit__AuthPerMinute: "1000" },
+      env: {
+        ASPNETCORE_ENVIRONMENT: "Development",
+        ConnectionStrings__Default: DB,
+        RateLimit__AuthPerMinute: "1000",
+        // WhatsApp links appear only when these are set (guest-whatsapp.spec.ts checks them).
+        Contact__WhatsAppNumber: "+91 98765 43210",
+        Contact__WhatsAppChannelUrl: "https://whatsapp.com/channel/0029VaExample",
+        Web__BaseUrl: WEB_URL,
+      },
       reuseExistingServer: true,
       timeout: 180_000,
     },

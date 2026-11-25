@@ -2521,6 +2521,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All decks'**
   String get allDecks;
+
+  /// No description provided for @exploreAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore without an account'**
+  String get exploreAsGuest;
+
+  /// No description provided for @guestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re exploring as a guest'**
+  String get guestTitle;
+
+  /// No description provided for @guestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse subjects, chapters and courses. Create a free account to watch lessons, practise, take tests and track your progress.'**
+  String get guestBody;
+
+  /// No description provided for @guestDrawerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse freely. A free account saves your progress.'**
+  String get guestDrawerBody;
+
+  /// No description provided for @createFreeAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create free account'**
+  String get createFreeAccount;
+
+  /// No description provided for @coursesToExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Courses to explore'**
+  String get coursesToExplore;
+
+  /// No description provided for @guestLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a free account to continue'**
+  String get guestLockedTitle;
+
+  /// No description provided for @guestLockedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a free account to watch lessons, practise and take tests. It takes a minute.'**
+  String get guestLockedBody;
+
+  /// No description provided for @guestPracticeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Practise questions with instant solutions, revise with flash cards and go back over your mistakes.'**
+  String get guestPracticeBody;
+
+  /// No description provided for @guestTestsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Take timed mock tests, make your own test from any chapters and see exactly where to improve.'**
+  String get guestTestsBody;
+
+  /// No description provided for @guestProfileBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your progress, get a daily study plan and carry on from any device.'**
+  String get guestProfileBody;
+
+  /// No description provided for @signUpToStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up free to start'**
+  String get signUpToStart;
+
+  /// No description provided for @whatsAppChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat with us on WhatsApp'**
+  String get whatsAppChat;
+
+  /// No description provided for @whatsAppChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Join our WhatsApp channel'**
+  String get whatsAppChannel;
+
+  /// No description provided for @inviteFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite friends on WhatsApp'**
+  String get inviteFriends;
+
+  /// No description provided for @shareOnWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share on WhatsApp'**
+  String get shareOnWhatsApp;
+
+  /// No description provided for @whatsAppHello.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi! I have a question about {brand}.'**
+  String whatsAppHello(String brand);
+
+  /// No description provided for @shareAppMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m preparing for NEET, JEE and Boards with {brand}: videos, practice, mock tests and flash cards. Have a look: {url}'**
+  String shareAppMessage(String brand, String url);
+
+  /// No description provided for @shareCourseMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Have a look at “{course}” on {brand}: {url}'**
+  String shareCourseMessage(String course, String brand, String url);
 }
 
 class _AppLocalizationsDelegate

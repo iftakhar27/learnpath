@@ -4,6 +4,7 @@
 flowchart TD
   Splash --> Intro[Intro slides · first launch only] --> Auth{Logged in?}
   Auth -- no --> Login[Login: OTP / email] --> Reg[Register] --> Setup[Profile setup:<br/>class, board, exam, year, language, study hours]
+  Auth -- explore --> GuestMode[Guest: subjects, courses, chapters<br/>practice/tests/profile ask to sign up]
   Auth -- yes --> Home
   Setup --> Home
 

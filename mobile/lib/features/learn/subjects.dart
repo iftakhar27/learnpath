@@ -8,6 +8,7 @@ import '../../core/api/models.g.dart';
 import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
+import '../home/guest_screens.dart' show JoinButtons;
 
 final libraryProvider = FutureProvider.autoDispose<LibraryDto>((ref) => ref.watch(apiProvider).library());
 final bookProvider = FutureProvider.autoDispose.family<LibrarySubjectDto, (String, String)>(
@@ -493,7 +494,12 @@ class NcertChapterScreen extends ConsumerWidget {
                           header,
                           Padding(
                             padding: const EdgeInsets.all(16),
-                            child: ch.canPractise && ch.practiceQuestionCount > 0
+                            child: ref.watch(sessionProvider) is Guest
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [Text(l.guestPracticeBody), const SizedBox(height: 12), const JoinButtons()],
+                                  )
+                                : ch.canPractise && ch.practiceQuestionCount > 0
                                 ? FilledButton.icon(
                                     icon: const Icon(Icons.edit_note_rounded),
                                     label: Text(l.practiseChapter(ch.practiceQuestionCount)),

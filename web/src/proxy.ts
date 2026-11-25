@@ -4,7 +4,9 @@ import { NextResponse, type NextRequest } from "next/server";
  * Navigation gate only: sends visitors without a session to the right login page before a protected page renders,
  * and signed-in visitors from the landing/login pages to their home. Every API call is still authorised by the API.
  */
-export const STUDENT_AREAS = ["/home", "/onboarding", "/learn", "/topics", "/watch", "/practice", "/tests", "/exam", "/results", "/plan", "/progress", "/profile", "/notifications", "/bookmarks", "/purchases", "/support", "/search", "/doubts", "/library", "/flashcards"];
+export const STUDENT_AREAS = ["/home", "/onboarding", "/topics", "/watch", "/practice", "/tests", "/exam", "/results", "/plan", "/progress", "/profile", "/notifications", "/bookmarks", "/purchases", "/support", "/search", "/doubts", "/flashcards"];
+/** Guests may browse these: the course catalogue, course pages and the NCERT subject pages (see (student)/layout.tsx). */
+export const GUEST_AREAS = ["/learn", "/library"];
 const STUDENT_PUBLIC = ["/", "/login", "/register"];
 
 export function proxy(request: NextRequest) {
@@ -37,7 +39,6 @@ export const config = {
     "/admin/:path*",
     "/home/:path*",
     "/onboarding/:path*",
-    "/learn/:path*",
     "/topics/:path*",
     "/watch/:path*",
     "/practice/:path*",
@@ -52,7 +53,6 @@ export const config = {
     "/purchases/:path*",
     "/support/:path*",
     "/doubts/:path*",
-    "/library/:path*",
     "/flashcards/:path*",
     "/search/:path*",
   ],
