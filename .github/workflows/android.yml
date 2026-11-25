@@ -20,7 +20,7 @@ concurrency:
 jobs:
   android:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       # The API the app talks to (override with a repository variable).
       API_BASE_URL: ${{ vars.API_BASE_URL || 'https://learnpath-api-89zs.onrender.com' }}
@@ -65,14 +65,18 @@ jobs:
         working-directory: mobile
         run: |
           set -o pipefail
-          # Downloads (Gradle, Maven) sometimes time out on the runner: retry those, fail at once on anything else.
-          for attempt in 1 2 3; do
+          # Downloads (Gradle, Maven) sometimes time out or are rate-limited (429) on the runner: retry those with a
+          # growing wait, fail at once on anything else.
+          attempt=0
+          for wait in 60 120 240 0; do
+            attempt=$((attempt + 1))
             if flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL" --dart-define=WEB_BASE_URL="$WEB_BASE_URL" 2>&1 | tee ../android-build.log; then
               exit 0
             fi
-            grep -qE "Server returned HTTP response code: 5|Could not (GET|HEAD|resolve|download)|Read timed out|Connection reset" ../android-build.log || exit 1
-            echo "::warning title=retry::A download failed (attempt $attempt of 3); retrying in 30 seconds"
-            sleep 30
+            grep -qE "Server returned HTTP response code: 5|status code (429|5[0-9][0-9])|Too Many Requests|Could not (GET|HEAD|resolve|download)|Read timed out|Connection reset" ../android-build.log || exit 1
+            [ "$wait" -eq 0 ] && break
+            echo "::warning title=retry::A download failed (attempt $attempt of 4); retrying in $wait seconds"
+            sleep "$wait"
           done
           exit 1
 
