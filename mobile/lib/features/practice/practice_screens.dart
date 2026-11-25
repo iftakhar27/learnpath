@@ -10,6 +10,7 @@ import '../../widgets/common.dart';
 import '../../widgets/question_view.dart';
 import '../doubts/doubt_screens.dart';
 import '../home/app_drawer.dart';
+import 'flashcards.dart';
 
 final analyticsProvider = FutureProvider.autoDispose<StudentAnalyticsDto>((ref) => ref.watch(apiProvider).analytics());
 
@@ -36,6 +37,7 @@ class PracticeHomeScreen extends ConsumerWidget {
         onRefresh: () async => ref.invalidate(analyticsProvider),
         padding: const EdgeInsets.only(top: 8, bottom: 24),
         children: [
+          const _FlashcardsCard(),
           mode(Icons.replay_rounded, l.practiceMistakes, l.practiceMistakesHint, 'incorrect'),
           mode(Icons.bookmark_outline_rounded, l.practiceBookmarked, l.practiceBookmarkedHint, 'bookmarked'),
           mode(Icons.history_edu_rounded, l.practicePyq, l.practicePyqHint, 'previous_year'),
@@ -388,4 +390,28 @@ Future<void> showReportSheet(BuildContext context, WidgetRef ref, String questio
     }
   }
   details.dispose();
+}
+
+/// Flash cards on the Practice tab, with how many are due today.
+class _FlashcardsCard extends ConsumerWidget {
+  const _FlashcardsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = context.l10n;
+    final scheme = Theme.of(context).colorScheme;
+    final due = ref.watch(flashcardsProvider).value?.dueTotal ?? 0;
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      color: scheme.primaryContainer,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Icon(Icons.style_outlined, color: scheme.primary),
+        title: Text(l.flashcardsTitle, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(due > 0 ? l.flashcardsDue(due) : l.flashcardsIntro),
+        trailing: const Icon(Icons.chevron_right_rounded),
+        onTap: () => context.push('/flashcards'),
+      ),
+    );
+  }
 }

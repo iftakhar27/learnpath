@@ -119,7 +119,7 @@ public class StudyPlanService(AppDbContext db, LearnerStatsService stats, Entitl
         {
             var tried = db.TestAttempts.Where(a => a.UserId == userId).Select(a => a.TestId);
             var test = await db.Tests.AsNoTracking()
-                .Where(t => t.Status == PublishStatus.Published && t.CourseId != null && courseIds.Contains(t.CourseId.Value) && !tried.Contains(t.Id))
+                .Where(t => t.Status == PublishStatus.Published && t.OwnerUserId == null && t.CourseId != null && courseIds.Contains(t.CourseId.Value) && !tried.Contains(t.Id))
                 .OrderBy(t => t.DurationMinutes).FirstOrDefaultAsync(ct);
             if (test is not null)
                 Add(PlanTaskType.Test, test.Id, $"Take: {lang.Pick(test.TitleEn, test.TitleHi)}", $"You completed {recentCompletions} lessons this week — check your understanding.", test.DurationMinutes);

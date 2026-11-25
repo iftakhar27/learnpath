@@ -26,7 +26,7 @@ const TONE: Record<Subject, { text: string; soft: string; ring: string }> = {
   Chemistry: { text: "text-chemistry", soft: "bg-chemistry-soft", ring: "stroke-chemistry" },
   Biology: { text: "text-biology", soft: "bg-biology-soft", ring: "stroke-biology" },
 };
-const tone = (s: string) => TONE[(s as Subject) in TONE ? (s as Subject) : "Physics"];
+export const tone = (s: string) => TONE[(s as Subject) in TONE ? (s as Subject) : "Physics"];
 
 /** Our own line icons, one per book: motion, current, flask, benzene ring, leaf, double helix. */
 const ICONS: Record<string, ReactNode> = {
@@ -279,6 +279,19 @@ export function NcertChapterPage() {
           <h1 className="text-2xl font-semibold">{ch.title}</h1>
         </div>
       </header>
+
+      {ch.flashcardCount > 0 && (
+        <Link href={routes.flashcardDeck(ch.id)} className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 hover:border-primary">
+          <span className={`rounded-xl p-2 ${tn.soft} ${tn.text}`}>
+            <Icon name="doc" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold">{t("flashcardsTitle")}</span>
+            <span className="block text-sm text-fg-muted">{t("flashcardsForChapter", { count: ch.flashcardCount })}</span>
+          </span>
+          <Icon name="chevronRight" className="text-fg-muted" />
+        </Link>
+      )}
 
       {ch.buyCourseId && (
         <p className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-warning-soft px-4 py-3 text-sm text-warning">

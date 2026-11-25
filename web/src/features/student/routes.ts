@@ -15,6 +15,7 @@ export const routes = {
   chapter: (ncertChapterId: string) => `/library/chapter/${ncertChapterId}`,
   practiceMode: (mode: "incorrect" | "bookmarked" | "previous_year") => `/practice/${mode}`,
   tests: "/tests",
+  customTest: "/tests/custom",
   test: (id: string) => `/tests/${id}`,
   exam: (attemptId: string) => `/exam/${attemptId}`,
   result: (attemptId: string) => `/results/${attemptId}`,
@@ -23,6 +24,8 @@ export const routes = {
   profile: "/profile",
   notifications: "/notifications",
   doubts: "/doubts",
+  flashcards: "/flashcards",
+  flashcardDeck: (ncertChapterId: string) => `/flashcards/${ncertChapterId}`,
   doubt: (id: string) => `/doubts/${id}`,
 };
 

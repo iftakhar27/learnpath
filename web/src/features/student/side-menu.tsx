@@ -18,7 +18,9 @@ const STUDY: Item[] = [
   { href: "/home", label: "tabHome", icon: "home" },
   { href: "/learn", label: "menuSubjectsCourses", icon: "book" },
   { href: "/practice", label: "tabPractice", icon: "pencil" },
+  { href: "/flashcards", label: "flashcardsTitle", icon: "doc" },
   { href: "/tests", label: "testsTitle", icon: "clipboard" },
+  { href: "/tests/custom", label: "customTestTitle", icon: "target" },
   { href: "/plan", label: "planTitle", icon: "clock" },
   { href: "/progress", label: "myProgress", icon: "check" },
   { href: "/bookmarks", label: "bookmarksTitle", icon: "bookmark" },
@@ -58,7 +60,7 @@ export function SideMenu({ open, onClose, profile, unread }: { open: boolean; on
     }
   }, [pathname, onClose]);
 
-  const on = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  const on = (href: string) => pathname === href || (href !== "/tests" && pathname.startsWith(href + "/")) || (href === "/tests" && pathname.startsWith("/tests/") && !pathname.startsWith("/tests/custom"));
   const link = (item: Item, extra?: ReactNode) => (
     <li key={item.href}>
       <Link

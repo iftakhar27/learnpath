@@ -12,6 +12,7 @@ import { Icon } from "@/components/ui/icons";
 import { StudentError } from "../errors";
 import { routes } from "../routes";
 import { Muted, PageTitle, useFormat } from "../ui";
+import { customTestsKey } from "./custom-test";
 
 type TestSummary = components["schemas"]["TestSummaryDto"];
 
@@ -28,12 +29,68 @@ function TestFacts({ test }: { test: TestSummary }) {
   );
 }
 
+function TestCard({ test }: { test: TestSummary }) {
+  const t = useT();
+  const action = test.inProgressAttemptId ? t("resumeTest") : test.attemptsUsed > 0 ? t("retakeTest") : t("startTest");
+  return (
+    <li className="flex flex-col rounded-2xl border border-border bg-surface p-5">
+      <span className="flex flex-wrap items-center gap-2 text-xs font-medium">
+        <span className="rounded-full bg-surface-muted px-2 py-0.5 text-fg-muted">{test.type === "Custom" ? t("customTestBadge") : test.type}</span>
+        {test.isFree && test.type !== "Custom" && <span className="rounded-full bg-primary-soft px-2 py-0.5 text-primary">{t("free")}</span>}
+        {test.locked && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 text-fg-muted">
+            <Icon name="lock" size={12} />
+            {t("locked")}
+          </span>
+        )}
+      </span>
+      <h2 className="mt-2 text-lg font-semibold">{test.title}</h2>
+      <div className="mt-1">
+        <TestFacts test={test} />
+      </div>
+      <div className="mt-auto flex flex-wrap gap-2 pt-4">
+        <Link href={routes.test(test.id)} className={buttonClass(test.locked ? "secondary" : "primary", "sm")} aria-label={`${action}: ${test.title}`}>
+          {action}
+        </Link>
+        {test.lastAttemptId && (
+          <Link href={routes.result(test.lastAttemptId)} className={buttonClass("secondary", "sm")}>
+            {t("viewResult")}
+          </Link>
+        )}
+      </div>
+    </li>
+  );
+}
+
 export function TestsList() {
   const t = useT();
   const q = useQuery({ queryKey: ["student", "tests"], queryFn: () => unwrap(api.GET("/api/v1/tests")) });
+  const mine = useQuery({ queryKey: customTestsKey, queryFn: () => unwrap(api.GET("/api/v1/tests/custom")) });
   return (
     <>
       <PageTitle>{t("testsTitle")}</PageTitle>
+      <Link href={routes.customTest} className="mb-6 flex items-center gap-4 rounded-2xl border border-primary/40 bg-primary-soft p-5 hover:border-primary">
+        <span className="rounded-xl bg-primary p-2.5 text-primary-fg">
+          <Icon name="target" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold">{t("customTestTitle")}</span>
+          <span className="mt-0.5 block text-sm text-fg-muted">{t("customTestIntro")}</span>
+        </span>
+        <Icon name="chevronRight" className="text-primary" />
+      </Link>
+      {mine.data && mine.data.length > 0 && (
+        <section aria-labelledby="my-custom-tests" className="mb-8">
+          <h2 id="my-custom-tests" className="mb-3 text-lg font-semibold">
+            {t("myCustomTests")}
+          </h2>
+          <ul className="grid gap-4 md:grid-cols-2">
+            {mine.data.slice(0, 6).map((test) => (
+              <TestCard key={test.id} test={test} />
+            ))}
+          </ul>
+        </section>
+      )}
       {q.isPending ? (
         <SkeletonRows rows={3} />
       ) : q.isError ? (
@@ -43,32 +100,7 @@ export function TestsList() {
       ) : (
         <ul className="grid gap-4 md:grid-cols-2">
           {q.data.map((test) => (
-            <li key={test.id} className="flex flex-col rounded-2xl border border-border bg-surface p-5">
-              <span className="flex flex-wrap items-center gap-2 text-xs font-medium">
-                <span className="rounded-full bg-surface-muted px-2 py-0.5 text-fg-muted">{test.type}</span>
-                {test.isFree && <span className="rounded-full bg-primary-soft px-2 py-0.5 text-primary">{t("free")}</span>}
-                {test.locked && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 text-fg-muted">
-                    <Icon name="lock" size={12} />
-                    {t("locked")}
-                  </span>
-                )}
-              </span>
-              <h2 className="mt-2 text-lg font-semibold">{test.title}</h2>
-              <div className="mt-1">
-                <TestFacts test={test} />
-              </div>
-              <div className="mt-auto flex flex-wrap gap-2 pt-4">
-                <Link href={routes.test(test.id)} className={buttonClass(test.locked ? "secondary" : "primary", "sm")} aria-label={`${test.inProgressAttemptId ? t("resumeTest") : test.attemptsUsed > 0 ? t("retakeTest") : t("startTest")}: ${test.title}`}>
-                  {test.inProgressAttemptId ? t("resumeTest") : test.attemptsUsed > 0 ? t("retakeTest") : t("startTest")}
-                </Link>
-                {test.lastAttemptId && (
-                  <Link href={routes.result(test.lastAttemptId)} className={buttonClass("secondary", "sm")}>
-                    {t("viewResult")}
-                  </Link>
-                )}
-              </div>
-            </li>
+            <TestCard key={test.id} test={test} />
           ))}
         </ul>
       )}

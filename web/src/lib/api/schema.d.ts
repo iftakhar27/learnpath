@@ -984,6 +984,216 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/flashcards/decks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminFlashcardDeckDto"][];
+                        "application/json": components["schemas"]["AdminFlashcardDeckDto"][];
+                        "text/json": components["schemas"]["AdminFlashcardDeckDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/flashcards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    ncertChapterId: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminFlashcardDto"][];
+                        "application/json": components["schemas"]["AdminFlashcardDto"][];
+                        "text/json": components["schemas"]["AdminFlashcardDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FlashcardUpsert"];
+                    "text/json": components["schemas"]["FlashcardUpsert"];
+                    "application/*+json": components["schemas"]["FlashcardUpsert"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["IdDto"];
+                        "application/json": components["schemas"]["IdDto"];
+                        "text/json": components["schemas"]["IdDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/flashcards/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FlashcardUpsert"];
+                    "text/json": components["schemas"]["FlashcardUpsert"];
+                    "application/*+json": components["schemas"]["FlashcardUpsert"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["IdDto"];
+                        "application/json": components["schemas"]["IdDto"];
+                        "text/json": components["schemas"]["IdDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/flashcards/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FlashcardImportRequest"];
+                    "text/json": components["schemas"]["FlashcardImportRequest"];
+                    "application/*+json": components["schemas"]["FlashcardImportRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FlashcardImportResult"];
+                        "application/json": components["schemas"]["FlashcardImportResult"];
+                        "text/json": components["schemas"]["FlashcardImportResult"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/dashboard": {
         parameters: {
             query?: never;
@@ -2676,6 +2886,107 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tests/custom/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CustomTestOptionsDto"];
+                        "application/json": components["schemas"]["CustomTestOptionsDto"];
+                        "text/json": components["schemas"]["CustomTestOptionsDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tests/custom": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TestSummaryDto"][];
+                        "application/json": components["schemas"]["TestSummaryDto"][];
+                        "text/json": components["schemas"]["TestSummaryDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateCustomTestRequest"];
+                    "text/json": components["schemas"]["CreateCustomTestRequest"];
+                    "application/*+json": components["schemas"]["CreateCustomTestRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TestSummaryDto"];
+                        "application/json": components["schemas"]["TestSummaryDto"];
+                        "text/json": components["schemas"]["TestSummaryDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/doubts": {
         parameters: {
             query?: never;
@@ -2857,6 +3168,127 @@ export interface paths {
                         "text/plain": components["schemas"]["DoubtDto"];
                         "application/json": components["schemas"]["DoubtDto"];
                         "text/json": components["schemas"]["DoubtDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flashcards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FlashcardsHomeDto"];
+                        "application/json": components["schemas"]["FlashcardsHomeDto"];
+                        "text/json": components["schemas"]["FlashcardsHomeDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flashcards/{chapterId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    chapterId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FlashcardDeckDetailDto"];
+                        "application/json": components["schemas"]["FlashcardDeckDetailDto"];
+                        "text/json": components["schemas"]["FlashcardDeckDetailDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flashcards/cards/{cardId}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    cardId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FlashcardReviewRequest"];
+                    "text/json": components["schemas"]["FlashcardReviewRequest"];
+                    "application/*+json": components["schemas"]["FlashcardReviewRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FlashcardReviewDto"];
+                        "application/json": components["schemas"]["FlashcardReviewDto"];
+                        "text/json": components["schemas"]["FlashcardReviewDto"];
                     };
                 };
             };
@@ -4862,6 +5294,32 @@ export interface components {
             /** Format: int32 */
             sortOrder: number;
         };
+        AdminFlashcardDeckDto: {
+            /** Format: uuid */
+            chapterId: string;
+            classLevel: string;
+            subject: string;
+            /** Format: int32 */
+            number: number;
+            title: string;
+            /** Format: int32 */
+            published: number;
+            /** Format: int32 */
+            drafts: number;
+        };
+        AdminFlashcardDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            ncertChapterId: string;
+            frontEn: string;
+            frontHi?: string | null;
+            backEn: string;
+            backHi?: string | null;
+            /** Format: int32 */
+            sortOrder: number;
+            status: components["schemas"]["PublishStatus"];
+        };
         AdminImportJobDto: {
             /** Format: uuid */
             id: string;
@@ -5347,6 +5805,13 @@ export interface components {
             /** Format: date-time */
             publishAt?: string | null;
         };
+        CreateCustomTestRequest: {
+            chapterIds: string[];
+            /** Format: int32 */
+            count?: number;
+            difficulty?: components["schemas"]["Difficulty"] | null;
+            skipCorrect?: boolean;
+        };
         CreateOrderRequest: {
             /** Format: uuid */
             courseId: string;
@@ -5362,6 +5827,34 @@ export interface components {
             count?: number;
             /** Format: uuid */
             ncertChapterId?: string | null;
+        };
+        CustomTestChapterDto: {
+            /** Format: uuid */
+            id: string;
+            classLevel: string;
+            /** Format: int32 */
+            number: number;
+            title: string;
+            /** Format: int32 */
+            easy: number;
+            /** Format: int32 */
+            medium: number;
+            /** Format: int32 */
+            hard: number;
+            /** Format: int32 */
+            locked: number;
+        };
+        CustomTestOptionsDto: {
+            subjects: components["schemas"]["CustomTestSubjectDto"][];
+            /** Format: int32 */
+            maxQuestions: number;
+            /** Format: int32 */
+            minutesPerQuestion: number;
+        };
+        CustomTestSubjectDto: {
+            subject: string;
+            title: string;
+            chapters: components["schemas"]["CustomTestChapterDto"][];
         };
         DashboardDto: {
             fullName: string;
@@ -5470,6 +5963,82 @@ export interface components {
             /** Format: int32 */
             sortOrder?: number;
         };
+        FlashcardDeckDetailDto: {
+            deck: components["schemas"]["FlashcardDeckDto"];
+            cards: components["schemas"]["FlashcardDto"][];
+            /** Format: date-time */
+            nextDueAt?: string | null;
+        };
+        FlashcardDeckDto: {
+            /** Format: uuid */
+            chapterId: string;
+            classLevel: string;
+            subject: string;
+            subjectTitle: string;
+            /** Format: int32 */
+            number: number;
+            title: string;
+            /** Format: int32 */
+            cards: number;
+            /** Format: int32 */
+            due: number;
+            /** Format: int32 */
+            mastered: number;
+        };
+        FlashcardDto: {
+            /** Format: uuid */
+            id: string;
+            front: string;
+            back: string;
+            /** Format: int32 */
+            box: number;
+            isNew: boolean;
+            isDue: boolean;
+            /** Format: date-time */
+            dueAt?: string | null;
+        };
+        FlashcardImportProblem: {
+            /** Format: int32 */
+            line: number;
+            reason: string;
+        };
+        FlashcardImportRequest: {
+            /** Format: uuid */
+            ncertChapterId: string;
+            text: string;
+            status?: components["schemas"]["PublishStatus"];
+        };
+        FlashcardImportResult: {
+            /** Format: int32 */
+            added: number;
+            problems: components["schemas"]["FlashcardImportProblem"][];
+        };
+        FlashcardReviewDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            box: number;
+            /** Format: date-time */
+            dueAt: string;
+            mastered: boolean;
+        };
+        FlashcardReviewRequest: {
+            known: boolean;
+        };
+        FlashcardUpsert: {
+            /** Format: uuid */
+            ncertChapterId: string;
+            frontEn: string;
+            frontHi?: string | null;
+            backEn: string;
+            backHi?: string | null;
+            status?: components["schemas"]["PublishStatus"];
+        };
+        FlashcardsHomeDto: {
+            decks: components["schemas"]["FlashcardDeckDto"][];
+            /** Format: int32 */
+            dueTotal: number;
+        };
         ForgotPasswordRequest: {
             email: string;
         };
@@ -5545,6 +6114,8 @@ export interface components {
             canPractise: boolean;
             /** Format: uuid */
             buyCourseId?: string | null;
+            /** Format: int32 */
+            flashcardCount: number;
         };
         LibraryChapterDto: {
             /** Format: uuid */

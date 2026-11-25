@@ -31,6 +31,7 @@ public static class LearningEventTypes
     public const string TestSubmitted = "test_submitted";
     public const string PlanTaskCompleted = "plan_task_completed";
     public const string CoursePurchased = "course_purchased";
+    public const string FlashcardReviewed = "flashcard_reviewed";
 }
 
 public enum BookmarkType { Question, Resource, Topic }

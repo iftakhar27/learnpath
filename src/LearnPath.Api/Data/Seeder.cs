@@ -42,6 +42,11 @@ public static class Seeder
 
         var linked = await NcertSyllabus.SeedAsync(db);
         if (linked > 0) logger.LogInformation("Linked {Count} course chapters to the NCERT syllabus", linked);
+        if (config.GetValue<bool>("Seed:SampleContent"))
+        {
+            var cards = await FlashcardSamples.SeedAsync(db, now);
+            if (cards > 0) logger.LogInformation("Seeded {Count} starter flash cards", cards);
+        }
 
         // Sample lessons have placeholder video IDs; point them at a public demo stream so playback can be tried
         // before a video host (Bunny Stream) is connected. Real lessons are never touched.

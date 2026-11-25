@@ -13,6 +13,7 @@ const NAV: NavItem[] = [
   { href: "/admin", label: "Dashboard", allowed: can.staff },
   { href: "/admin/catalog", label: "Courses & syllabus", allowed: can.editContent },
   { href: "/admin/questions", label: "Question bank", allowed: can.editContent },
+  { href: "/admin/flashcards", label: "Flash cards", allowed: can.editContent },
   { href: "/admin/tests", label: "Tests", allowed: can.editContent },
   { href: "/admin/students", label: "Students", allowed: can.support },
   { href: "/admin/doubts", label: "Doubts", allowed: can.doubts },

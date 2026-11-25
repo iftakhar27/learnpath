@@ -98,6 +98,7 @@ class LibraryApi implements HttpClientAdapter {
         'practiceQuestionCount': 3,
         'canPractise': true,
         'buyCourseId': null,
+        'flashcardCount': 4,
         'topics': [
           {
             'id': 't1',
@@ -203,6 +204,7 @@ void main() {
     await tester.tap(find.text('Units and Measurement'));
     await tester.pumpAndSettle();
     expect(find.text('Chapter 1'), findsOneWidget);
+    expect(find.text('4 flash cards'), findsOneWidget);
     expect(find.text('Dimensions explained'), findsOneWidget);
     expect(find.text('From Physics Starter'), findsOneWidget);
 

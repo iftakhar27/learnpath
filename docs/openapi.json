@@ -1401,6 +1401,303 @@
         }
       }
     },
+    "/api/v1/admin/flashcards/decks": {
+      "get": {
+        "tags": [
+          "AdminFlashcards"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFlashcardDeckDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFlashcardDeckDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFlashcardDeckDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/flashcards": {
+      "get": {
+        "tags": [
+          "AdminFlashcards"
+        ],
+        "parameters": [
+          {
+            "name": "ncertChapterId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFlashcardDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFlashcardDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFlashcardDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AdminFlashcards"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardUpsert"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardUpsert"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardUpsert"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/flashcards/{id}": {
+      "put": {
+        "tags": [
+          "AdminFlashcards"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardUpsert"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardUpsert"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardUpsert"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AdminFlashcards"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/flashcards/import": {
+      "post": {
+        "tags": [
+          "AdminFlashcards"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardImportRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardImportRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardImportRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardImportResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardImportResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardImportResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/dashboard": {
       "get": {
         "tags": [
@@ -3627,6 +3924,131 @@
         }
       }
     },
+    "/api/v1/tests/custom/options": {
+      "get": {
+        "tags": [
+          "CustomTests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomTestOptionsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomTestOptionsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomTestOptionsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tests/custom": {
+      "get": {
+        "tags": [
+          "CustomTests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestSummaryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestSummaryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CustomTests"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomTestRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomTestRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomTestRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestSummaryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestSummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestSummaryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/doubts": {
       "post": {
         "tags": [
@@ -3887,6 +4309,146 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DoubtDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/flashcards": {
+      "get": {
+        "tags": [
+          "Flashcards"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardsHomeDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardsHomeDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardsHomeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/flashcards/{chapterId}": {
+      "get": {
+        "tags": [
+          "Flashcards"
+        ],
+        "parameters": [
+          {
+            "name": "chapterId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardDeckDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardDeckDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardDeckDetailDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/flashcards/cards/{cardId}/review": {
+      "post": {
+        "tags": [
+          "Flashcards"
+        ],
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardReviewRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardReviewRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FlashcardReviewRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardReviewDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardReviewDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardReviewDto"
                 }
               }
             }
@@ -6447,6 +7009,93 @@
         },
         "additionalProperties": false
       },
+      "AdminFlashcardDeckDto": {
+        "required": [
+          "chapterId",
+          "classLevel",
+          "drafts",
+          "number",
+          "published",
+          "subject",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "chapterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classLevel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "published": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "drafts": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminFlashcardDto": {
+        "required": [
+          "backEn",
+          "frontEn",
+          "id",
+          "ncertChapterId",
+          "sortOrder",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ncertChapterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "frontEn": {
+            "type": "string"
+          },
+          "frontHi": {
+            "type": "string",
+            "nullable": true
+          },
+          "backEn": {
+            "type": "string"
+          },
+          "backHi": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublishStatus"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "AdminImportJobDto": {
         "required": [
           "createdAt",
@@ -8115,6 +8764,37 @@
         },
         "additionalProperties": false
       },
+      "CreateCustomTestRequest": {
+        "required": [
+          "chapterIds"
+        ],
+        "type": "object",
+        "properties": {
+          "chapterIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "difficulty": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Difficulty"
+              }
+            ],
+            "nullable": true
+          },
+          "skipCorrect": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateOrderRequest": {
         "required": [
           "courseId"
@@ -8163,6 +8843,100 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomTestChapterDto": {
+        "required": [
+          "classLevel",
+          "easy",
+          "hard",
+          "id",
+          "locked",
+          "medium",
+          "number",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classLevel": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "easy": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "medium": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hard": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "locked": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomTestOptionsDto": {
+        "required": [
+          "maxQuestions",
+          "minutesPerQuestion",
+          "subjects"
+        ],
+        "type": "object",
+        "properties": {
+          "subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomTestSubjectDto"
+            }
+          },
+          "maxQuestions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minutesPerQuestion": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomTestSubjectDto": {
+        "required": [
+          "chapters",
+          "subject",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "chapters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomTestChapterDto"
+            }
           }
         },
         "additionalProperties": false
@@ -8537,6 +9311,278 @@
         },
         "additionalProperties": false
       },
+      "FlashcardDeckDetailDto": {
+        "required": [
+          "cards",
+          "deck"
+        ],
+        "type": "object",
+        "properties": {
+          "deck": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FlashcardDeckDto"
+              }
+            ]
+          },
+          "cards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlashcardDto"
+            }
+          },
+          "nextDueAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardDeckDto": {
+        "required": [
+          "cards",
+          "chapterId",
+          "classLevel",
+          "due",
+          "mastered",
+          "number",
+          "subject",
+          "subjectTitle",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "chapterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classLevel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "subjectTitle": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "cards": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "due": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mastered": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardDto": {
+        "required": [
+          "back",
+          "box",
+          "front",
+          "id",
+          "isDue",
+          "isNew"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "front": {
+            "type": "string"
+          },
+          "back": {
+            "type": "string"
+          },
+          "box": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isNew": {
+            "type": "boolean"
+          },
+          "isDue": {
+            "type": "boolean"
+          },
+          "dueAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardImportProblem": {
+        "required": [
+          "line",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "line": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardImportRequest": {
+        "required": [
+          "ncertChapterId",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "ncertChapterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublishStatus"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardImportResult": {
+        "required": [
+          "added",
+          "problems"
+        ],
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "problems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlashcardImportProblem"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardReviewDto": {
+        "required": [
+          "box",
+          "dueAt",
+          "id",
+          "mastered"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "box": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dueAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mastered": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardReviewRequest": {
+        "required": [
+          "known"
+        ],
+        "type": "object",
+        "properties": {
+          "known": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardUpsert": {
+        "required": [
+          "backEn",
+          "frontEn",
+          "ncertChapterId"
+        ],
+        "type": "object",
+        "properties": {
+          "ncertChapterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "frontEn": {
+            "type": "string"
+          },
+          "frontHi": {
+            "type": "string",
+            "nullable": true
+          },
+          "backEn": {
+            "type": "string"
+          },
+          "backHi": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublishStatus"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlashcardsHomeDto": {
+        "required": [
+          "decks",
+          "dueTotal"
+        ],
+        "type": "object",
+        "properties": {
+          "decks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlashcardDeckDto"
+            }
+          },
+          "dueTotal": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "ForgotPasswordRequest": {
         "required": [
           "email"
@@ -8729,6 +9775,7 @@
         "required": [
           "canPractise",
           "classLevel",
+          "flashcardCount",
           "id",
           "number",
           "practiceQuestionCount",
@@ -8786,6 +9833,10 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "flashcardCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

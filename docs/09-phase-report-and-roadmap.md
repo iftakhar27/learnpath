@@ -217,6 +217,44 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Custom test generator and flash cards (25 Nov 2026)
+
+- **Custom test generator (app and website):** Tests → "Create a custom test".
+  - The student picks NCERT chapters (Physics, Chemistry, Biology; Class 11 and 12), the number of questions (10, 20,
+    30, 45, 90, 180, or all there are), the difficulty, and whether to skip questions already answered correctly.
+  - Each chapter shows how many questions the student can use and how many more are in paid courses. Chapters only in
+    paid courses can't be picked.
+  - The test is private to the student. Questions are spread across the chosen chapters, with one section per subject
+    in NEET order, one minute per question (at least 5), and NEET marking (+4 / −1).
+  - It runs in the existing exam player with the same results, review and analytics, and is listed under
+    "My custom tests".
+  - Custom tests never appear in the shared test list, search, study plans or the admin test list. Up to 20 a day per
+    student.
+- **Flash cards (app and website):** a deck per NCERT chapter, free for every signed-in student.
+  - Reached from Practice, the side menu and the chapter page.
+  - Tap (or Space) flips a card. The student answers "Got it" or "Still learning" with the buttons, a swipe (app) or the
+    arrow keys (website).
+  - Spaced repetition: "got it" brings a card back in 1, 3, 7, 16, then 35 days; "still learning" brings it back
+    straight away. Three in a row counts as mastered.
+  - Decks show cards due and mastered, and a session ends with a summary. Reviews count towards the streak.
+- **Admin:** a new "Flash cards" page.
+  - Lists all 79 chapters with their card counts.
+  - Per chapter: add a card (English, optional Hindi, draft or published), paste many at once ("front | back" per line,
+    problems reported by line), edit and delete.
+- **Starter decks:** 43 cards for four chapters (Units and Measurement, Laws of Motion, Some Basic Concepts of
+  Chemistry, Cell: The Unit of Life), added with the sample content. They use standard textbook facts but should be
+  reviewed by a subject expert. Hindi isn't written yet; English shows instead.
+- **Verified:**
+  - 5 backend tests: options, privacy and unseen-first selection, errors and the daily limit, spaced repetition,
+    admin writing and pasting.
+  - 3 browser tests and 2 app tests.
+  - Screenshots in light and dark on phone, plus the admin editor.
+  - Found and fixed along the way:
+    - A "Hard only" request in a free chapter wrongly said "buy a course".
+    - Deck tiles in the app were announced as progress bars to screen readers.
+    - "Add card" and "Add cards" were too alike in the admin editor.
+  - All suites green: 121 backend, 44 browser, 36 app.
+
 ### Intro slides, side menu and night mode (25 Nov 2026)
 
 - **Intro slides (app):** four slides on first launch, before the sign-in choices: NCERT chapters, NEET-style

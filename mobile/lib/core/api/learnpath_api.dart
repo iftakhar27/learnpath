@@ -210,9 +210,23 @@ class LearnPathApi {
       _call(() => _dio.post('/doubts/$id/messages', data: DoubtReplyRequest(text: text).toJson()), (d) => DoubtDto.fromJson(_map(d)));
   Future<DoubtDto> resolveDoubt(String id) => _call(() => _dio.post('/doubts/$id/resolve'), (d) => DoubtDto.fromJson(_map(d)));
 
+  // ---- Flash cards ----
+  Future<FlashcardsHomeDto> flashcards() => _call(() => _dio.get('/flashcards'), (d) => FlashcardsHomeDto.fromJson(_map(d)));
+  Future<FlashcardDeckDetailDto> flashcardDeck(String chapterId) =>
+      _call(() => _dio.get('/flashcards/$chapterId'), (d) => FlashcardDeckDetailDto.fromJson(_map(d)));
+  Future<FlashcardReviewDto> reviewFlashcard(String cardId, {required bool known}) => _call(
+    () => _dio.post('/flashcards/cards/$cardId/review', data: FlashcardReviewRequest(known: known).toJson()),
+    (d) => FlashcardReviewDto.fromJson(_map(d)),
+  );
+
   // ---- Tests ----
   Future<List<TestSummaryDto>> tests({String? courseId}) =>
       _call(() => _dio.get('/tests', queryParameters: {'courseId': ?courseId}), (d) => _list(d, TestSummaryDto.fromJson));
+  Future<CustomTestOptionsDto> customTestOptions() =>
+      _call(() => _dio.get('/tests/custom/options'), (d) => CustomTestOptionsDto.fromJson(_map(d)));
+  Future<List<TestSummaryDto>> myCustomTests() => _call(() => _dio.get('/tests/custom'), (d) => _list(d, TestSummaryDto.fromJson));
+  Future<TestSummaryDto> createCustomTest(CreateCustomTestRequest body) =>
+      _call(() => _dio.post('/tests/custom', data: body.toJson()), (d) => TestSummaryDto.fromJson(_map(d)));
   Future<TestDetailDto> testDetail(String testId) => _call(() => _dio.get('/tests/$testId'), (d) => TestDetailDto.fromJson(_map(d)));
   Future<AttemptDto> startAttempt(String testId) => _call(() => _dio.post('/tests/$testId/attempts'), (d) => AttemptDto.fromJson(_map(d)));
   Future<AttemptDto> attempt(String attemptId) => _call(() => _dio.get('/attempts/$attemptId'), (d) => AttemptDto.fromJson(_map(d)));

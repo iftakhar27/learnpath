@@ -14,6 +14,7 @@ import '../../widgets/question_view.dart';
 import '../home/app_drawer.dart';
 import '../home/home_screen.dart';
 import '../practice/practice_screens.dart';
+import 'custom_test_screen.dart';
 import 'exam_session.dart';
 import '../doubts/doubt_screens.dart';
 
@@ -28,24 +29,54 @@ class TestsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
     final tests = ref.watch(testsProvider);
+    final mine = ref.watch(myCustomTestsProvider).value ?? const <TestSummaryDto>[];
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(leading: const MenuButton(), title: Text(l.testsTitle)),
       body: AsyncView(
         value: tests,
         onRetry: () => ref.invalidate(testsProvider),
-        data: (list) => list.isEmpty
-            ? EmptyState(icon: Icons.assignment_outlined, message: l.testsEmpty)
-            : RefreshableList(
-                onRefresh: () async => ref.invalidate(testsProvider),
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                children: [
-                  for (final t in list)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _TestCard(test: t),
-                    ),
-                ],
+        data: (list) => RefreshableList(
+          onRefresh: () async {
+            ref.invalidate(testsProvider);
+            ref.invalidate(myCustomTestsProvider);
+          },
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          children: [
+            Card(
+              color: scheme.primaryContainer,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                leading: Icon(Icons.tune_rounded, color: scheme.primary),
+                title: Text(l.customTestTitle, style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text(l.customTestIntro),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/tests/custom'),
               ),
+            ),
+            if (mine.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 20, 0, 8),
+                child: Text(l.myCustomTests, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+              ),
+              for (final t in mine.take(5))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _TestCard(test: t),
+                ),
+              const SizedBox(height: 8),
+            ] else
+              const SizedBox(height: 12),
+            if (list.isEmpty)
+              EmptyState(icon: Icons.assignment_outlined, message: l.testsEmpty)
+            else
+              for (final t in list)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _TestCard(test: t),
+                ),
+          ],
+        ),
       ),
     );
   }
@@ -82,7 +113,10 @@ class _TestCard extends StatelessWidget {
                 Pill(l.questionsCount(test.questionCount)),
                 Pill(l.marksCount(formatNumber(test.maxMarks))),
                 Pill(l.minutesCount(test.durationMinutes)),
-                if (test.isFree) Pill(l.free, color: scheme.primary, background: scheme.primaryContainer),
+                if (test.type == 'Custom')
+                  Pill(l.customTestBadge, color: scheme.primary, background: scheme.primaryContainer)
+                else if (test.isFree)
+                  Pill(l.free, color: scheme.primary, background: scheme.primaryContainer),
                 if (test.maxAttempts != null) Pill(l.attemptsUsed(test.attemptsUsed, test.maxAttempts!)),
               ],
             ),

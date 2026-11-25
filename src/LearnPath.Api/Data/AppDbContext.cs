@@ -37,6 +37,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<PracticeSession> PracticeSessions => Set<PracticeSession>();
     public DbSet<PracticeAnswer> PracticeAnswers => Set<PracticeAnswer>();
     public DbSet<QuestionReport> QuestionReports => Set<QuestionReport>();
+    public DbSet<Flashcard> Flashcards => Set<Flashcard>();
+    public DbSet<FlashcardReview> FlashcardReviews => Set<FlashcardReview>();
 
     public DbSet<ResourceProgress> ResourceProgress => Set<ResourceProgress>();
     public DbSet<LearningEvent> LearningEvents => Set<LearningEvent>();
@@ -179,6 +181,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasOne<Course>().WithMany().HasForeignKey(x => x.CourseId).OnDelete(DeleteBehavior.Restrict);
             e.HasMany(x => x.Sections).WithOne().HasForeignKey(x => x.TestId).OnDelete(DeleteBehavior.Cascade);
             e.HasMany(x => x.Questions).WithOne().HasForeignKey(x => x.TestId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.OwnerUserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => new { x.OwnerUserId, x.CreatedAt });
+        });
+        b.Entity<Flashcard>(e =>
+        {
+            e.HasIndex(x => new { x.NcertChapterId, x.SortOrder });
+            e.Property(x => x.FrontEn).HasMaxLength(500);
+            e.Property(x => x.FrontHi).HasMaxLength(500);
+            e.Property(x => x.BackEn).HasMaxLength(1000);
+            e.Property(x => x.BackHi).HasMaxLength(1000);
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(16);
+            e.HasOne<NcertChapter>().WithMany().HasForeignKey(x => x.NcertChapterId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<FlashcardReview>(e =>
+        {
+            e.HasKey(x => new { x.UserId, x.FlashcardId });
+            e.HasIndex(x => new { x.UserId, x.DueAt });
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<Flashcard>().WithMany().HasForeignKey(x => x.FlashcardId).OnDelete(DeleteBehavior.Cascade);
         });
         b.Entity<TestQuestion>(e =>
         {

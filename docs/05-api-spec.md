@@ -25,7 +25,8 @@ npx @openapitools/openapi-generator-cli generate -i docs/openapi.json -g dart-di
 `invalid_credentials`, `email_taken`, `terms_required`, `otp_invalid`, `otp_too_soon` (429), `invalid_refresh_token` (401),
 `entitlement_required` (402 → show paywall), `attempt_closed`, `attempt_expired`, `max_attempts_reached`, `test_not_open`,
 `test_closed`, `invalid_answer`, `no_questions`, `signature_invalid`, `already_owned`, `exam_required`,
-`guardian_consent_required`, `no_quiz`, `quiz_session`, `doubt_limit` (429), `internal_error` (500).
+`guardian_consent_required`, `no_quiz`, `quiz_session`, `doubt_limit` (429), `custom_test_limit` (429), `invalid_chapter`,
+`too_many_lines`, `internal_error` (500).
 
 ## Test-taking flow
 
@@ -75,6 +76,36 @@ when used or expired), then opens the course with Razorpay checkout started. Bac
 - `POST /practice/sessions {mode:"ncert", ncertChapterId}` practises it. Admins link course chapters with
   `ncertChapterId` on `/admin/chapters` (omit to keep or, on create, to match by title; an empty GUID unlinks);
   `GET /admin/ncert-chapters` lists them.
+
+## Custom tests
+
+- `GET /tests/custom/options` → `{subjects:[{subject, title, chapters:[{id, classLevel, number, title, easy, medium, hard,
+  locked}]}], maxQuestions: 180, minutesPerQuestion: 1}`: NCERT chapters with questions, counted by difficulty among
+  courses the student can open; `locked` = more in courses they haven't bought.
+- `POST /tests/custom {chapterIds, count (1–180), difficulty?, skipCorrect = true}` → a `TestSummaryDto` (`type: "Custom"`).
+  The test is private to the student, spread across the chosen chapters, one section per subject (Physics, Chemistry,
+  Biology), one minute per question (at least 5), the questions' own marks (NEET: +4 / −1). With `skipCorrect`,
+  questions already answered correctly come last. Fewer questions than asked when there aren't enough. `402` when the
+  chapters' questions are only in paid courses, `409 no_questions`, `400 invalid_chapter`, up to 20 a day
+  (`429 custom_test_limit`).
+- It then runs like any test: `GET /tests/{id}`, `POST /tests/{id}/attempts`, results and review. `GET /tests/custom`
+  lists the student's latest 30; they never appear in `GET /tests`, search, study plans or the admin test list.
+
+## Flash cards
+
+- `GET /flashcards` → `{decks:[{chapterId, classLevel, subject, subjectTitle, number, title, cards, due, mastered}],
+  dueTotal}`: NCERT chapters with published cards. Free for every signed-in student.
+- `GET /flashcards/{chapterId}` → `{deck, cards:[{id, front, back, box, isNew, isDue, dueAt}], nextDueAt}`: cards still
+  being learnt first, then overdue reviews, then new cards in deck order, then cards not due yet.
+- `POST /flashcards/cards/{id}/review {known}` → `{box, dueAt, mastered}`. Leitner boxes: "got it" moves a card up one
+  box (most 5) and due again in 1, 3, 7, 16 or 35 days; "still learning" puts it back in box 0, due now. Box 3 or
+  more counts as mastered. Reviews count towards the streak.
+- `GET /library/chapters/{id}` includes `flashcardCount`.
+- Admin (content editors): `GET /admin/flashcards/decks` (all 79 chapters with published/draft counts),
+  `GET /admin/flashcards?ncertChapterId=`, `POST /admin/flashcards`, `PUT /admin/flashcards/{id}`,
+  `DELETE /admin/flashcards/{id}`, `POST /admin/flashcards/import {ncertChapterId, text, status}`: one card per line,
+  `front | back` (or tab-separated), optional `| front in Hindi | back in Hindi`, `#` comments; returns `{added,
+  problems:[{line, reason}]}` (missing back, too long, already in the deck). Up to 500 lines.
 
 ## Forgotten passwords
 
@@ -135,6 +166,12 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `GET` | `/api/v1/admin/exams` |
 | `POST` | `/api/v1/admin/exams` |
 | `PUT` | `/api/v1/admin/exams/{id}` |
+| `GET` | `/api/v1/admin/flashcards` |
+| `POST` | `/api/v1/admin/flashcards` |
+| `GET` | `/api/v1/admin/flashcards/decks` |
+| `POST` | `/api/v1/admin/flashcards/import` |
+| `PUT` | `/api/v1/admin/flashcards/{id}` |
+| `DELETE` | `/api/v1/admin/flashcards/{id}` |
 | `GET` | `/api/v1/admin/imports` |
 | `GET` | `/api/v1/admin/ncert-chapters` |
 | `GET` | `/api/v1/admin/orders` |
@@ -193,12 +230,15 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `GET` | `/api/v1/courses` |
 | `POST` | `/api/v1/courses/{courseId}/enroll` |
 | `GET` | `/api/v1/courses/{courseId}/syllabus` |
-| `GET` | `/api/v1/doubts` |
 | `POST` | `/api/v1/doubts` |
+| `GET` | `/api/v1/doubts` |
 | `GET` | `/api/v1/doubts/{id}` |
 | `POST` | `/api/v1/doubts/{id}/messages` |
 | `POST` | `/api/v1/doubts/{id}/resolve` |
 | `GET` | `/api/v1/exams` |
+| `GET` | `/api/v1/flashcards` |
+| `POST` | `/api/v1/flashcards/cards/{cardId}/review` |
+| `GET` | `/api/v1/flashcards/{chapterId}` |
 | `GET` | `/api/v1/learning/bookmarks` |
 | `POST` | `/api/v1/learning/bookmarks` |
 | `DELETE` | `/api/v1/learning/bookmarks/{id}` |
@@ -211,8 +251,8 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/notifications/read-all` |
 | `GET` | `/api/v1/notifications/unread-count` |
 | `POST` | `/api/v1/notifications/{id}/read` |
-| `GET` | `/api/v1/payments/orders` |
 | `POST` | `/api/v1/payments/orders` |
+| `GET` | `/api/v1/payments/orders` |
 | `POST` | `/api/v1/payments/orders/{orderId}/refund-request` |
 | `POST` | `/api/v1/payments/verify` |
 | `POST` | `/api/v1/payments/webhooks` |
@@ -233,9 +273,12 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/student/study-plan/regenerate` |
 | `POST` | `/api/v1/student/study-plan/tasks/{taskId}/complete` |
 | `POST` | `/api/v1/student/study-plan/tasks/{taskId}/skip` |
-| `GET` | `/api/v1/support/tickets` |
 | `POST` | `/api/v1/support/tickets` |
+| `GET` | `/api/v1/support/tickets` |
 | `GET` | `/api/v1/tests` |
+| `GET` | `/api/v1/tests/custom` |
+| `POST` | `/api/v1/tests/custom` |
+| `GET` | `/api/v1/tests/custom/options` |
 | `GET` | `/api/v1/tests/{testId}` |
 | `POST` | `/api/v1/tests/{testId}/attempts` |
 | `GET` | `/api/v1/topics/{topicId}` |

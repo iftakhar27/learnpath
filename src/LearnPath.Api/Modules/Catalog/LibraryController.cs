@@ -16,7 +16,8 @@ public record LibraryChapterDto(Guid Id, int Number, string Title, int Topics, i
 public record LibrarySubjectDto(string ClassLevel, string Subject, string Title, List<LibraryChapterDto> Chapters, int ProgressPercent);
 public record LibraryTopicDto(Guid Id, string Title, Guid CourseId, string Course, bool HasAccess, List<ResourceDto> Resources);
 public record LibraryChapterDetailDto(Guid Id, int Number, string Title, string ClassLevel, string Subject, string SubjectTitle,
-    Guid? PreviousChapterId, Guid? NextChapterId, List<LibraryTopicDto> Topics, int PracticeQuestionCount, bool CanPractise, Guid? BuyCourseId);
+    Guid? PreviousChapterId, Guid? NextChapterId, List<LibraryTopicDto> Topics, int PracticeQuestionCount, bool CanPractise, Guid? BuyCourseId,
+    int FlashcardCount);
 
 /// <summary>
 /// Browse by NCERT book: the subject grid (Physics, Chemistry, Biology × Class 11, 12), each book's chapter list, and a
@@ -175,7 +176,9 @@ public class LibraryController(AppDbContext db, EntitlementService entitlements,
             ? ordered.Select(ch => courses[ch.Subject!.CourseId]).OrderBy(c => c.PriceInPaise).First().Id
             : (Guid?)null;
 
+        var flashcards = await db.Flashcards.CountAsync(f => f.NcertChapterId == id && f.Status == PublishStatus.Published, ct);
         return new LibraryChapterDetailDto(n.Id, n.Number, lang.Pick(n.TitleEn, n.TitleHi), n.ClassLevel, n.Subject, SubjectTitle(n.Subject),
-            idx > 0 ? siblings[idx - 1] : null, idx >= 0 && idx < siblings.Count - 1 ? siblings[idx + 1] : null, topics, practice, practiceTopicIds.Count > 0, buy);
+            idx > 0 ? siblings[idx - 1] : null, idx >= 0 && idx < siblings.Count - 1 ? siblings[idx + 1] : null, topics, practice, practiceTopicIds.Count > 0, buy,
+            flashcards);
     }
 }

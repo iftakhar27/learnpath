@@ -670,5 +670,141 @@
   "appearance": "Appearance",
   "themeAuto": "Auto",
   "themeLight": "Light",
-  "themeDark": "Dark"
+  "themeDark": "Dark",
+  "customTestTitle": "Create a custom test",
+  "customTestIntro": "Pick chapters, how many questions and the difficulty. You get a timed test, just like the real exam.",
+  "myCustomTests": "My custom tests",
+  "customTestBadge": "Your test",
+  "chooseChapters": "Choose chapters",
+  "selectAll": "Select all",
+  "clearSelection": "Clear",
+  "chaptersSelected": "{count, plural, =0{No chapters selected} =1{1 chapter selected} other{{count} chapters selected}}",
+  "@chaptersSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "questionsAvailable": "{count, plural, =0{No questions available} =1{1 question available} other{{count} questions available}}",
+  "@questionsAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreInPaidCourses": "{count, plural, =1{1 more in paid courses} other{{count} more in paid courses}}",
+  "@moreInPaidCourses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onlyInPaidCourses": "Only in paid courses",
+  "numberOfQuestions": "Number of questions",
+  "allQuestionsCount": "All ({count})",
+  "@allQuestionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "difficulty": "Difficulty",
+  "difficultyAny": "Any",
+  "difficultyEasy": "Easy",
+  "difficultyMedium": "Medium",
+  "difficultyHard": "Hard",
+  "skipCorrect": "Skip questions I've already got right",
+  "skipCorrectHint": "They're only used when there aren't enough others.",
+  "createTest": "Create test",
+  "customTestNoChapters": "No chapters have questions yet. Check back soon.",
+  "customTestPickChapter": "Choose at least one chapter",
+  "flashcardsTitle": "Flash cards",
+  "flashcardsIntro": "Quick revision, chapter by chapter. Cards you know come back less often.",
+  "flashcardsDue": "{count, plural, =0{Nothing due} =1{1 card due} other{{count} cards due}}",
+  "@flashcardsDue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsCount": "{count, plural, =1{1 card} other{{count} cards}}",
+  "@flashcardsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsMastered": "{count} mastered",
+  "@flashcardsMastered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsEmpty": "No flash cards yet. Check back soon.",
+  "flashcardsForChapter": "{count, plural, =1{1 flash card} other{{count} flash cards}}",
+  "@flashcardsForChapter": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardFront": "Question",
+  "cardBack": "Answer",
+  "tapToFlip": "Tap the card to see the answer",
+  "showAnswer": "Show answer",
+  "gotIt": "Got it",
+  "stillLearning": "Still learning",
+  "cardProgress": "Card {current} of {total}",
+  "@cardProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionDone": "Session done",
+  "sessionKnew": "You knew {known} of {total}.",
+  "@sessionKnew": {
+    "placeholders": {
+      "known": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionAgainSoon": "{count, plural, =0{} =1{1 card will come back soon.} other{{count} cards will come back soon.}}",
+  "@sessionAgainSoon": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCaughtUp": "All caught up!",
+  "nextCardsDue": "The next cards are due on {date}.",
+  "@nextCardsDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reviseAll": "Revise all cards",
+  "studyNow": "Study now",
+  "studyAgain": "Study again",
+  "allDecks": "All decks"
 }

@@ -62,6 +62,8 @@ public class Test
     public DateTimeOffset? AvailableUntil { get; set; }
     public PublishStatus Status { get; set; } = PublishStatus.Draft;
     public DateTimeOffset CreatedAt { get; set; }
+    /// <summary>Custom tests a student generated for themselves: private to that student, never listed for others.</summary>
+    public Guid? OwnerUserId { get; set; }
     public List<TestSection> Sections { get; set; } = [];
     public List<TestQuestion> Questions { get; set; } = [];
 }
@@ -186,4 +188,33 @@ public class QuestionReport
     public string Status { get; set; } = "Open";   // Open, Fixed, Rejected
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? ResolvedAt { get; set; }
+}
+
+/// <summary>A revision card in an NCERT chapter's deck: a prompt on the front, the answer on the back.</summary>
+public class Flashcard
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid NcertChapterId { get; set; }
+    public string FrontEn { get; set; } = "";
+    public string? FrontHi { get; set; }
+    public string BackEn { get; set; } = "";
+    public string? BackHi { get; set; }
+    public int SortOrder { get; set; }
+    public PublishStatus Status { get; set; } = PublishStatus.Published;
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+}
+
+/// <summary>
+/// A student's place with one card (Leitner boxes): "got it" moves the card up a box and further out, "still learning"
+/// sends it back to box 1, due again straight away. No row yet means the card is new to the student.
+/// </summary>
+public class FlashcardReview
+{
+    public Guid UserId { get; set; }
+    public Guid FlashcardId { get; set; }
+    public int Box { get; set; }
+    public DateTimeOffset DueAt { get; set; }
+    public DateTimeOffset LastReviewedAt { get; set; }
+    public int Reviews { get; set; }
 }

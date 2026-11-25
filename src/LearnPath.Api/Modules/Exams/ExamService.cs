@@ -26,7 +26,7 @@ public class ExamService(AppDbContext db, EntitlementService entitlements, TimeP
     public async Task<AttemptDto> StartAsync(Guid userId, Guid testId, CancellationToken ct)
     {
         var now = clock.GetUtcNow();
-        var test = await db.Tests.AsNoTracking().FirstOrDefaultAsync(t => t.Id == testId && t.Status == PublishStatus.Published, ct)
+        var test = await db.Tests.AsNoTracking().FirstOrDefaultAsync(t => t.Id == testId && t.Status == PublishStatus.Published && (t.OwnerUserId == null || t.OwnerUserId == userId), ct)
                    ?? throw AppException.NotFound("Test");
         if (test.AvailableFrom > now) throw AppException.Conflict("test_not_open", "This test has not opened yet.");
         if (test.AvailableUntil < now) throw AppException.Conflict("test_closed", "This test is closed.");

@@ -101,8 +101,9 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     public async Task<Guid> CourseIdAsync(bool free) =>
         await WithDb(db => db.Courses.Where(c => c.IsFree == free).Select(c => c.Id).FirstAsync());
 
+    /// <summary>The seeded sample tests: the free Dimensional Analysis quiz or the paid Laws of Motion chapter test.</summary>
     public async Task<Guid> TestIdAsync(bool free) =>
-        await WithDb(db => db.Tests.Where(t => t.IsFree == free).Select(t => t.Id).FirstAsync());
+        await WithDb(db => db.Tests.Where(t => t.TitleEn == (free ? "Dimensional Analysis Quiz (Sample)" : "Laws of Motion — Chapter Test (Sample)")).Select(t => t.Id).FirstAsync());
 }
 
 [CollectionDefinition("api")]

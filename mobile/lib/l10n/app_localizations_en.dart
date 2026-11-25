@@ -1296,4 +1296,216 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeDark => 'Dark';
+
+  @override
+  String get customTestTitle => 'Create a custom test';
+
+  @override
+  String get customTestIntro =>
+      'Pick chapters, how many questions and the difficulty. You get a timed test, just like the real exam.';
+
+  @override
+  String get myCustomTests => 'My custom tests';
+
+  @override
+  String get customTestBadge => 'Your test';
+
+  @override
+  String get chooseChapters => 'Choose chapters';
+
+  @override
+  String get selectAll => 'Select all';
+
+  @override
+  String get clearSelection => 'Clear';
+
+  @override
+  String chaptersSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count chapters selected',
+      one: '1 chapter selected',
+      zero: 'No chapters selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String questionsAvailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count questions available',
+      one: '1 question available',
+      zero: 'No questions available',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String moreInPaidCourses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more in paid courses',
+      one: '1 more in paid courses',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onlyInPaidCourses => 'Only in paid courses';
+
+  @override
+  String get numberOfQuestions => 'Number of questions';
+
+  @override
+  String allQuestionsCount(int count) {
+    return 'All ($count)';
+  }
+
+  @override
+  String get difficulty => 'Difficulty';
+
+  @override
+  String get difficultyAny => 'Any';
+
+  @override
+  String get difficultyEasy => 'Easy';
+
+  @override
+  String get difficultyMedium => 'Medium';
+
+  @override
+  String get difficultyHard => 'Hard';
+
+  @override
+  String get skipCorrect => 'Skip questions I\'ve already got right';
+
+  @override
+  String get skipCorrectHint =>
+      'They\'re only used when there aren\'t enough others.';
+
+  @override
+  String get createTest => 'Create test';
+
+  @override
+  String get customTestNoChapters =>
+      'No chapters have questions yet. Check back soon.';
+
+  @override
+  String get customTestPickChapter => 'Choose at least one chapter';
+
+  @override
+  String get flashcardsTitle => 'Flash cards';
+
+  @override
+  String get flashcardsIntro =>
+      'Quick revision, chapter by chapter. Cards you know come back less often.';
+
+  @override
+  String flashcardsDue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards due',
+      one: '1 card due',
+      zero: 'Nothing due',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String flashcardsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String flashcardsMastered(int count) {
+    return '$count mastered';
+  }
+
+  @override
+  String get flashcardsEmpty => 'No flash cards yet. Check back soon.';
+
+  @override
+  String flashcardsForChapter(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count flash cards',
+      one: '1 flash card',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cardFront => 'Question';
+
+  @override
+  String get cardBack => 'Answer';
+
+  @override
+  String get tapToFlip => 'Tap the card to see the answer';
+
+  @override
+  String get showAnswer => 'Show answer';
+
+  @override
+  String get gotIt => 'Got it';
+
+  @override
+  String get stillLearning => 'Still learning';
+
+  @override
+  String cardProgress(int current, int total) {
+    return 'Card $current of $total';
+  }
+
+  @override
+  String get sessionDone => 'Session done';
+
+  @override
+  String sessionKnew(int known, int total) {
+    return 'You knew $known of $total.';
+  }
+
+  @override
+  String sessionAgainSoon(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards will come back soon.',
+      one: '1 card will come back soon.',
+      zero: '',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get allCaughtUp => 'All caught up!';
+
+  @override
+  String nextCardsDue(String date) {
+    return 'The next cards are due on $date.';
+  }
+
+  @override
+  String get reviseAll => 'Revise all cards';
+
+  @override
+  String get studyNow => 'Study now';
+
+  @override
+  String get studyAgain => 'Study again';
+
+  @override
+  String get allDecks => 'All decks';
 }

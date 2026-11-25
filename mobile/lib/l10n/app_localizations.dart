@@ -2245,6 +2245,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dark'**
   String get themeDark;
+
+  /// No description provided for @customTestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a custom test'**
+  String get customTestTitle;
+
+  /// No description provided for @customTestIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick chapters, how many questions and the difficulty. You get a timed test, just like the real exam.'**
+  String get customTestIntro;
+
+  /// No description provided for @myCustomTests.
+  ///
+  /// In en, this message translates to:
+  /// **'My custom tests'**
+  String get myCustomTests;
+
+  /// No description provided for @customTestBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Your test'**
+  String get customTestBadge;
+
+  /// No description provided for @chooseChapters.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose chapters'**
+  String get chooseChapters;
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get selectAll;
+
+  /// No description provided for @clearSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearSelection;
+
+  /// No description provided for @chaptersSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No chapters selected} =1{1 chapter selected} other{{count} chapters selected}}'**
+  String chaptersSelected(int count);
+
+  /// No description provided for @questionsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No questions available} =1{1 question available} other{{count} questions available}}'**
+  String questionsAvailable(int count);
+
+  /// No description provided for @moreInPaidCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more in paid courses} other{{count} more in paid courses}}'**
+  String moreInPaidCourses(int count);
+
+  /// No description provided for @onlyInPaidCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'Only in paid courses'**
+  String get onlyInPaidCourses;
+
+  /// No description provided for @numberOfQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of questions'**
+  String get numberOfQuestions;
+
+  /// No description provided for @allQuestionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'All ({count})'**
+  String allQuestionsCount(int count);
+
+  /// No description provided for @difficulty.
+  ///
+  /// In en, this message translates to:
+  /// **'Difficulty'**
+  String get difficulty;
+
+  /// No description provided for @difficultyAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get difficultyAny;
+
+  /// No description provided for @difficultyEasy.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get difficultyEasy;
+
+  /// No description provided for @difficultyMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get difficultyMedium;
+
+  /// No description provided for @difficultyHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get difficultyHard;
+
+  /// No description provided for @skipCorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip questions I\'ve already got right'**
+  String get skipCorrect;
+
+  /// No description provided for @skipCorrectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'They\'re only used when there aren\'t enough others.'**
+  String get skipCorrectHint;
+
+  /// No description provided for @createTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Create test'**
+  String get createTest;
+
+  /// No description provided for @customTestNoChapters.
+  ///
+  /// In en, this message translates to:
+  /// **'No chapters have questions yet. Check back soon.'**
+  String get customTestNoChapters;
+
+  /// No description provided for @customTestPickChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least one chapter'**
+  String get customTestPickChapter;
+
+  /// No description provided for @flashcardsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flash cards'**
+  String get flashcardsTitle;
+
+  /// No description provided for @flashcardsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick revision, chapter by chapter. Cards you know come back less often.'**
+  String get flashcardsIntro;
+
+  /// No description provided for @flashcardsDue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Nothing due} =1{1 card due} other{{count} cards due}}'**
+  String flashcardsDue(int count);
+
+  /// No description provided for @flashcardsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card} other{{count} cards}}'**
+  String flashcardsCount(int count);
+
+  /// No description provided for @flashcardsMastered.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} mastered'**
+  String flashcardsMastered(int count);
+
+  /// No description provided for @flashcardsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No flash cards yet. Check back soon.'**
+  String get flashcardsEmpty;
+
+  /// No description provided for @flashcardsForChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 flash card} other{{count} flash cards}}'**
+  String flashcardsForChapter(int count);
+
+  /// No description provided for @cardFront.
+  ///
+  /// In en, this message translates to:
+  /// **'Question'**
+  String get cardFront;
+
+  /// No description provided for @cardBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer'**
+  String get cardBack;
+
+  /// No description provided for @tapToFlip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the card to see the answer'**
+  String get tapToFlip;
+
+  /// No description provided for @showAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Show answer'**
+  String get showAnswer;
+
+  /// No description provided for @gotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get gotIt;
+
+  /// No description provided for @stillLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'Still learning'**
+  String get stillLearning;
+
+  /// No description provided for @cardProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {current} of {total}'**
+  String cardProgress(int current, int total);
+
+  /// No description provided for @sessionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Session done'**
+  String get sessionDone;
+
+  /// No description provided for @sessionKnew.
+  ///
+  /// In en, this message translates to:
+  /// **'You knew {known} of {total}.'**
+  String sessionKnew(int known, int total);
+
+  /// No description provided for @sessionAgainSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{} =1{1 card will come back soon.} other{{count} cards will come back soon.}}'**
+  String sessionAgainSoon(int count);
+
+  /// No description provided for @allCaughtUp.
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up!'**
+  String get allCaughtUp;
+
+  /// No description provided for @nextCardsDue.
+  ///
+  /// In en, this message translates to:
+  /// **'The next cards are due on {date}.'**
+  String nextCardsDue(String date);
+
+  /// No description provided for @reviseAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Revise all cards'**
+  String get reviseAll;
+
+  /// No description provided for @studyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Study now'**
+  String get studyNow;
+
+  /// No description provided for @studyAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Study again'**
+  String get studyAgain;
+
+  /// No description provided for @allDecks.
+  ///
+  /// In en, this message translates to:
+  /// **'All decks'**
+  String get allDecks;
 }
 
 class _AppLocalizationsDelegate

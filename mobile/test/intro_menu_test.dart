@@ -181,7 +181,11 @@ void main() {
     // Night mode switches the whole app and is remembered.
     await tester.tap(find.byTooltip('Open navigation menu'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.widgetWithText(SwitchListTile, 'Night mode'));
+    await tester.scrollUntilVisible(
+      find.widgetWithText(SwitchListTile, 'Night mode'),
+      200,
+      scrollable: find.descendant(of: find.byType(Drawer), matching: find.byType(Scrollable)),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(SwitchListTile, 'Night mode'));
     await tester.pumpAndSettle();
@@ -199,6 +203,9 @@ void main() {
       -200,
       scrollable: find.descendant(of: find.byType(Drawer), matching: find.byType(Scrollable)),
     );
+
+    await tester.ensureVisible(find.text('Subjects & courses'));
+    await tester.pumpAndSettle();
 
     // Tabs switch in place.
     await tester.tap(find.text('Subjects & courses'));

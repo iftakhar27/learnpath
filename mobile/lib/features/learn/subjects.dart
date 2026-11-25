@@ -369,6 +369,19 @@ class NcertChapterScreen extends ConsumerWidget {
                     ch.title,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
                   ),
+                  if (ch.flashcardCount > 0) ...[
+                    const SizedBox(height: 8),
+                    Card(
+                      margin: EdgeInsets.zero,
+                      child: ListTile(
+                        leading: Icon(Icons.style_outlined, color: color),
+                        title: Text(l.flashcardsTitle, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        subtitle: Text(l.flashcardsForChapter(ch.flashcardCount)),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.push('/flashcards/${ch.id}'),
+                      ),
+                    ),
+                  ],
                   if (ch.buyCourseId case final courseId?) ...[
                     const SizedBox(height: 8),
                     Card(

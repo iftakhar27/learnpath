@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { useT, type MessageKey } from "@/lib/i18n";
@@ -11,6 +11,7 @@ import { Button, buttonClass } from "@/components/ui/button";
 import { PageLoading } from "@/components/ui/feedback";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { StudentError } from "../errors";
+import { flashcardsKey } from "../flashcards/flashcards";
 import { QuestionView, isAnswered, isOptionType, type Answer } from "../question";
 import { routes } from "../routes";
 import { PageTitle, ProgressBar } from "../ui";
@@ -28,10 +29,25 @@ const MODES: { mode: Mode; title: MessageKey; hint: MessageKey; icon: IconName }
 
 export function PracticeHome() {
   const t = useT();
+  const cards = useQuery({ queryKey: flashcardsKey, queryFn: () => unwrap(api.GET("/api/v1/flashcards")) });
   return (
     <>
       <PageTitle>{t("practiceTitle")}</PageTitle>
       <ul className="grid gap-4 sm:grid-cols-2">
+        <li className="sm:col-span-2">
+          <Link href={routes.flashcards} className="flex h-full items-start gap-4 rounded-2xl border border-primary/40 bg-primary-soft p-5 hover:border-primary">
+            <span className="rounded-xl bg-primary p-2.5 text-primary-fg">
+              <Icon name="doc" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">{t("flashcardsTitle")}</span>
+              <span className="mt-1 block text-sm text-fg-muted">{t("flashcardsIntro")}</span>
+            </span>
+            {cards.data && cards.data.dueTotal > 0 && (
+              <span className="shrink-0 rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-fg">{t("flashcardsDue", { count: cards.data.dueTotal })}</span>
+            )}
+          </Link>
+        </li>
         {MODES.map((m) => (
           <li key={m.mode}>
             <Link href={routes.practiceMode(m.mode)} className="flex h-full items-start gap-4 rounded-2xl border border-border bg-surface p-5 hover:border-primary">

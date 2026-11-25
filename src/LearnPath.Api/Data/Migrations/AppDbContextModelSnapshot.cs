@@ -532,6 +532,83 @@ namespace LearnPath.Api.Data.Migrations
                     b.ToTable("Exams");
                 });
 
+            modelBuilder.Entity("LearnPath.Api.Domain.Flashcard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BackEn")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("BackHi")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FrontEn")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("FrontHi")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("NcertChapterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NcertChapterId", "SortOrder");
+
+                    b.ToTable("Flashcards");
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.FlashcardReview", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FlashcardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Box")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("DueAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("LastReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Reviews")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "FlashcardId");
+
+                    b.HasIndex("FlashcardId");
+
+                    b.HasIndex("UserId", "DueAt");
+
+                    b.ToTable("FlashcardReviews");
+                });
+
             modelBuilder.Entity("LearnPath.Api.Domain.LearningEvent", b =>
                 {
                     b.Property<long>("Id")
@@ -1451,6 +1528,9 @@ namespace LearnPath.Api.Data.Migrations
                     b.Property<int?>("MaxAttempts")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("OwnerUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("ShuffleOptions")
                         .HasColumnType("boolean");
 
@@ -1477,6 +1557,8 @@ namespace LearnPath.Api.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("OwnerUserId", "CreatedAt");
 
                     b.ToTable("Tests");
                 });
@@ -1912,6 +1994,30 @@ namespace LearnPath.Api.Data.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("LearnPath.Api.Domain.Flashcard", b =>
+                {
+                    b.HasOne("LearnPath.Api.Domain.NcertChapter", null)
+                        .WithMany()
+                        .HasForeignKey("NcertChapterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.FlashcardReview", b =>
+                {
+                    b.HasOne("LearnPath.Api.Domain.Flashcard", null)
+                        .WithMany()
+                        .HasForeignKey("FlashcardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LearnPath.Api.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("LearnPath.Api.Domain.LearningResource", b =>
                 {
                     b.HasOne("LearnPath.Api.Domain.Topic", "Topic")
@@ -2058,6 +2164,11 @@ namespace LearnPath.Api.Data.Migrations
                         .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("LearnPath.Api.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("LearnPath.Api.Domain.TestAttempt", b =>

@@ -97,6 +97,7 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<EntitlementService>();
 builder.Services.AddScoped<ExamService>();
 builder.Services.AddScoped<ResultsService>();
+builder.Services.AddScoped<TestSummaryService>();
 builder.Services.AddScoped<LearnerStatsService>();
 builder.Services.AddScoped<StudyPlanService>();
 builder.Services.AddScoped<CommerceService>();

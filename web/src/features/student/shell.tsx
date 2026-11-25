@@ -19,7 +19,7 @@ const brand = process.env.NEXT_PUBLIC_BRAND_NAME ?? "LearnPath";
 const NAV: { href: string; label: MessageKey; icon: IconName; also?: string[] }[] = [
   { href: "/home", label: "tabHome", icon: "home", also: ["/plan"] },
   { href: "/learn", label: "tabLearn", icon: "book", also: ["/topics", "/watch", "/library"] },
-  { href: "/practice", label: "tabPractice", icon: "pencil" },
+  { href: "/practice", label: "tabPractice", icon: "pencil", also: ["/flashcards"] },
   { href: "/tests", label: "tabTests", icon: "clipboard", also: ["/exam", "/results"] },
   { href: "/profile", label: "tabProfile", icon: "user", also: ["/progress", "/bookmarks", "/purchases", "/support", "/notifications", "/doubts"] },
 ];

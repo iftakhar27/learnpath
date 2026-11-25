@@ -22,7 +22,7 @@ public class AdminTestsController(AppDbContext db, AuditService audit, TimeProvi
 {
     [HttpGet]
     public Task<List<AdminTestListItem>> List([FromQuery] Guid? courseId, [FromQuery] PublishStatus? status, CancellationToken ct) =>
-        db.Tests.AsNoTracking().Where(t => (courseId == null || t.CourseId == courseId) && (status == null || t.Status == status))
+        db.Tests.AsNoTracking().Where(t => t.OwnerUserId == null && (courseId == null || t.CourseId == courseId) && (status == null || t.Status == status))
             .OrderByDescending(t => t.CreatedAt)
             .Select(t => new AdminTestListItem(t.Id, t.TitleEn, t.Type, t.CourseId, db.Courses.Where(c => c.Id == t.CourseId).Select(c => c.TitleEn).FirstOrDefault(),
                 t.DurationMinutes, t.IsFree, t.Status, t.Questions.Count, t.Questions.Sum(q => (decimal?)q.Marks) ?? 0, db.TestAttempts.Count(a => a.TestId == t.Id), t.CreatedAt))

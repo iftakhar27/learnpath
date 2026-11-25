@@ -21,6 +21,8 @@ flowchart TD
   Topic --> Video[Video player] & Notes[Notes viewer] & PracCfg
   Practice --> PracCfg[Practice config] --> QPlayer[Question player] --> PracSum[Practice summary]
   Practice --> Revision[Revision centre] --> Bookmarks & Incorrect[Incorrect questions]
+  Practice --> Flash[Flash cards: decks → study]
+  Tests --> Gen[Custom test generator] --> Instr
   Tests --> TList[Test list] --> Instr[Instructions] --> Exam[Exam interface<br/>palette, timer, review] --> Confirm[Submit confirmation] --> Result[Results & analytics] --> Review[Question review]
   Tests --> PYQ[Previous-year papers · P1]
   Profile --> Settings & Subs[Subscriptions] & Txn[Transactions] & Help[Help & support] --> Ticket[Ticket detail]

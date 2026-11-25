@@ -42,7 +42,7 @@ public class SearchController(AppDbContext db, RequestLanguage lang) : Controlle
                 .Where(r => (EF.Functions.ILike(r.TitleEn, pattern) || EF.Functions.ILike(r.TitleHi ?? "", pattern))).Take(15).ToListAsync(ct))
                 .Select(r => new SearchHitDto(r.Type == ResourceType.Video ? "video" : "notes", r.Id, lang.Pick(r.TitleEn, r.TitleHi), lang.Pick(r.Topic!.TitleEn, r.Topic.TitleHi))));
         if (Want("test"))
-            hits.AddRange((await db.Tests.AsNoTracking().Where(t => t.Status == PublishStatus.Published && (EF.Functions.ILike(t.TitleEn, pattern) || EF.Functions.ILike(t.TitleHi ?? "", pattern)))
+            hits.AddRange((await db.Tests.AsNoTracking().Where(t => t.Status == PublishStatus.Published && t.OwnerUserId == null && (EF.Functions.ILike(t.TitleEn, pattern) || EF.Functions.ILike(t.TitleHi ?? "", pattern)))
                 .Take(10).ToListAsync(ct)).Select(t => new SearchHitDto("test", t.Id, lang.Pick(t.TitleEn, t.TitleHi), t.Type.ToString())));
         return hits;
     }

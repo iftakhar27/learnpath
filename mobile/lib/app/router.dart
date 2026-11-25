@@ -14,8 +14,10 @@ import '../features/learn/quiz_screen.dart';
 import '../features/learn/subjects.dart';
 import '../features/learn/video_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
+import '../features/practice/flashcards.dart';
 import '../features/practice/practice_screens.dart';
 import '../features/profile/profile_screens.dart';
+import '../features/tests/custom_test_screen.dart';
 import '../features/tests/test_screens.dart';
 import '../widgets/common.dart';
 
@@ -119,6 +121,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, s) => PracticeSessionScreen(
           request: s.extra is CreatePracticeRequest ? s.extra! as CreatePracticeRequest : const CreatePracticeRequest(mode: 'incorrect'),
         ),
+      ),
+      GoRoute(parentNavigatorKey: _rootKey, path: '/tests/custom', builder: (_, _) => const CustomTestScreen()),
+      GoRoute(parentNavigatorKey: _rootKey, path: '/flashcards', builder: (_, _) => const FlashcardDecksScreen()),
+      GoRoute(
+        parentNavigatorKey: _rootKey,
+        path: '/flashcards/:id',
+        builder: (_, s) => FlashcardStudyScreen(chapterId: s.pathParameters['id']!),
       ),
       GoRoute(
         parentNavigatorKey: _rootKey,
