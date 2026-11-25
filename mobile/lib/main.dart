@@ -25,6 +25,7 @@ class LearnPathApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
+      themeMode: ref.watch(themeModeProvider),
       locale: ref.watch(localeProvider),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: [AppLocalizations.delegate, ...GlobalMaterialLocalizations.delegates],

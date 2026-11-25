@@ -10,6 +10,7 @@ import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../auth/auth_screens.dart';
+import '../home/app_drawer.dart';
 import '../home/home_screen.dart';
 import '../onboarding/onboarding_screen.dart';
 import '../practice/practice_screens.dart';
@@ -137,7 +138,7 @@ class ProfileScreen extends ConsumerWidget {
         ListTile(leading: Icon(icon), title: Text(title), trailing: const Icon(Icons.chevron_right_rounded), onTap: () => context.push(route));
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.profileTitle)),
+      appBar: AppBar(leading: const MenuButton(), title: Text(l.profileTitle)),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
@@ -149,6 +150,7 @@ class ProfileScreen extends ConsumerWidget {
           if (examName != null) Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Text(l.preparingFor(examName, '${p.targetYear ?? ''}'))),
           const SizedBox(height: 8),
           ListTile(leading: const Icon(Icons.translate_rounded), title: Text(l.language), trailing: const LanguageToggle()),
+          ListTile(leading: const Icon(Icons.dark_mode_outlined), title: Text(l.appearance), trailing: const ThemeModeToggle()),
           link(Icons.tune_rounded, l.editPreferences, '/preferences'),
           link(Icons.insights_rounded, l.myProgress, '/progress'),
           link(Icons.event_note_rounded, l.planTitle, '/plan'),

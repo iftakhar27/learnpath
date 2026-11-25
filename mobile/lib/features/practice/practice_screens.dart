@@ -9,6 +9,7 @@ import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/question_view.dart';
 import '../doubts/doubt_screens.dart';
+import '../home/app_drawer.dart';
 
 final analyticsProvider = FutureProvider.autoDispose<StudentAnalyticsDto>((ref) => ref.watch(apiProvider).analytics());
 
@@ -30,7 +31,7 @@ class PracticeHomeScreen extends ConsumerWidget {
       ),
     );
     return Scaffold(
-      appBar: AppBar(title: Text(l.practiceTitle)),
+      appBar: AppBar(leading: const MenuButton(), title: Text(l.practiceTitle)),
       body: RefreshableList(
         onRefresh: () async => ref.invalidate(analyticsProvider),
         padding: const EdgeInsets.only(top: 8, bottom: 24),

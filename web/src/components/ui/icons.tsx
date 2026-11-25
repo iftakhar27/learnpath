@@ -22,6 +22,10 @@ const paths = {
   flag: "M5 21V4m0 0h11l-2 4 2 4H5",
   x: "M6 6l12 12M18 6 6 18",
   chat: "M4 5h16v11H10l-5 4v-4H4z",
+  menu: "M4 6h16M4 12h16M4 18h16",
+  moon: "M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z",
+  logout: "M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10",
+  external: "M14 4h6v6M20 4l-9 9M18 14v6H4V6h6",
 } as const;
 
 export type IconName = keyof typeof paths;

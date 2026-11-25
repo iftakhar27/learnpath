@@ -6,7 +6,9 @@ import '../core/api/models.g.dart';
 import '../core/providers.dart';
 import '../features/auth/auth_screens.dart';
 import '../features/doubts/doubt_screens.dart';
+import '../features/home/app_drawer.dart';
 import '../features/home/home_screen.dart';
+import '../features/intro/intro_screen.dart';
 import '../features/learn/learn_screens.dart';
 import '../features/learn/quiz_screen.dart';
 import '../features/learn/subjects.dart';
@@ -24,6 +26,7 @@ const _publicRoutes = {'/welcome', '/login', '/register', '/otp', '/forgot-passw
 class _SessionListenable extends ChangeNotifier {
   _SessionListenable(Ref ref) {
     ref.listen(sessionProvider, (_, _) => notifyListeners());
+    ref.listen(introProvider, (_, _) => notifyListeners());
   }
 }
 
@@ -37,16 +40,21 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     redirect: (context, state) {
       final session = ref.read(sessionProvider);
+      final introSeen = ref.read(introProvider);
       final loc = state.matchedLocation;
       return switch (session) {
         SessionLoading() || SessionUnreachable() => loc == '/splash' ? null : '/splash',
+        // First launch: the intro slides come before signing in.
+        SignedOut() when introSeen == null => loc == '/splash' ? null : '/splash',
+        SignedOut() when introSeen == false => loc == '/intro' ? null : '/intro',
         SignedOut() => _publicRoutes.contains(loc) ? null : '/welcome',
         SignedIn(:final profile) when !profile.onboardingComplete => loc == '/onboarding' ? null : '/onboarding',
-        SignedIn() => (loc == '/splash' || loc == '/onboarding' || _publicRoutes.contains(loc)) ? '/home' : null,
+        SignedIn() => (loc == '/splash' || loc == '/intro' || loc == '/onboarding' || _publicRoutes.contains(loc)) ? '/home' : null,
       };
     },
     routes: [
       GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
+      GoRoute(path: '/intro', builder: (_, _) => const IntroScreen()),
       GoRoute(path: '/welcome', builder: (_, _) => const WelcomeScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
@@ -159,6 +167,7 @@ class _HomeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = context.l10n;
     return Scaffold(
+      drawer: const AppDrawer(),
       body: shell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: shell.currentIndex,

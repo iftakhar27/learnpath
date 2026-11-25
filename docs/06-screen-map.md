@@ -2,7 +2,7 @@
 
 ```mermaid
 flowchart TD
-  Splash --> Onb[Onboarding carousel] --> Auth{Logged in?}
+  Splash --> Intro[Intro slides · first launch only] --> Auth{Logged in?}
   Auth -- no --> Login[Login: OTP / email] --> Reg[Register] --> Setup[Profile setup:<br/>class, board, exam, year, language, study hours]
   Auth -- yes --> Home
   Setup --> Home
@@ -24,7 +24,12 @@ flowchart TD
   Tests --> TList[Test list] --> Instr[Instructions] --> Exam[Exam interface<br/>palette, timer, review] --> Confirm[Submit confirmation] --> Result[Results & analytics] --> Review[Question review]
   Tests --> PYQ[Previous-year papers · P1]
   Profile --> Settings & Subs[Subscriptions] & Txn[Transactions] & Help[Help & support] --> Ticket[Ticket detail]
+  Tabs -. ☰ .-> Menu[Side menu: study pages, help, night mode, language, sign out]
 ```
+
+Every tab screen (and the website header) has a ☰ side menu with the same sections in both: the student, Study, Help,
+Settings (night mode, language, preferences) and Sign out. Night mode is Auto / Light / Dark: a switch in the menu, all
+three in Profile → Appearance.
 
 ## Admin portal (web)
 
@@ -47,7 +52,7 @@ flowchart TD
 | Primary | `#4F46E5` (indigo 600) |
 | Accent | `#F59E0B` (amber 500, streaks/highlights) |
 | Success / Error | `#16A34A` / `#DC2626` |
-| Surface / Background | `#FFFFFF` / `#F7F7FB`; dark: `#1A1B26` / `#0F1018` |
+| Surface / Background | `#FFFFFF` / `#F7F7FB`; dark (night mode): `#1A1B26` / `#0F1018` |
 | Radius | 12 px cards, 8 px inputs, 999 px chips |
 | Spacing scale | 4, 8, 12, 16, 24, 32 |
 | Type | Noto Sans + Noto Sans Devanagari (covers Hindi), 14/16/20/24/32 |

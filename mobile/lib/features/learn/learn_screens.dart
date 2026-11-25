@@ -9,6 +9,7 @@ import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../../core/config.dart';
+import '../home/app_drawer.dart';
 import '../home/home_screen.dart';
 import '../payments/buy_on_website.dart';
 import '../doubts/doubt_screens.dart';
@@ -61,7 +62,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final query = CatalogQuery(_q, _filter);
     final courses = ref.watch(catalogProvider(query));
     return Scaffold(
-      appBar: AppBar(title: Text(l.tabLearn)),
+      appBar: AppBar(leading: const MenuButton(), title: Text(l.tabLearn)),
       body: Column(
         children: [
           Padding(

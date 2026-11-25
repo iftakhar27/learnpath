@@ -1235,4 +1235,64 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get coursesHeading => 'कोर्स';
+
+  @override
+  String get intro1Title => 'हर NCERT अध्याय, बस एक टैप पर';
+
+  @override
+  String get intro1Body =>
+      'कक्षा 11 और 12 की भौतिकी, रसायन और जीव विज्ञान, हर अध्याय के वीडियो, नोट्स और अभ्यास के साथ।';
+
+  @override
+  String get intro2Title => 'NEET की तरह अभ्यास करें';
+
+  @override
+  String get intro2Body =>
+      'अध्याय क्विज़, पिछले वर्षों के प्रश्न और समय वाले मॉक टेस्ट, तुरंत परिणाम और हल के साथ।';
+
+  @override
+  String get intro3Title => 'अटक गए? डाउट पूछें';
+
+  @override
+  String get intro3Body =>
+      'अपना प्रश्न लिखें और टीचर जवाब देंगे। जवाब आने पर आपको सूचना मिलेगी।';
+
+  @override
+  String get intro4Title => 'योजना बनाएं, प्रगति देखें, सुधार करें';
+
+  @override
+  String get intro4Body =>
+      'रोज़ की पढ़ाई की योजना, हर विषय में आपकी प्रगति और कमज़ोर टॉपिक, ताकि आप हमेशा जानें कि आगे क्या पढ़ना है।';
+
+  @override
+  String introProgress(int current, int total) {
+    return 'स्लाइड $current / $total';
+  }
+
+  @override
+  String get menuStudy => 'पढ़ाई';
+
+  @override
+  String get menuHelp => 'मदद';
+
+  @override
+  String get menuSettings => 'सेटिंग्स';
+
+  @override
+  String get menuSubjectsCourses => 'विषय और कोर्स';
+
+  @override
+  String get nightMode => 'नाइट मोड';
+
+  @override
+  String get appearance => 'थीम';
+
+  @override
+  String get themeAuto => 'ऑटो';
+
+  @override
+  String get themeLight => 'लाइट';
+
+  @override
+  String get themeDark => 'डार्क';
 }

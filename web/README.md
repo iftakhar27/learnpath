@@ -61,6 +61,7 @@ src/features/student/...         student screens; tests/exam-session.ts is the e
 src/features/admin/...           screens: catalog, questions, tests, students, ops (doubts, orders, support, announcements, audit)
 src/lib/i18n                     English/Hindi: strings generated from the app's ARB files + web-messages.ts
 src/components/ui                design-system primitives (tokens in app/globals.css, light + dark)
+src/lib/theme.ts                 night mode: Auto / Light / Dark kept in localStorage, applied as <html data-theme>
 src/lib                          API client + generated types, session/permissions, formatting
 e2e/                             Playwright tests
 ```

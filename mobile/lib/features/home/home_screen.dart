@@ -8,6 +8,7 @@ import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../learn/subjects.dart';
+import 'app_drawer.dart';
 import 'notification_bell.dart';
 
 final dashboardProvider = FutureProvider.autoDispose<DashboardDto>((ref) => ref.watch(apiProvider).dashboard());
@@ -45,6 +46,7 @@ class HomeScreen extends ConsumerWidget {
     final l = context.l10n;
     return Scaffold(
       appBar: AppBar(
+        leading: const MenuButton(),
         title: Text(dash.hasValue ? l.greeting(dash.value!.fullName.split(' ').first) : ''),
         actions: [
           IconButton(tooltip: l.search, icon: const Icon(Icons.search_rounded), onPressed: () => context.push('/search')),

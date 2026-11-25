@@ -217,6 +217,32 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Intro slides, side menu and night mode (25 Nov 2026)
+
+- **Intro slides (app):** four slides on first launch, before the sign-in choices: NCERT chapters, NEET-style
+  practice and tests, ask a doubt, plan and progress. They have Skip, Next / Get started, swipe, and the English/हिंदी
+  switch. They are shown once per phone. Students who are already signed in never see them, even after signing out.
+  The website keeps its landing page instead.
+- **Side menu (app and website):** opened from the ☰ button on the tab screens (app) or the header (website), and it
+  covers the whole screen. It holds:
+  - the student's name and target exam, linking to Profile;
+  - **Study:** home, subjects & courses, practice, tests, study plan, progress, saved;
+  - **Help:** ask a doubt, notifications with the unread count, purchases, support;
+  - **Settings:** a night-mode switch, language, study preferences, change password (app, email accounts only),
+    privacy policy;
+  - **Sign out.**
+- **Night mode:** **Auto** (follow the device, the default), **Light** or **Dark**. The menu has a one-tap switch and
+  Profile → Appearance has all three. The choice is kept on the phone (app) or in the browser (website).
+  - On the website, the choice is applied before the page paints, so there is no white flash. It syncs across tabs,
+    and the phone's address-bar colour follows it.
+  - In the app, subject colours use lighter shades at night so small text on them stays readable.
+- **Verified:**
+  - 5 new app tests: intro once, Skip, signed-in students skip it, menu, theme restored.
+  - 1 new browser test: menu links, closing, night mode from the menu, reload, Profile Auto/Light/Dark against a dark
+    device, sign out from the menu.
+  - Screenshots of every new screen in light and dark, at phone and desktop widths.
+  - All suites green: 116 backend, 41 browser, 34 app.
+
 ### Subject grid and NCERT chapters (25 Nov 2026)
 
 Browse by book, after a review of a competitor's app for ideas (structure only; our own design and icons): the home

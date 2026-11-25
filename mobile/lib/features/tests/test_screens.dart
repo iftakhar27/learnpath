@@ -11,6 +11,7 @@ import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/question_view.dart';
+import '../home/app_drawer.dart';
 import '../home/home_screen.dart';
 import '../practice/practice_screens.dart';
 import 'exam_session.dart';
@@ -28,7 +29,7 @@ class TestsScreen extends ConsumerWidget {
     final l = context.l10n;
     final tests = ref.watch(testsProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(l.testsTitle)),
+      appBar: AppBar(leading: const MenuButton(), title: Text(l.testsTitle)),
       body: AsyncView(
         value: tests,
         onRetry: () => ref.invalidate(testsProvider),

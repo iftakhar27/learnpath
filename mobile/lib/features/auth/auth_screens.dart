@@ -75,6 +75,26 @@ class LanguageToggle extends ConsumerWidget {
   }
 }
 
+/// Auto (follow the phone), light or dark.
+class ThemeModeToggle extends ConsumerWidget {
+  const ThemeModeToggle({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = context.l10n;
+    return SegmentedButton<ThemeMode>(
+      segments: [
+        ButtonSegment(value: ThemeMode.system, label: Text(l.themeAuto)),
+        ButtonSegment(value: ThemeMode.light, label: Text(l.themeLight)),
+        ButtonSegment(value: ThemeMode.dark, label: Text(l.themeDark)),
+      ],
+      selected: {ref.watch(themeModeProvider)},
+      showSelectedIcon: false,
+      onSelectionChanged: (s) => ref.read(themeModeProvider.notifier).set(s.first),
+    );
+  }
+}
+
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
 

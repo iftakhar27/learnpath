@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
+import { themeBootScript } from "@/lib/theme-boot";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -28,8 +30,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    // data-theme (night mode) is set by the boot script before React hydrates.
+    <html lang="en" suppressHydrationWarning>
       <body className="min-h-dvh">
+        <Script id="theme-boot" strategy="beforeInteractive">
+          {themeBootScript}
+        </Script>
         <Providers>{children}</Providers>
       </body>
     </html>

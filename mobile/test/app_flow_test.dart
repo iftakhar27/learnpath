@@ -103,9 +103,12 @@ Widget app(FakeApi api, MemoryTokenStore store) => ProviderScope(
   child: const LearnPathApp(),
 );
 
+/// A phone that has already been through the intro slides.
+MemoryTokenStore introSeen() => MemoryTokenStore()..prefs['intro_seen'] = '1';
+
 void main() {
   testWidgets('welcome screen switches the whole UI to Hindi', (tester) async {
-    await tester.pumpWidget(app(FakeApi(), MemoryTokenStore()));
+    await tester.pumpWidget(app(FakeApi(), introSeen()));
     await tester.pumpAndSettle();
     expect(find.text('Continue with mobile number'), findsOneWidget);
 
@@ -117,7 +120,7 @@ void main() {
 
   testWidgets('email sign-in validates, shows server errors, then routes a new student to onboarding', (tester) async {
     final api = FakeApi();
-    final store = MemoryTokenStore();
+    final store = introSeen();
     await tester.pumpWidget(app(api, store));
     await tester.pumpAndSettle();
 
@@ -163,7 +166,7 @@ void main() {
 
   testWidgets('signing in while another phone is signed in asks first, then takes over', (tester) async {
     final api = FakeApi()..otherPhoneActive = true;
-    final store = MemoryTokenStore();
+    final store = introSeen();
     await tester.pumpWidget(app(api, store));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Sign in with email'));

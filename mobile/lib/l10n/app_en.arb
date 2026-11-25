@@ -642,5 +642,33 @@
   "physicsShort": "Physics",
   "chemistryShort": "Chemistry",
   "biologyShort": "Biology",
-  "coursesHeading": "Courses"
+  "coursesHeading": "Courses",
+  "intro1Title": "Every NCERT chapter, one tap away",
+  "intro1Body": "Physics, Chemistry and Biology for Class 11 and 12, with videos, notes and practice for each chapter.",
+  "intro2Title": "Practise the NEET way",
+  "intro2Body": "Chapter quizzes, previous-year questions and timed mock tests, with instant results and solutions.",
+  "intro3Title": "Stuck? Ask a doubt",
+  "intro3Body": "Type your question and a teacher answers. You'll get a notification when they reply.",
+  "intro4Title": "Plan, track, improve",
+  "intro4Body": "A daily study plan, your progress in each subject and your weak topics, so you always know what to study next.",
+  "introProgress": "Slide {current} of {total}",
+  "@introProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "menuStudy": "Study",
+  "menuHelp": "Help",
+  "menuSettings": "Settings",
+  "menuSubjectsCourses": "Subjects & courses",
+  "nightMode": "Night mode",
+  "appearance": "Appearance",
+  "themeAuto": "Auto",
+  "themeLight": "Light",
+  "themeDark": "Dark"
 }

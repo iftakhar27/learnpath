@@ -43,6 +43,70 @@ class LocaleController extends Notifier<Locale> {
 
 final localeProvider = NotifierProvider<LocaleController, Locale>(LocaleController.new);
 
+/// Light, dark (night mode) or following the phone's setting. Kept on this device.
+class ThemeModeController extends Notifier<ThemeMode> {
+  static const key = 'theme';
+
+  @override
+  ThemeMode build() {
+    unawaited(_restore());
+    return ThemeMode.system;
+  }
+
+  Future<void> _restore() async {
+    try {
+      final saved = await ref.read(tokenStoreProvider).readPreference(key);
+      final mode = ThemeMode.values.where((m) => m.name == saved).firstOrNull;
+      if (mode != null && ref.mounted) state = mode;
+    } catch (_) {
+      // Unreadable storage: keep following the phone.
+    }
+  }
+
+  Future<void> set(ThemeMode mode) async {
+    state = mode;
+    await ref.read(tokenStoreProvider).writePreference(key, mode.name);
+  }
+}
+
+final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(ThemeModeController.new);
+
+/// Whether this phone has seen the intro slides: null while it is being read. Signing in counts as seen, so students
+/// who already use the app never get the intro after signing out.
+class IntroController extends Notifier<bool?> {
+  static const key = 'intro_seen';
+
+  @override
+  bool? build() {
+    ref.listen(sessionProvider, (_, s) {
+      if (s is SignedIn && state != true) unawaited(finish());
+    });
+    unawaited(_restore());
+    return null;
+  }
+
+  Future<void> _restore() async {
+    bool seen;
+    try {
+      seen = await ref.read(tokenStoreProvider).readPreference(key) != null;
+    } catch (_) {
+      seen = true; // never trap a student on the intro because storage failed
+    }
+    if (ref.mounted && state == null) state = seen;
+  }
+
+  Future<void> finish() async {
+    state = true;
+    try {
+      await ref.read(tokenStoreProvider).writePreference(key, '1');
+    } catch (_) {
+      // Shown again next launch at worst.
+    }
+  }
+}
+
+final introProvider = NotifierProvider<IntroController, bool?>(IntroController.new);
+
 final apiClientProvider = Provider<ApiClient>(
   (ref) => ApiClient(
     baseUrl: AppConfig.apiBaseUrl,

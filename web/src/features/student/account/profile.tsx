@@ -14,6 +14,7 @@ import { useToast } from "@/components/ui/toast";
 import { StudentError } from "../errors";
 import { LanguageSwitch } from "../language-switch";
 import { useChangeLanguage, useProfile } from "../profile";
+import { ThemeSwitch } from "../theme-switch";
 
 const LINKS: { href: string; label: MessageKey; icon: IconName }[] = [
   { href: "/profile/preferences", label: "editPreferences", icon: "target" },
@@ -27,7 +28,7 @@ const LINKS: { href: string; label: MessageKey; icon: IconName }[] = [
 ];
 const privacyUrl = process.env.NEXT_PUBLIC_PRIVACY_URL ?? "https://example.com/privacy";
 
-async function signOut(to = "/login") {
+export async function signOut(to = "/login") {
   await fetch("/api/session/logout", { method: "POST" }).catch(() => undefined);
   // A full load clears every cached query from this session.
   window.location.assign(to);
@@ -89,6 +90,11 @@ export function ProfilePage() {
       <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-5">
         <span className="font-medium">{t("language")}</span>
         <LanguageSwitch onChange={changeLanguage} />
+      </section>
+
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-5">
+        <span className="font-medium">{t("appearance")}</span>
+        <ThemeSwitch />
       </section>
 
       {/* Mobile-number accounts sign in with one-time codes and have no password. */}

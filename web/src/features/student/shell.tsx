@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import { isLang } from "@/lib/i18n/current";
@@ -10,6 +10,7 @@ import { useLanguage, useT, type MessageKey } from "@/lib/i18n";
 import { Spinner } from "@/components/ui/feedback";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { LanguageSwitch } from "./language-switch";
+import { SideMenu } from "./side-menu";
 import { StudentError } from "./errors";
 import { useChangeLanguage, useProfile } from "./profile";
 
@@ -32,7 +33,7 @@ export const notificationsKey = ["student", "notifications"] as const;
 /** How often the bell re-checks while the tab is visible (also on focus, and when notifications are read). */
 const UNREAD_POLL_MS = 30_000;
 
-/** Frame for signed-in student pages: top bar (desktop nav), bottom tabs on phones, onboarding and language sync. */
+/** Frame for signed-in student pages: top bar (menu, desktop nav), bottom tabs on phones, onboarding and language sync. */
 export function StudentShell({ children }: { children: ReactNode }) {
   const t = useT();
   const pathname = usePathname();
@@ -49,6 +50,8 @@ export function StudentShell({ children }: { children: ReactNode }) {
     refetchOnWindowFocus: "always",
   });
   const unread = unreadCount.data?.count ?? 0;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   const p = profile.data;
   useEffect(() => {
@@ -80,6 +83,16 @@ export function StudentShell({ children }: { children: ReactNode }) {
       </a>
       <header className="sticky top-0 z-30 border-b border-border bg-surface/95 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label={t("openMenu")}
+            aria-haspopup="dialog"
+            aria-expanded={menuOpen}
+            className="-ml-2 -mr-2 rounded-lg p-2 text-fg-muted hover:bg-surface-muted hover:text-fg"
+          >
+            <Icon name="menu" />
+          </button>
           <Link href="/home" className="text-lg font-semibold">
             {brand}
           </Link>
@@ -122,6 +135,7 @@ export function StudentShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
+      <SideMenu open={menuOpen} onClose={closeMenu} profile={p} unread={unread} />
       <main id="main" className="mx-auto max-w-6xl px-4 py-6">
         {children}
       </main>

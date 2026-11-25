@@ -2137,6 +2137,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Courses'**
   String get coursesHeading;
+
+  /// No description provided for @intro1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Every NCERT chapter, one tap away'**
+  String get intro1Title;
+
+  /// No description provided for @intro1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Physics, Chemistry and Biology for Class 11 and 12, with videos, notes and practice for each chapter.'**
+  String get intro1Body;
+
+  /// No description provided for @intro2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Practise the NEET way'**
+  String get intro2Title;
+
+  /// No description provided for @intro2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter quizzes, previous-year questions and timed mock tests, with instant results and solutions.'**
+  String get intro2Body;
+
+  /// No description provided for @intro3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Stuck? Ask a doubt'**
+  String get intro3Title;
+
+  /// No description provided for @intro3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your question and a teacher answers. You\'ll get a notification when they reply.'**
+  String get intro3Body;
+
+  /// No description provided for @intro4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan, track, improve'**
+  String get intro4Title;
+
+  /// No description provided for @intro4Body.
+  ///
+  /// In en, this message translates to:
+  /// **'A daily study plan, your progress in each subject and your weak topics, so you always know what to study next.'**
+  String get intro4Body;
+
+  /// No description provided for @introProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Slide {current} of {total}'**
+  String introProgress(int current, int total);
+
+  /// No description provided for @menuStudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Study'**
+  String get menuStudy;
+
+  /// No description provided for @menuHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get menuHelp;
+
+  /// No description provided for @menuSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get menuSettings;
+
+  /// No description provided for @menuSubjectsCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'Subjects & courses'**
+  String get menuSubjectsCourses;
+
+  /// No description provided for @nightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Night mode'**
+  String get nightMode;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @themeAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get themeAuto;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
 }
 
 class _AppLocalizationsDelegate

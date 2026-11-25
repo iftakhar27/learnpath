@@ -17,12 +17,15 @@ final ncertChapterProvider = FutureProvider.autoDispose.family<LibraryChapterDet
   (ref, id) => ref.watch(apiProvider).libraryChapter(id),
 );
 
-/// Colour per subject (the website uses the same hues).
-Color subjectColor(String subject) => switch (subject) {
-  'Chemistry' => const Color(0xFFEA580C),
-  'Biology' => const Color(0xFF059669),
-  _ => const Color(0xFF2563EB),
-};
+/// Colour per subject, lighter in night mode so small text on it stays readable (the website uses the same hues).
+Color subjectColor(BuildContext context, String subject) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  return switch (subject) {
+    'Chemistry' => dark ? const Color(0xFFFB923C) : const Color(0xFFEA580C),
+    'Biology' => dark ? const Color(0xFF34D399) : const Color(0xFF059669),
+    _ => dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+  };
+}
 
 /// One icon per book: motion, current, flask, benzene ring, leaf, microscope.
 IconData subjectIcon(String subject, String classLevel) => switch ((subject, classLevel)) {
@@ -52,7 +55,7 @@ class ProgressRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = subjectColor(subject);
+    final color = subjectColor(context, subject);
     return SizedBox.square(
       dimension: size,
       child: Stack(
@@ -100,7 +103,7 @@ class SubjectGrid extends ConsumerWidget {
             if (lib.resume case final resume?) ...[
               const SizedBox(height: 8),
               ActionChip(
-                avatar: Icon(Icons.play_arrow_rounded, color: subjectColor(resume.subject)),
+                avatar: Icon(Icons.play_arrow_rounded, color: subjectColor(context, resume.subject)),
                 label: Text(l.continueChapter(resume.title), overflow: TextOverflow.ellipsis),
                 onPressed: () => context.push('/ncert/${resume.chapterId}'),
               ),
@@ -212,7 +215,7 @@ class SubjectScreen extends ConsumerWidget {
         value: book,
         onRetry: () => ref.invalidate(bookProvider((classLevel, subject))),
         data: (b) {
-          final color = subjectColor(b.subject);
+          final color = subjectColor(context, b.subject);
           final ready = b.chapters.where((c) => c.ready).length;
           return RefreshableList(
             onRefresh: () async => ref.invalidate(bookProvider((classLevel, subject))),
@@ -352,7 +355,7 @@ class NcertChapterScreen extends ConsumerWidget {
           value: chapter,
           onRetry: () => ref.invalidate(ncertChapterProvider(chapterId)),
           data: (ch) {
-            final color = subjectColor(ch.subject);
+            final color = subjectColor(context, ch.subject);
             final header = Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
               child: Column(

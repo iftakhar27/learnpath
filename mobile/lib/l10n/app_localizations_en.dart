@@ -1236,4 +1236,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coursesHeading => 'Courses';
+
+  @override
+  String get intro1Title => 'Every NCERT chapter, one tap away';
+
+  @override
+  String get intro1Body =>
+      'Physics, Chemistry and Biology for Class 11 and 12, with videos, notes and practice for each chapter.';
+
+  @override
+  String get intro2Title => 'Practise the NEET way';
+
+  @override
+  String get intro2Body =>
+      'Chapter quizzes, previous-year questions and timed mock tests, with instant results and solutions.';
+
+  @override
+  String get intro3Title => 'Stuck? Ask a doubt';
+
+  @override
+  String get intro3Body =>
+      'Type your question and a teacher answers. You\'ll get a notification when they reply.';
+
+  @override
+  String get intro4Title => 'Plan, track, improve';
+
+  @override
+  String get intro4Body =>
+      'A daily study plan, your progress in each subject and your weak topics, so you always know what to study next.';
+
+  @override
+  String introProgress(int current, int total) {
+    return 'Slide $current of $total';
+  }
+
+  @override
+  String get menuStudy => 'Study';
+
+  @override
+  String get menuHelp => 'Help';
+
+  @override
+  String get menuSettings => 'Settings';
+
+  @override
+  String get menuSubjectsCourses => 'Subjects & courses';
+
+  @override
+  String get nightMode => 'Night mode';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get themeAuto => 'Auto';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
 }
