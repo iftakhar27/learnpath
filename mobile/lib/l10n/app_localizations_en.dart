@@ -1150,4 +1150,90 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backToSignIn => 'Back to sign in';
+
+  @override
+  String get subjectsTitle => 'Subjects';
+
+  @override
+  String get subjectsSubtitle => 'NCERT, chapter by chapter';
+
+  @override
+  String classLevel(Object level) {
+    return 'Class $level';
+  }
+
+  @override
+  String chaptersReady(int ready, int total) {
+    return '$ready of $total chapters ready';
+  }
+
+  @override
+  String continueChapter(Object title) {
+    return 'Continue: $title';
+  }
+
+  @override
+  String chapterNumber(int number) {
+    return 'Chapter $number';
+  }
+
+  @override
+  String get chapterComingSoon => 'Lessons coming soon';
+
+  @override
+  String videosCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count videos',
+      one: '1 video',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count notes',
+      one: '1 note',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get videos => 'Videos';
+
+  @override
+  String get noVideosYet => 'No videos for this chapter yet.';
+
+  @override
+  String get noNotesYet => 'No notes for this chapter yet.';
+
+  @override
+  String practiseChapter(int count) {
+    return 'Practise this chapter ($count questions)';
+  }
+
+  @override
+  String fromCourse(Object course) {
+    return 'From $course';
+  }
+
+  @override
+  String get chapterLocked =>
+      'This chapter is in a paid course. Buy it to unlock every lesson.';
+
+  @override
+  String get physicsShort => 'Physics';
+
+  @override
+  String get chemistryShort => 'Chemistry';
+
+  @override
+  String get biologyShort => 'Biology';
+
+  @override
+  String get coursesHeading => 'Courses';
 }

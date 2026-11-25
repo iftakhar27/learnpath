@@ -17,7 +17,9 @@ public record AdminResourceDto(Guid Id, Guid TopicId, ResourceType Type, string 
 public record AdminTopicDto(Guid Id, Guid ChapterId, string TitleEn, string? TitleHi, string? ObjectivesEn, string? ObjectivesHi,
     int EstimatedMinutes, int SortOrder, int QuestionCount, List<AdminResourceDto> Resources, int PublishedQuestionCount, int QuizQuestionCount, int QuizPassPercent);
 
-public record AdminChapterDto(Guid Id, Guid SubjectId, string? UnitTitleEn, string TitleEn, string? TitleHi, int SortOrder, List<AdminTopicDto> Topics);
+public record AdminChapterDto(Guid Id, Guid SubjectId, string? UnitTitleEn, string TitleEn, string? TitleHi, int SortOrder, List<AdminTopicDto> Topics, Guid? NcertChapterId);
+
+public record AdminNcertChapterDto(Guid Id, string ClassLevel, string Subject, int Number, string TitleEn);
 
 public record AdminSubjectDto(Guid Id, Guid CourseId, string TitleEn, string? TitleHi, int SortOrder, List<AdminChapterDto> Chapters);
 

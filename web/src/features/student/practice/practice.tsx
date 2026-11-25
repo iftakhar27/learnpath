@@ -66,6 +66,12 @@ export function PracticeTopicPage() {
   return <PracticeSession request={{ mode: "topic", topicId, count: 10 }} backHref={routes.topic(topicId)} />;
 }
 
+/** Practice an NCERT chapter: questions from every course that teaches it and the student can open. */
+export function PracticeNcertPage() {
+  const { chapterId } = useParams<{ chapterId: string }>();
+  return <PracticeSession request={{ mode: "ncert", ncertChapterId: chapterId, count: 10 }} backHref={routes.chapter(chapterId)} />;
+}
+
 export function PracticeModePage() {
   const { mode } = useParams<{ mode: string }>();
   const valid = MODES.some((m) => m.mode === mode);

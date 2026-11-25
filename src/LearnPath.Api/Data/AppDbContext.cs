@@ -20,6 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<Chapter> Chapters => Set<Chapter>();
     public DbSet<Topic> Topics => Set<Topic>();
+    public DbSet<NcertChapter> NcertChapters => Set<NcertChapter>();
     public DbSet<TopicPrerequisite> TopicPrerequisites => Set<TopicPrerequisite>();
     public DbSet<LearningResource> LearningResources => Set<LearningResource>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
@@ -122,7 +123,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasMany(x => x.Subjects).WithOne().HasForeignKey(x => x.CourseId).OnDelete(DeleteBehavior.Cascade);
         });
         b.Entity<Subject>(e => e.HasMany(x => x.Chapters).WithOne(x => x.Subject).HasForeignKey(x => x.SubjectId).OnDelete(DeleteBehavior.Cascade));
-        b.Entity<Chapter>(e => e.HasMany(x => x.Topics).WithOne(x => x.Chapter).HasForeignKey(x => x.ChapterId).OnDelete(DeleteBehavior.Cascade));
+        b.Entity<Chapter>(e =>
+        {
+            e.HasMany(x => x.Topics).WithOne(x => x.Chapter).HasForeignKey(x => x.ChapterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => x.NcertChapterId);
+            e.HasOne<NcertChapter>().WithMany().HasForeignKey(x => x.NcertChapterId).OnDelete(DeleteBehavior.SetNull);
+        });
+        b.Entity<NcertChapter>(e =>
+        {
+            e.HasIndex(x => new { x.ClassLevel, x.Subject, x.Number }).IsUnique();
+            e.Property(x => x.ClassLevel).HasMaxLength(4);
+            e.Property(x => x.Subject).HasMaxLength(16);
+            e.Property(x => x.TitleEn).HasMaxLength(200);
+            e.Property(x => x.TitleHi).HasMaxLength(200);
+        });
         b.Entity<Topic>(e => e.HasMany(x => x.Resources).WithOne(x => x.Topic).HasForeignKey(x => x.TopicId).OnDelete(DeleteBehavior.Cascade));
         b.Entity<TopicPrerequisite>(e =>
         {

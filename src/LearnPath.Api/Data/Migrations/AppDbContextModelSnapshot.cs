@@ -188,6 +188,9 @@ namespace LearnPath.Api.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("NcertChapterId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
 
@@ -205,6 +208,8 @@ namespace LearnPath.Api.Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("NcertChapterId");
 
                     b.HasIndex("SubjectId");
 
@@ -614,6 +619,42 @@ namespace LearnPath.Api.Data.Migrations
                     b.HasIndex("TopicId");
 
                     b.ToTable("LearningResources");
+                });
+
+            modelBuilder.Entity("LearnPath.Api.Domain.NcertChapter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ClassLevel")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("TitleEn")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TitleHi")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassLevel", "Subject", "Number")
+                        .IsUnique();
+
+                    b.ToTable("NcertChapters");
                 });
 
             modelBuilder.Entity("LearnPath.Api.Domain.Notification", b =>
@@ -1767,6 +1808,11 @@ namespace LearnPath.Api.Data.Migrations
 
             modelBuilder.Entity("LearnPath.Api.Domain.Chapter", b =>
                 {
+                    b.HasOne("LearnPath.Api.Domain.NcertChapter", null)
+                        .WithMany()
+                        .HasForeignKey("NcertChapterId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("LearnPath.Api.Domain.Subject", "Subject")
                         .WithMany("Chapters")
                         .HasForeignKey("SubjectId")

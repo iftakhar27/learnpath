@@ -64,6 +64,18 @@ website exchanges the code with `POST /auth/handoff/redeem {code, deviceSlot:"br
 tokens as a sign-in (the one-browser rule applies: `409 session_active`, retry with `takeOver`; `400 handoff_invalid`
 when used or expired), then opens the course with Razorpay checkout started. Back in the app, the course is refreshed.
 
+## Browse by NCERT book
+
+- `GET /library` → `{tiles:[{classLevel, subject, title, chapters, readyChapters, progressPercent}], resume}` (6 books; `resume`
+  is the NCERT chapter of the last lesson studied). Open to visitors; progress needs sign-in.
+- `GET /library/{classLevel}/{subject}` (e.g. `/library/11/physics`) → the book's chapters with topic/video/note counts,
+  `ready` (some published course teaches it), `locked` (only in courses the student doesn't own) and progress.
+- `GET /library/chapters/{id}` → the chapter's topics and lessons from every published course that teaches it (owned and
+  free courses first), `canPractise`, `practiceQuestionCount`, `buyCourseId` when nothing is open, previous/next chapter.
+- `POST /practice/sessions {mode:"ncert", ncertChapterId}` practises it. Admins link course chapters with
+  `ncertChapterId` on `/admin/chapters` (omit to keep or, on create, to match by title; an empty GUID unlinks);
+  `GET /admin/ncert-chapters` lists them.
+
 ## Forgotten passwords
 
 - `POST /auth/password/forgot {email}` → `202` whether or not the email has an account. If it does, an email with a link
@@ -124,6 +136,7 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/admin/exams` |
 | `PUT` | `/api/v1/admin/exams/{id}` |
 | `GET` | `/api/v1/admin/imports` |
+| `GET` | `/api/v1/admin/ncert-chapters` |
 | `GET` | `/api/v1/admin/orders` |
 | `GET` | `/api/v1/admin/question-reports` |
 | `POST` | `/api/v1/admin/question-reports/{id}/resolve` |
@@ -191,6 +204,9 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `DELETE` | `/api/v1/learning/bookmarks/{id}` |
 | `GET` | `/api/v1/learning/history` |
 | `POST` | `/api/v1/learning/progress` |
+| `GET` | `/api/v1/library` |
+| `GET` | `/api/v1/library/chapters/{id}` |
+| `GET` | `/api/v1/library/{classLevel}/{subject}` |
 | `GET` | `/api/v1/notifications` |
 | `POST` | `/api/v1/notifications/read-all` |
 | `GET` | `/api/v1/notifications/unread-count` |

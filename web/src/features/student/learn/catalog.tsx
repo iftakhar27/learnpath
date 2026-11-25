@@ -11,6 +11,7 @@ import { StudentError } from "../errors";
 import { useProfile } from "../profile";
 import { routes } from "../routes";
 import { Muted, PageTitle, useFormat } from "../ui";
+import { SubjectGrid } from "./subjects";
 
 type PriceFilter = "all" | "free" | "paid";
 
@@ -38,6 +39,10 @@ export function Catalog() {
   return (
     <>
       <PageTitle>{t("tabLearn")}</PageTitle>
+      <div className="mb-8">
+        <SubjectGrid />
+      </div>
+      <h2 className="mb-3 text-lg font-semibold">{t("coursesHeading")}</h2>
       <div role="search" aria-label={t("filterCourses")} className="mb-6 flex flex-wrap items-center gap-3">
         <Input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("searchHint")} aria-label={t("search")} className="w-full sm:w-72" />
         <Select value={examId} onChange={(e) => setExamChoice(e.target.value)} aria-label={t("chooseExam")} className="w-full sm:w-56">

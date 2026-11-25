@@ -20,7 +20,7 @@ import { TopicQuizCard } from "./quiz";
 type Resource = components["schemas"]["ResourceDto"];
 export const topicKey = (id: string) => ["student", "topic", id] as const;
 
-function ResourceRow({ r, onError }: { r: Resource; onError: (e: unknown) => void }) {
+export function ResourceRow({ r, onError }: { r: Resource; onError: (e: unknown) => void }) {
   const t = useT();
   const f = useFormat();
   const qc = useQueryClient();

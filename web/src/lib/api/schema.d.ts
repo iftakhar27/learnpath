@@ -522,6 +522,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/ncert-chapters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminNcertChapterDto"][];
+                        "application/json": components["schemas"]["AdminNcertChapterDto"][];
+                        "text/json": components["schemas"]["AdminNcertChapterDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/topics": {
         parameters: {
             query?: never;
@@ -3045,6 +3082,122 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["LibraryDto"];
+                        "application/json": components["schemas"]["LibraryDto"];
+                        "text/json": components["schemas"]["LibraryDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/{classLevel}/{subject}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    classLevel: string;
+                    subject: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["LibrarySubjectDto"];
+                        "application/json": components["schemas"]["LibrarySubjectDto"];
+                        "text/json": components["schemas"]["LibrarySubjectDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/chapters/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["LibraryChapterDetailDto"];
+                        "application/json": components["schemas"]["LibraryChapterDetailDto"];
+                        "text/json": components["schemas"]["LibraryChapterDetailDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications": {
         parameters: {
             query?: never;
@@ -4585,6 +4738,8 @@ export interface components {
             /** Format: int32 */
             sortOrder: number;
             topics: components["schemas"]["AdminTopicDto"][];
+            /** Format: uuid */
+            ncertChapterId?: string | null;
         };
         AdminCourseDto: {
             /** Format: uuid */
@@ -4720,6 +4875,15 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             errors: components["schemas"]["ImportErrorDto"][];
+        };
+        AdminNcertChapterDto: {
+            /** Format: uuid */
+            id: string;
+            classLevel: string;
+            subject: string;
+            /** Format: int32 */
+            number: number;
+            titleEn: string;
         };
         AdminOptionDto: {
             /** Format: uuid */
@@ -5196,6 +5360,8 @@ export interface components {
             difficulty?: components["schemas"]["Difficulty"] | null;
             /** Format: int32 */
             count?: number;
+            /** Format: uuid */
+            ncertChapterId?: string | null;
         };
         DashboardDto: {
             fullName: string;
@@ -5360,6 +5526,83 @@ export interface components {
             failed: number;
             errors: components["schemas"]["ImportErrorDto"][];
         };
+        LibraryChapterDetailDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            number: number;
+            title: string;
+            classLevel: string;
+            subject: string;
+            subjectTitle: string;
+            /** Format: uuid */
+            previousChapterId?: string | null;
+            /** Format: uuid */
+            nextChapterId?: string | null;
+            topics: components["schemas"]["LibraryTopicDto"][];
+            /** Format: int32 */
+            practiceQuestionCount: number;
+            canPractise: boolean;
+            /** Format: uuid */
+            buyCourseId?: string | null;
+        };
+        LibraryChapterDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            number: number;
+            title: string;
+            /** Format: int32 */
+            topics: number;
+            /** Format: int32 */
+            videos: number;
+            /** Format: int32 */
+            notes: number;
+            ready: boolean;
+            locked: boolean;
+            /** Format: int32 */
+            progressPercent: number;
+        };
+        LibraryDto: {
+            tiles: components["schemas"]["LibraryTileDto"][];
+            resume?: components["schemas"]["LibraryResumeDto"] | null;
+        };
+        LibraryResumeDto: {
+            /** Format: uuid */
+            chapterId: string;
+            title: string;
+            classLevel: string;
+            subject: string;
+        };
+        LibrarySubjectDto: {
+            classLevel: string;
+            subject: string;
+            title: string;
+            chapters: components["schemas"]["LibraryChapterDto"][];
+            /** Format: int32 */
+            progressPercent: number;
+        };
+        LibraryTileDto: {
+            classLevel: string;
+            subject: string;
+            title: string;
+            /** Format: int32 */
+            chapters: number;
+            /** Format: int32 */
+            readyChapters: number;
+            /** Format: int32 */
+            progressPercent: number;
+        };
+        LibraryTopicDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: uuid */
+            courseId: string;
+            course: string;
+            hasAccess: boolean;
+            resources: components["schemas"]["ResourceDto"][];
+        };
         LoginRequest: {
             email: string;
             password: string;
@@ -5384,6 +5627,8 @@ export interface components {
             quizQuestionCount?: number | null;
             /** Format: int32 */
             quizPassPercent?: number | null;
+            /** Format: uuid */
+            ncertChapterId?: string | null;
         };
         NotificationDto: {
             /** Format: uuid */

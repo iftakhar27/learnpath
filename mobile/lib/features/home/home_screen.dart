@@ -7,6 +7,7 @@ import '../../core/api/models.g.dart';
 import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
+import '../learn/subjects.dart';
 import 'notification_bell.dart';
 
 final dashboardProvider = FutureProvider.autoDispose<DashboardDto>((ref) => ref.watch(apiProvider).dashboard());
@@ -54,9 +55,13 @@ class HomeScreen extends ConsumerWidget {
         value: dash,
         onRetry: () => ref.invalidate(dashboardProvider),
         data: (d) => RefreshableList(
-          onRefresh: () async => ref.invalidate(dashboardProvider),
+          onRefresh: () async {
+            ref.invalidate(dashboardProvider);
+            ref.invalidate(libraryProvider);
+          },
           children: [
             _Hero(d: d),
+            const SubjectGrid(),
             Card(
               margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: ListTile(

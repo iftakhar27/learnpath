@@ -2023,6 +2023,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to sign in'**
   String get backToSignIn;
+
+  /// No description provided for @subjectsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subjects'**
+  String get subjectsTitle;
+
+  /// No description provided for @subjectsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NCERT, chapter by chapter'**
+  String get subjectsSubtitle;
+
+  /// No description provided for @classLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Class {level}'**
+  String classLevel(Object level);
+
+  /// No description provided for @chaptersReady.
+  ///
+  /// In en, this message translates to:
+  /// **'{ready} of {total} chapters ready'**
+  String chaptersReady(int ready, int total);
+
+  /// No description provided for @continueChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue: {title}'**
+  String continueChapter(Object title);
+
+  /// No description provided for @chapterNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter {number}'**
+  String chapterNumber(int number);
+
+  /// No description provided for @chapterComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons coming soon'**
+  String get chapterComingSoon;
+
+  /// No description provided for @videosCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 video} other{{count} videos}}'**
+  String videosCount(int count);
+
+  /// No description provided for @notesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 note} other{{count} notes}}'**
+  String notesCount(int count);
+
+  /// No description provided for @videos.
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get videos;
+
+  /// No description provided for @noVideosYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No videos for this chapter yet.'**
+  String get noVideosYet;
+
+  /// No description provided for @noNotesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes for this chapter yet.'**
+  String get noNotesYet;
+
+  /// No description provided for @practiseChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Practise this chapter ({count} questions)'**
+  String practiseChapter(int count);
+
+  /// No description provided for @fromCourse.
+  ///
+  /// In en, this message translates to:
+  /// **'From {course}'**
+  String fromCourse(Object course);
+
+  /// No description provided for @chapterLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This chapter is in a paid course. Buy it to unlock every lesson.'**
+  String get chapterLocked;
+
+  /// No description provided for @physicsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Physics'**
+  String get physicsShort;
+
+  /// No description provided for @chemistryShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Chemistry'**
+  String get chemistryShort;
+
+  /// No description provided for @biologyShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Biology'**
+  String get biologyShort;
+
+  /// No description provided for @coursesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Courses'**
+  String get coursesHeading;
 }
 
 class _AppLocalizationsDelegate

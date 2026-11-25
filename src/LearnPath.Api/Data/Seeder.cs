@@ -40,6 +40,9 @@ public static class Seeder
             logger.LogInformation("Seeded sample content");
         }
 
+        var linked = await NcertSyllabus.SeedAsync(db);
+        if (linked > 0) logger.LogInformation("Linked {Count} course chapters to the NCERT syllabus", linked);
+
         // Sample lessons have placeholder video IDs; point them at a public demo stream so playback can be tried
         // before a video host (Bunny Stream) is connected. Real lessons are never touched.
         var demoVideo = config["Seed:SampleVideoUrl"];

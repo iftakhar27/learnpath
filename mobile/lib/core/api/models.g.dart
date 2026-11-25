@@ -58,6 +58,7 @@ class AdminChapterDto {
     this.titleHi,
     required this.sortOrder,
     required this.topics,
+    this.ncertChapterId,
   });
 
   factory AdminChapterDto.fromJson(Map<String, dynamic> json) => AdminChapterDto(
@@ -68,6 +69,7 @@ class AdminChapterDto {
     titleHi: json['titleHi'] == null ? null : json['titleHi'] as String,
     sortOrder: (json['sortOrder'] as num).toInt(),
     topics: (json['topics'] as List<dynamic>).map((x) => AdminTopicDto.fromJson(x as Map<String, dynamic>)).toList(),
+    ncertChapterId: json['ncertChapterId'] == null ? null : json['ncertChapterId'] as String,
   );
 
   final String id;
@@ -77,6 +79,7 @@ class AdminChapterDto {
   final String? titleHi;
   final int sortOrder;
   final List<AdminTopicDto> topics;
+  final String? ncertChapterId;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -86,6 +89,7 @@ class AdminChapterDto {
     'titleHi': ?titleHi,
     'sortOrder': sortOrder,
     'topics': topics.map((x) => x.toJson()).toList(),
+    'ncertChapterId': ?ncertChapterId,
   };
 }
 
@@ -499,6 +503,39 @@ class AdminImportJobDto {
     'failedRows': failedRows,
     'createdAt': createdAt.toIso8601String(),
     'errors': errors.map((x) => x.toJson()).toList(),
+  };
+}
+
+@immutable
+class AdminNcertChapterDto {
+  const AdminNcertChapterDto({
+    required this.id,
+    required this.classLevel,
+    required this.subject,
+    required this.number,
+    required this.titleEn,
+  });
+
+  factory AdminNcertChapterDto.fromJson(Map<String, dynamic> json) => AdminNcertChapterDto(
+    id: json['id'] as String,
+    classLevel: json['classLevel'] as String,
+    subject: json['subject'] as String,
+    number: (json['number'] as num).toInt(),
+    titleEn: json['titleEn'] as String,
+  );
+
+  final String id;
+  final String classLevel;
+  final String subject;
+  final int number;
+  final String titleEn;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'classLevel': classLevel,
+    'subject': subject,
+    'number': number,
+    'titleEn': titleEn,
   };
 }
 
@@ -2003,7 +2040,14 @@ class CreateOrderRequest {
 
 @immutable
 class CreatePracticeRequest {
-  const CreatePracticeRequest({required this.mode, this.topicId, this.chapterId, this.difficulty, this.count});
+  const CreatePracticeRequest({
+    required this.mode,
+    this.topicId,
+    this.chapterId,
+    this.difficulty,
+    this.count,
+    this.ncertChapterId,
+  });
 
   factory CreatePracticeRequest.fromJson(Map<String, dynamic> json) => CreatePracticeRequest(
     mode: json['mode'] as String,
@@ -2011,6 +2055,7 @@ class CreatePracticeRequest {
     chapterId: json['chapterId'] == null ? null : json['chapterId'] as String,
     difficulty: json['difficulty'] == null ? null : Difficulty.fromJson(json['difficulty'] as String),
     count: json['count'] == null ? null : (json['count'] as num).toInt(),
+    ncertChapterId: json['ncertChapterId'] == null ? null : json['ncertChapterId'] as String,
   );
 
   final String mode;
@@ -2018,6 +2063,7 @@ class CreatePracticeRequest {
   final String? chapterId;
   final Difficulty? difficulty;
   final int? count;
+  final String? ncertChapterId;
 
   Map<String, dynamic> toJson() => {
     'mode': mode,
@@ -2025,6 +2071,7 @@ class CreatePracticeRequest {
     'chapterId': ?chapterId,
     'difficulty': ?difficulty?.toJson(),
     'count': ?count,
+    'ncertChapterId': ?ncertChapterId,
   };
 }
 
@@ -2581,6 +2628,271 @@ class ImportResultDto {
 }
 
 @immutable
+class LibraryChapterDetailDto {
+  const LibraryChapterDetailDto({
+    required this.id,
+    required this.number,
+    required this.title,
+    required this.classLevel,
+    required this.subject,
+    required this.subjectTitle,
+    this.previousChapterId,
+    this.nextChapterId,
+    required this.topics,
+    required this.practiceQuestionCount,
+    required this.canPractise,
+    this.buyCourseId,
+  });
+
+  factory LibraryChapterDetailDto.fromJson(Map<String, dynamic> json) => LibraryChapterDetailDto(
+    id: json['id'] as String,
+    number: (json['number'] as num).toInt(),
+    title: json['title'] as String,
+    classLevel: json['classLevel'] as String,
+    subject: json['subject'] as String,
+    subjectTitle: json['subjectTitle'] as String,
+    previousChapterId: json['previousChapterId'] == null ? null : json['previousChapterId'] as String,
+    nextChapterId: json['nextChapterId'] == null ? null : json['nextChapterId'] as String,
+    topics: (json['topics'] as List<dynamic>).map((x) => LibraryTopicDto.fromJson(x as Map<String, dynamic>)).toList(),
+    practiceQuestionCount: (json['practiceQuestionCount'] as num).toInt(),
+    canPractise: json['canPractise'] as bool,
+    buyCourseId: json['buyCourseId'] == null ? null : json['buyCourseId'] as String,
+  );
+
+  final String id;
+  final int number;
+  final String title;
+  final String classLevel;
+  final String subject;
+  final String subjectTitle;
+  final String? previousChapterId;
+  final String? nextChapterId;
+  final List<LibraryTopicDto> topics;
+  final int practiceQuestionCount;
+  final bool canPractise;
+  final String? buyCourseId;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'number': number,
+    'title': title,
+    'classLevel': classLevel,
+    'subject': subject,
+    'subjectTitle': subjectTitle,
+    'previousChapterId': ?previousChapterId,
+    'nextChapterId': ?nextChapterId,
+    'topics': topics.map((x) => x.toJson()).toList(),
+    'practiceQuestionCount': practiceQuestionCount,
+    'canPractise': canPractise,
+    'buyCourseId': ?buyCourseId,
+  };
+}
+
+@immutable
+class LibraryChapterDto {
+  const LibraryChapterDto({
+    required this.id,
+    required this.number,
+    required this.title,
+    required this.topics,
+    required this.videos,
+    required this.notes,
+    required this.ready,
+    required this.locked,
+    required this.progressPercent,
+  });
+
+  factory LibraryChapterDto.fromJson(Map<String, dynamic> json) => LibraryChapterDto(
+    id: json['id'] as String,
+    number: (json['number'] as num).toInt(),
+    title: json['title'] as String,
+    topics: (json['topics'] as num).toInt(),
+    videos: (json['videos'] as num).toInt(),
+    notes: (json['notes'] as num).toInt(),
+    ready: json['ready'] as bool,
+    locked: json['locked'] as bool,
+    progressPercent: (json['progressPercent'] as num).toInt(),
+  );
+
+  final String id;
+  final int number;
+  final String title;
+  final int topics;
+  final int videos;
+  final int notes;
+  final bool ready;
+  final bool locked;
+  final int progressPercent;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'number': number,
+    'title': title,
+    'topics': topics,
+    'videos': videos,
+    'notes': notes,
+    'ready': ready,
+    'locked': locked,
+    'progressPercent': progressPercent,
+  };
+}
+
+@immutable
+class LibraryDto {
+  const LibraryDto({required this.tiles, this.resume});
+
+  factory LibraryDto.fromJson(Map<String, dynamic> json) => LibraryDto(
+    tiles: (json['tiles'] as List<dynamic>).map((x) => LibraryTileDto.fromJson(x as Map<String, dynamic>)).toList(),
+    resume: json['resume'] == null ? null : LibraryResumeDto.fromJson(json['resume'] as Map<String, dynamic>),
+  );
+
+  final List<LibraryTileDto> tiles;
+  final LibraryResumeDto? resume;
+
+  Map<String, dynamic> toJson() => {'tiles': tiles.map((x) => x.toJson()).toList(), 'resume': ?resume?.toJson()};
+}
+
+@immutable
+class LibraryResumeDto {
+  const LibraryResumeDto({
+    required this.chapterId,
+    required this.title,
+    required this.classLevel,
+    required this.subject,
+  });
+
+  factory LibraryResumeDto.fromJson(Map<String, dynamic> json) => LibraryResumeDto(
+    chapterId: json['chapterId'] as String,
+    title: json['title'] as String,
+    classLevel: json['classLevel'] as String,
+    subject: json['subject'] as String,
+  );
+
+  final String chapterId;
+  final String title;
+  final String classLevel;
+  final String subject;
+
+  Map<String, dynamic> toJson() => {
+    'chapterId': chapterId,
+    'title': title,
+    'classLevel': classLevel,
+    'subject': subject,
+  };
+}
+
+@immutable
+class LibrarySubjectDto {
+  const LibrarySubjectDto({
+    required this.classLevel,
+    required this.subject,
+    required this.title,
+    required this.chapters,
+    required this.progressPercent,
+  });
+
+  factory LibrarySubjectDto.fromJson(Map<String, dynamic> json) => LibrarySubjectDto(
+    classLevel: json['classLevel'] as String,
+    subject: json['subject'] as String,
+    title: json['title'] as String,
+    chapters: (json['chapters'] as List<dynamic>)
+        .map((x) => LibraryChapterDto.fromJson(x as Map<String, dynamic>))
+        .toList(),
+    progressPercent: (json['progressPercent'] as num).toInt(),
+  );
+
+  final String classLevel;
+  final String subject;
+  final String title;
+  final List<LibraryChapterDto> chapters;
+  final int progressPercent;
+
+  Map<String, dynamic> toJson() => {
+    'classLevel': classLevel,
+    'subject': subject,
+    'title': title,
+    'chapters': chapters.map((x) => x.toJson()).toList(),
+    'progressPercent': progressPercent,
+  };
+}
+
+@immutable
+class LibraryTileDto {
+  const LibraryTileDto({
+    required this.classLevel,
+    required this.subject,
+    required this.title,
+    required this.chapters,
+    required this.readyChapters,
+    required this.progressPercent,
+  });
+
+  factory LibraryTileDto.fromJson(Map<String, dynamic> json) => LibraryTileDto(
+    classLevel: json['classLevel'] as String,
+    subject: json['subject'] as String,
+    title: json['title'] as String,
+    chapters: (json['chapters'] as num).toInt(),
+    readyChapters: (json['readyChapters'] as num).toInt(),
+    progressPercent: (json['progressPercent'] as num).toInt(),
+  );
+
+  final String classLevel;
+  final String subject;
+  final String title;
+  final int chapters;
+  final int readyChapters;
+  final int progressPercent;
+
+  Map<String, dynamic> toJson() => {
+    'classLevel': classLevel,
+    'subject': subject,
+    'title': title,
+    'chapters': chapters,
+    'readyChapters': readyChapters,
+    'progressPercent': progressPercent,
+  };
+}
+
+@immutable
+class LibraryTopicDto {
+  const LibraryTopicDto({
+    required this.id,
+    required this.title,
+    required this.courseId,
+    required this.course,
+    required this.hasAccess,
+    required this.resources,
+  });
+
+  factory LibraryTopicDto.fromJson(Map<String, dynamic> json) => LibraryTopicDto(
+    id: json['id'] as String,
+    title: json['title'] as String,
+    courseId: json['courseId'] as String,
+    course: json['course'] as String,
+    hasAccess: json['hasAccess'] as bool,
+    resources: (json['resources'] as List<dynamic>)
+        .map((x) => ResourceDto.fromJson(x as Map<String, dynamic>))
+        .toList(),
+  );
+
+  final String id;
+  final String title;
+  final String courseId;
+  final String course;
+  final bool hasAccess;
+  final List<ResourceDto> resources;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'courseId': courseId,
+    'course': course,
+    'hasAccess': hasAccess,
+    'resources': resources.map((x) => x.toJson()).toList(),
+  };
+}
+
+@immutable
 class LoginRequest {
   const LoginRequest({
     required this.email,
@@ -2630,6 +2942,7 @@ class NodeUpsert {
     this.estimatedMinutes,
     this.quizQuestionCount,
     this.quizPassPercent,
+    this.ncertChapterId,
   });
 
   factory NodeUpsert.fromJson(Map<String, dynamic> json) => NodeUpsert(
@@ -2643,6 +2956,7 @@ class NodeUpsert {
     estimatedMinutes: json['estimatedMinutes'] == null ? null : (json['estimatedMinutes'] as num).toInt(),
     quizQuestionCount: json['quizQuestionCount'] == null ? null : (json['quizQuestionCount'] as num).toInt(),
     quizPassPercent: json['quizPassPercent'] == null ? null : (json['quizPassPercent'] as num).toInt(),
+    ncertChapterId: json['ncertChapterId'] == null ? null : json['ncertChapterId'] as String,
   );
 
   final String parentId;
@@ -2655,6 +2969,7 @@ class NodeUpsert {
   final int? estimatedMinutes;
   final int? quizQuestionCount;
   final int? quizPassPercent;
+  final String? ncertChapterId;
 
   Map<String, dynamic> toJson() => {
     'parentId': parentId,
@@ -2667,6 +2982,7 @@ class NodeUpsert {
     'estimatedMinutes': ?estimatedMinutes,
     'quizQuestionCount': ?quizQuestionCount,
     'quizPassPercent': ?quizPassPercent,
+    'ncertChapterId': ?ncertChapterId,
   };
 }
 

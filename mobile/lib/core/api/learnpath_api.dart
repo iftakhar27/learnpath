@@ -147,6 +147,12 @@ class LearnPathApi {
   Future<CourseDetailDto> syllabus(String courseId) => _call(() => _dio.get('/courses/$courseId/syllabus'), (d) => CourseDetailDto.fromJson(_map(d)));
   Future<void> enroll(String courseId) => _send(() => _dio.post('/courses/$courseId/enroll'));
   Future<TopicDetailDto> topic(String topicId) => _call(() => _dio.get('/topics/$topicId'), (d) => TopicDetailDto.fromJson(_map(d)));
+  // Browse by NCERT book (the subject grid).
+  Future<LibraryDto> library() => _call(() => _dio.get('/library'), (d) => LibraryDto.fromJson(_map(d)));
+  Future<LibrarySubjectDto> libraryBook(String classLevel, String subject) =>
+      _call(() => _dio.get('/library/$classLevel/$subject'), (d) => LibrarySubjectDto.fromJson(_map(d)));
+  Future<LibraryChapterDetailDto> libraryChapter(String id) =>
+      _call(() => _dio.get('/library/chapters/$id'), (d) => LibraryChapterDetailDto.fromJson(_map(d)));
   Future<PlaybackDto> playback(String resourceId) => _call(() => _dio.get('/resources/$resourceId/playback'), (d) => PlaybackDto.fromJson(_map(d)));
 
   Future<ProgressDto> saveProgress(String resourceId, int positionSeconds, {bool markCompleted = false}) => _call(

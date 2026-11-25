@@ -217,6 +217,21 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Subject grid and NCERT chapters (25 Nov 2026)
+
+Browse by book, after a review of a competitor's app for ideas (structure only; our own design and icons): the home
+and Learn screens (website and app) open with a **subject grid**, Physics, Chemistry, Biology × Class 11 and 12, with
+each tile's progress ring, "x of y chapters ready" and a "Continue: <chapter>" shortcut. A tile opens the full **NCERT
+chapter list** (rationalised 2023-24 syllabus, 79 chapters; ones without lessons say "coming soon"; switch class or
+subject from the page), and a chapter shows **Videos / Notes / Practice** gathered from every published course that
+teaches it (locked lessons and a "view course" link when it's only in a paid course; free previews still play).
+Course chapters link to NCERT chapters automatically by subject and title (existing ones once, new ones on creation);
+admins can change or remove the link in the syllabus editor. Practice works per NCERT chapter. Hindi chapter titles
+are not filled in yet (English shows). Also: **Next.js 16.4.3 → 16.4.6** (the build now refuses versions with known
+advisories; 16.4.6 fixes seven, including response disclosure when forwarding fetched responses, which the website
+does). **Verified:** 4 backend tests, 1 browser test (grid → book → chapter tabs → practice; locked chapter; book
+switching), 1 app test; all suites green (116 / 40 / 29).
+
 ### Forgot password by email (9 Nov 2026)
 
 "Forgot password?" on the website's student and admin sign-in pages and on the app's email sign-in emails a link to the

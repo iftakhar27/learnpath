@@ -764,6 +764,44 @@
         }
       }
     },
+    "/api/v1/admin/ncert-chapters": {
+      "get": {
+        "tags": [
+          "AdminContent"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminNcertChapterDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminNcertChapterDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminNcertChapterDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/topics": {
       "post": {
         "tags": [
@@ -4097,6 +4135,122 @@
         }
       }
     },
+    "/api/v1/library": {
+      "get": {
+        "tags": [
+          "Library"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/library/{classLevel}/{subject}": {
+      "get": {
+        "tags": [
+          "Library"
+        ],
+        "parameters": [
+          {
+            "name": "classLevel",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subject",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibrarySubjectDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibrarySubjectDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibrarySubjectDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/library/chapters/{id}": {
+      "get": {
+        "tags": [
+          "Library"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryChapterDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryChapterDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryChapterDetailDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/notifications": {
       "get": {
         "tags": [
@@ -5875,6 +6029,11 @@
             "items": {
               "$ref": "#/components/schemas/AdminTopicDto"
             }
+          },
+          "ncertChapterId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6328,6 +6487,36 @@
             "items": {
               "$ref": "#/components/schemas/ImportErrorDto"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminNcertChapterDto": {
+        "required": [
+          "classLevel",
+          "id",
+          "number",
+          "subject",
+          "titleEn"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classLevel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "titleEn": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7969,6 +8158,11 @@
           "count": {
             "type": "integer",
             "format": "int32"
+          },
+          "ncertChapterId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -8531,6 +8725,273 @@
         },
         "additionalProperties": false
       },
+      "LibraryChapterDetailDto": {
+        "required": [
+          "canPractise",
+          "classLevel",
+          "id",
+          "number",
+          "practiceQuestionCount",
+          "subject",
+          "subjectTitle",
+          "title",
+          "topics"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "classLevel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "subjectTitle": {
+            "type": "string"
+          },
+          "previousChapterId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "nextChapterId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LibraryTopicDto"
+            }
+          },
+          "practiceQuestionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "canPractise": {
+            "type": "boolean"
+          },
+          "buyCourseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LibraryChapterDto": {
+        "required": [
+          "id",
+          "locked",
+          "notes",
+          "number",
+          "progressPercent",
+          "ready",
+          "title",
+          "topics",
+          "videos"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "topics": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "videos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ready": {
+            "type": "boolean"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "progressPercent": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LibraryDto": {
+        "required": [
+          "tiles"
+        ],
+        "type": "object",
+        "properties": {
+          "tiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LibraryTileDto"
+            }
+          },
+          "resume": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LibraryResumeDto"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LibraryResumeDto": {
+        "required": [
+          "chapterId",
+          "classLevel",
+          "subject",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "chapterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "classLevel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LibrarySubjectDto": {
+        "required": [
+          "chapters",
+          "classLevel",
+          "progressPercent",
+          "subject",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "classLevel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "chapters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LibraryChapterDto"
+            }
+          },
+          "progressPercent": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LibraryTileDto": {
+        "required": [
+          "chapters",
+          "classLevel",
+          "progressPercent",
+          "readyChapters",
+          "subject",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "classLevel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "chapters": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "readyChapters": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "progressPercent": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LibraryTopicDto": {
+        "required": [
+          "course",
+          "courseId",
+          "hasAccess",
+          "id",
+          "resources",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "course": {
+            "type": "string"
+          },
+          "hasAccess": {
+            "type": "boolean"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResourceDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "LoginRequest": {
         "required": [
           "email",
@@ -8609,6 +9070,11 @@
           "quizPassPercent": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          },
+          "ncertChapterId": {
+            "type": "string",
+            "format": "uuid",
             "nullable": true
           }
         },

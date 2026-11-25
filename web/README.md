@@ -52,7 +52,7 @@ When the API contract changes: run `../scripts/export-openapi.sh`, then `npm run
 src/app/page.tsx, login, register, onboarding   student landing and sign-in (mobile OTP or email)
 src/app/(student)/...            student pages inside the site frame: home, learn, topics, watch, practice, tests,
                                  results, plan, progress, profile, notifications, bookmarks, purchases, support,
-                                 doubts, topic quizzes (topics/[id]/quiz)
+                                 doubts, topic quizzes (topics/[id]/quiz), subject grid books and NCERT chapters (library/...)
 src/app/exam/[attemptId]         full-screen exam player (outside the frame)
 src/app/admin/login              staff sign-in page
 src/app/admin/(portal)/...       admin pages (thin server components; each wraps a client feature in <Suspense>)

@@ -570,5 +570,77 @@
       "email": {}
     }
   },
-  "backToSignIn": "Back to sign in"
+  "backToSignIn": "Back to sign in",
+  "subjectsTitle": "Subjects",
+  "subjectsSubtitle": "NCERT, chapter by chapter",
+  "classLevel": "Class {level}",
+  "@classLevel": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "chaptersReady": "{ready} of {total} chapters ready",
+  "@chaptersReady": {
+    "placeholders": {
+      "ready": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "continueChapter": "Continue: {title}",
+  "@continueChapter": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "chapterNumber": "Chapter {number}",
+  "@chapterNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "chapterComingSoon": "Lessons coming soon",
+  "videosCount": "{count, plural, =1{1 video} other{{count} videos}}",
+  "@videosCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notesCount": "{count, plural, =1{1 note} other{{count} notes}}",
+  "@notesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "videos": "Videos",
+  "noVideosYet": "No videos for this chapter yet.",
+  "noNotesYet": "No notes for this chapter yet.",
+  "practiseChapter": "Practise this chapter ({count} questions)",
+  "@practiseChapter": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fromCourse": "From {course}",
+  "@fromCourse": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "chapterLocked": "This chapter is in a paid course. Buy it to unlock every lesson.",
+  "physicsShort": "Physics",
+  "chemistryShort": "Chemistry",
+  "biologyShort": "Biology",
+  "coursesHeading": "Courses"
 }

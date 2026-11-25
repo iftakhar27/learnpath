@@ -22,6 +22,12 @@
   --focus: #6366f1;
   /* Chart marks (validated with the dataviz palette checks against each surface). */
   --chart-1: #4f46e5;
+  --physics: #2563eb;
+  --physics-soft: #e8efff;
+  --chemistry: #ea580c;
+  --chemistry-soft: #fff0e6;
+  --biology: #059669;
+  --biology-soft: #e3f6ef;
   color-scheme: light;
 }
 
@@ -45,11 +51,23 @@
     --warning-soft: #372a12;
     --focus: #a5b4fc;
     --chart-1: #7c83f6;
+    --physics: #60a5fa;
+    --physics-soft: #1b2a4a;
+    --chemistry: #fb923c;
+    --chemistry-soft: #3a2416;
+    --biology: #34d399;
+    --biology-soft: #12322a;
     color-scheme: dark;
   }
 }
 
 @theme inline {
+  --color-physics: var(--physics);
+  --color-physics-soft: var(--physics-soft);
+  --color-chemistry: var(--chemistry);
+  --color-chemistry-soft: var(--chemistry-soft);
+  --color-biology: var(--biology);
+  --color-biology-soft: var(--biology-soft);
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);

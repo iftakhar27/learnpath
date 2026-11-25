@@ -9,6 +9,7 @@ import '../features/doubts/doubt_screens.dart';
 import '../features/home/home_screen.dart';
 import '../features/learn/learn_screens.dart';
 import '../features/learn/quiz_screen.dart';
+import '../features/learn/subjects.dart';
 import '../features/learn/video_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/practice/practice_screens.dart';
@@ -82,6 +83,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootKey,
         path: '/topic/:id',
         builder: (_, s) => TopicScreen(topicId: s.pathParameters['id']!),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootKey,
+        path: '/subject/:cls/:subject',
+        builder: (_, s) => SubjectScreen(classLevel: s.pathParameters['cls']!, subject: s.pathParameters['subject']!),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootKey,
+        path: '/ncert/:id',
+        builder: (_, s) => NcertChapterScreen(chapterId: s.pathParameters['id']!),
       ),
       GoRoute(
         parentNavigatorKey: _rootKey,

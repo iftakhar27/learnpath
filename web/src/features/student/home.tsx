@@ -8,6 +8,7 @@ import { useT } from "@/lib/i18n";
 import { PageLoading } from "@/components/ui/feedback";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { StudentError } from "./errors";
+import { SubjectGrid } from "./learn/subjects";
 import { planTaskHref, routes } from "./routes";
 import { Muted, ProgressBar, Section, useFormat } from "./ui";
 
@@ -57,6 +58,8 @@ export function StudentHome() {
           {t("streakDays", { days: d.streakDays })}
         </span>
       </div>
+
+      <SubjectGrid />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

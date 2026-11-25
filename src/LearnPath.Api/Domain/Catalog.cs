@@ -54,7 +54,32 @@ public class Chapter
     public string TitleEn { get; set; } = "";
     public string? TitleHi { get; set; }
     public int SortOrder { get; set; }
+    /// <summary>The NCERT chapter this course chapter teaches (drives the subject grid); null when it isn't one.</summary>
+    public Guid? NcertChapterId { get; set; }
     public List<Topic> Topics { get; set; } = [];
+}
+
+/// <summary>
+/// The NCERT syllabus (Class 11 and 12 Physics, Chemistry, Biology): the fixed list students browse by subject.
+/// Course chapters link to it, so a chapter shows the lessons of every course that teaches it.
+/// </summary>
+public class NcertChapter
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string ClassLevel { get; set; } = "";   // "11" or "12"
+    public string Subject { get; set; } = "";      // NcertSubjects.*
+    public int Number { get; set; }
+    public string TitleEn { get; set; } = "";
+    public string? TitleHi { get; set; }
+}
+
+public static class NcertSubjects
+{
+    public const string Physics = "Physics";
+    public const string Chemistry = "Chemistry";
+    public const string Biology = "Biology";
+    public static readonly string[] All = [Physics, Chemistry, Biology];
+    public static readonly string[] Classes = ["11", "12"];
 }
 
 public class Topic

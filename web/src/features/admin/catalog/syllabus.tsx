@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { api, unwrap } from "@/lib/api/client";
 import type { AdminChapter, AdminCourseTree, AdminResource, AdminSubject, AdminTopic, NodeUpsert, PublishStatus, ResourceType, ResourceUpsert } from "@/lib/api/types";
@@ -74,8 +75,18 @@ type ModalState =
   | { type: "delete"; kind: Kind | "resource"; id: string; title: string }
   | null;
 
+const NO_NCERT = "00000000-0000-0000-0000-000000000000";
+
+/** The NCERT chapters (79), for linking course chapters to the students' subject grid. */
+function useNcertChapters() {
+  return useQuery({ queryKey: ["admin", "ncert-chapters"], queryFn: () => unwrap(api.GET("/api/v1/admin/ncert-chapters")), staleTime: Infinity });
+}
+
+const ncertLabel = (n: { subject: string; classLevel: string; number: number; titleEn: string }) => `${n.subject} ${n.classLevel} · Ch ${n.number} ${n.titleEn}`;
+
 export function SyllabusEditor({ tree }: { tree: AdminCourseTree }) {
   const { data: user } = useSession();
+  const ncert = useNcertChapters();
   const canPublish = can.publishContent(user?.roles);
   const [modal, setModal] = useState<ModalState>(null);
   const treeKey = ["admin", "course-tree", tree.course.id];
@@ -140,7 +151,9 @@ export function SyllabusEditor({ tree }: { tree: AdminCourseTree }) {
                   title={c.titleEn}
                   titleHi={c.titleHi}
                   eyebrow={c.unitTitleEn}
-                  meta={`${c.topics.length} topic${c.topics.length === 1 ? "" : "s"}`}
+                  meta={`${c.topics.length} topic${c.topics.length === 1 ? "" : "s"} · ${
+                    c.ncertChapterId ? `NCERT: ${(() => { const n = ncert.data?.find((x) => x.id === c.ncertChapterId); return n ? ncertLabel(n) : "linked"; })()}` : "Not linked to NCERT"
+                  }`}
                   actions={
                     <>
                       {nodeMoves("chapter", s.chapters, ci)}
@@ -307,6 +320,7 @@ function quizLabel(t: AdminTopic): string {
 }
 
 type NodeValues = {
+  ncert: string;
   titleEn: string;
   titleHi: string;
   unitTitleEn: string;
@@ -321,11 +335,13 @@ function NodeModal({ state, treeKey, onClose }: { state: Extract<ModalState, { t
   const { kind, node } = state;
   const chapter = kind === "chapter" ? (node as AdminChapter | undefined) : undefined;
   const topic = kind === "topic" ? (node as AdminTopic | undefined) : undefined;
+  const ncert = useNcertChapters();
   const { register, handleSubmit, formState } = useForm<NodeValues>({
     defaultValues: {
       titleEn: node?.titleEn ?? "",
       titleHi: node?.titleHi ?? "",
       unitTitleEn: chapter?.unitTitleEn ?? "",
+      ncert: chapter ? (chapter.ncertChapterId ?? NO_NCERT) : "auto",
       objectivesEn: topic?.objectivesEn ?? "",
       objectivesHi: topic?.objectivesHi ?? "",
       estimatedMinutes: String(topic?.estimatedMinutes ?? 30),
@@ -351,6 +367,8 @@ function NodeModal({ state, treeKey, onClose }: { state: Extract<ModalState, { t
             titleHi: blankToNull(v.titleHi),
             sortOrder: state.nextOrder,
             unitTitleEn: kind === "chapter" ? blankToNull(v.unitTitleEn) : null,
+            // "auto": the API matches a new chapter to the NCERT chapter with the same subject and title.
+            ncertChapterId: kind === "chapter" && v.ncert !== "auto" ? v.ncert : undefined,
             objectivesEn: kind === "topic" ? blankToNull(v.objectivesEn) : null,
             objectivesHi: kind === "topic" ? blankToNull(v.objectivesHi) : null,
             estimatedMinutes: kind === "topic" ? Number(v.estimatedMinutes) || 0 : 0,
@@ -368,9 +386,22 @@ function NodeModal({ state, treeKey, onClose }: { state: Extract<ModalState, { t
           </Field>
         </BilingualRow>
         {kind === "chapter" && (
-          <Field label="Unit (optional)" htmlFor="node-unit" hint="Groups chapters, e.g. Mechanics.">
-            <Input id="node-unit" {...register("unitTitleEn")} />
-          </Field>
+          <>
+            <Field label="Unit (optional)" htmlFor="node-unit" hint="Groups chapters, e.g. Mechanics.">
+              <Input id="node-unit" {...register("unitTitleEn")} />
+            </Field>
+            <Field label="NCERT chapter" htmlFor="node-ncert" hint="Students find this chapter's lessons under this NCERT chapter in the subject grid.">
+              <Select id="node-ncert" {...register("ncert")}>
+                {!chapter && <option value="auto">Match automatically by title</option>}
+                <option value={NO_NCERT}>Not an NCERT chapter</option>
+                {ncert.data?.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {ncertLabel(n)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </>
         )}
         {kind === "topic" && (
           <>

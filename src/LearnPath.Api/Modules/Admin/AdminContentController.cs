@@ -25,7 +25,8 @@ public record CourseUpsert([Required] Guid ExamId, [Required, MaxLength(120), Re
     [Range(1, 3650)] int? AccessDays, DateTimeOffset? PublishAt);
 public record NodeUpsert([Required] Guid ParentId, [Required, MaxLength(200)] string TitleEn, string? TitleHi, int SortOrder = 0, string? UnitTitleEn = null,
     string? ObjectivesEn = null, string? ObjectivesHi = null, [Range(0, 1000)] int EstimatedMinutes = 0,
-    [Range(0, 50)] int? QuizQuestionCount = null, [Range(1, 100)] int? QuizPassPercent = null); // topics only; null keeps the current (or default) value
+    [Range(0, 50)] int? QuizQuestionCount = null, [Range(1, 100)] int? QuizPassPercent = null, // topics only; null keeps the current (or default) value
+    Guid? NcertChapterId = null); // chapters only: the NCERT chapter it teaches; null keeps it (or matches by title on create), Guid.Empty = none
 public record ResourceUpsert([Required] Guid TopicId, [Required] ResourceType Type, [Required, MaxLength(200)] string TitleEn, string? TitleHi,
     [RegularExpression("^(en|hi)$")] string Language, int SortOrder, bool IsFreePreview, string? VideoProviderId, [Range(1, 36000)] int? DurationSeconds,
     string? DocumentStorageKey, bool AllowDownload);
@@ -85,7 +86,7 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
                 new AdminChapterDto(ch.Id, ch.SubjectId, ch.UnitTitleEn, ch.TitleEn, ch.TitleHi, ch.SortOrder, ch.Topics.OrderBy(t => t.SortOrder).ThenBy(t => t.TitleEn).Select(t =>
                     new AdminTopicDto(t.Id, t.ChapterId, t.TitleEn, t.TitleHi, t.ObjectivesEn, t.ObjectivesHi, t.EstimatedMinutes, t.SortOrder,
                         questionCounts.GetValueOrDefault(t.Id)?.Count ?? 0, t.Resources.OrderBy(r => r.SortOrder).Select(ToDto).ToList(),
-                        questionCounts.GetValueOrDefault(t.Id)?.Published ?? 0, t.QuizQuestionCount, t.QuizPassPercent)).ToList())).ToList())).ToList());
+                        questionCounts.GetValueOrDefault(t.Id)?.Published ?? 0, t.QuizQuestionCount, t.QuizPassPercent)).ToList(), ch.NcertChapterId)).ToList())).ToList());
     }
 
     internal static AdminCourseDto ToDto(Course c, int enrollments) => new(c.Id, c.ExamId, c.Slug, c.TitleEn, c.TitleHi, c.DescriptionEn, c.DescriptionHi,
@@ -147,6 +148,12 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
     {
         if (!await db.Subjects.AnyAsync(s => s.Id == req.ParentId, ct)) throw AppException.NotFound("Subject");
         var c = new Chapter { SubjectId = req.ParentId, TitleEn = req.TitleEn, TitleHi = req.TitleHi, SortOrder = req.SortOrder, UnitTitleEn = req.UnitTitleEn };
+        if (req.NcertChapterId is null)
+        {
+            var subject = await db.Subjects.Where(s => s.Id == req.ParentId).Select(s => s.TitleEn).FirstAsync(ct);
+            c.NcertChapterId = await NcertSyllabus.MatchAsync(db, subject, req.TitleEn, ct);
+        }
+        else c.NcertChapterId = await NcertLinkAsync(req.NcertChapterId.Value, ct);
         db.Chapters.Add(c);
         return await Save("chapter.create", "Chapter", c.Id, req, ct);
     }
@@ -156,7 +163,21 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
     {
         var c = await db.Chapters.FindAsync([id], ct) ?? throw AppException.NotFound("Chapter");
         (c.TitleEn, c.TitleHi, c.SortOrder, c.UnitTitleEn) = (req.TitleEn, req.TitleHi, req.SortOrder, req.UnitTitleEn);
+        if (req.NcertChapterId is { } link) c.NcertChapterId = await NcertLinkAsync(link, ct);
         return await Save("chapter.update", "Chapter", id, req, ct);
+    }
+
+    /// <summary>The NCERT chapters, for linking course chapters to the subject grid.</summary>
+    [HttpGet("ncert-chapters")]
+    public async Task<List<AdminNcertChapterDto>> NcertChapters(CancellationToken ct) =>
+        await db.NcertChapters.AsNoTracking().OrderBy(n => n.Subject).ThenBy(n => n.ClassLevel).ThenBy(n => n.Number)
+            .Select(n => new AdminNcertChapterDto(n.Id, n.ClassLevel, n.Subject, n.Number, n.TitleEn)).ToListAsync(ct);
+
+    private async Task<Guid?> NcertLinkAsync(Guid id, CancellationToken ct)
+    {
+        if (id == Guid.Empty) return null;
+        if (!await db.NcertChapters.AnyAsync(n => n.Id == id, ct)) throw AppException.BadRequest("invalid_ncert_chapter", "Unknown NCERT chapter.");
+        return id;
     }
 
     [HttpPost("topics")]

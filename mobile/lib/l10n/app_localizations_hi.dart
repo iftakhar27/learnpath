@@ -1149,4 +1149,90 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get backToSignIn => 'साइन इन पर वापस जाएँ';
+
+  @override
+  String get subjectsTitle => 'विषय';
+
+  @override
+  String get subjectsSubtitle => 'NCERT, अध्याय दर अध्याय';
+
+  @override
+  String classLevel(Object level) {
+    return 'कक्षा $level';
+  }
+
+  @override
+  String chaptersReady(int ready, int total) {
+    return '$total में से $ready अध्याय तैयार';
+  }
+
+  @override
+  String continueChapter(Object title) {
+    return 'जारी रखें: $title';
+  }
+
+  @override
+  String chapterNumber(int number) {
+    return 'अध्याय $number';
+  }
+
+  @override
+  String get chapterComingSoon => 'पाठ जल्द आ रहे हैं';
+
+  @override
+  String videosCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count वीडियो',
+      one: '1 वीडियो',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count नोट्स',
+      one: '1 नोट',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get videos => 'वीडियो';
+
+  @override
+  String get noVideosYet => 'इस अध्याय के वीडियो अभी उपलब्ध नहीं हैं।';
+
+  @override
+  String get noNotesYet => 'इस अध्याय के नोट्स अभी उपलब्ध नहीं हैं।';
+
+  @override
+  String practiseChapter(int count) {
+    return 'इस अध्याय का अभ्यास करें ($count प्रश्न)';
+  }
+
+  @override
+  String fromCourse(Object course) {
+    return '$course से';
+  }
+
+  @override
+  String get chapterLocked =>
+      'यह अध्याय एक पेड कोर्स में है। सभी पाठ खोलने के लिए कोर्स खरीदें।';
+
+  @override
+  String get physicsShort => 'भौतिकी';
+
+  @override
+  String get chemistryShort => 'रसायन';
+
+  @override
+  String get biologyShort => 'जीव विज्ञान';
+
+  @override
+  String get coursesHeading => 'कोर्स';
 }

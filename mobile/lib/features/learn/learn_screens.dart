@@ -13,6 +13,7 @@ import '../home/home_screen.dart';
 import '../payments/buy_on_website.dart';
 import '../doubts/doubt_screens.dart';
 import 'quiz_screen.dart';
+import 'subjects.dart';
 
 enum PriceFilter { all, free, paid }
 
@@ -96,19 +97,26 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
             child: AsyncView(
               value: courses,
               onRetry: () => ref.invalidate(catalogProvider(query)),
-              data: (list) => list.isEmpty
-                  ? EmptyState(icon: Icons.menu_book_outlined, message: l.coursesEmpty)
-                  : RefreshableList(
-                      onRefresh: () async => ref.invalidate(catalogProvider(query)),
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                      children: [
-                        for (final c in list)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: CourseCard(course: c),
-                          ),
-                      ],
+              data: (list) => RefreshableList(
+                onRefresh: () async {
+                  ref.invalidate(catalogProvider(query));
+                  ref.invalidate(libraryProvider);
+                },
+                padding: const EdgeInsets.only(bottom: 24),
+                children: [
+                  if (_q.isEmpty) const SubjectGrid(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    child: Text(l.coursesHeading, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+                  ),
+                  if (list.isEmpty) EmptyState(icon: Icons.menu_book_outlined, message: l.coursesEmpty),
+                  for (final c in list)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      child: CourseCard(course: c),
                     ),
+                ],
+              ),
             ),
           ),
         ],

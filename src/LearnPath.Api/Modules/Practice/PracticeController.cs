@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore;
 namespace LearnPath.Api.Modules.Practice;
 
 public record CreatePracticeRequest(
-    [RegularExpression("^(topic|chapter|incorrect|bookmarked|previous_year)$")] string Mode,
-    Guid? TopicId, Guid? ChapterId, Difficulty? Difficulty, [Range(1, 50)] int Count = 10);
+    [RegularExpression("^(topic|chapter|ncert|incorrect|bookmarked|previous_year)$")] string Mode,
+    Guid? TopicId, Guid? ChapterId, Difficulty? Difficulty, [Range(1, 50)] int Count = 10, Guid? NcertChapterId = null);
 public record PracticeQuestionDto(Guid QuestionId, string Type, string Difficulty, string Stem, string? ImageUrl, string? Hint, List<PlayerOptionDto> Options, decimal Marks, decimal NegativeMarks);
 public record PracticeSessionDto(Guid SessionId, string Mode, List<PracticeQuestionDto> Questions);
 public record PracticeAnswerRequest([Required] Guid QuestionId, [Required] AnswerResponse Response, [Range(0, 3600)] int TimeSpentSeconds);
@@ -43,6 +43,17 @@ public class PracticeController(AppDbContext db, EntitlementService entitlements
                 var chapter = await db.Chapters.AsNoTracking().Include(c => c.Subject).FirstOrDefaultAsync(c => c.Id == req.ChapterId, ct) ?? throw AppException.NotFound("Chapter");
                 await EnsureAccess(userId, chapter.Subject!.CourseId, ct);
                 q = q.Where(x => x.Topic!.ChapterId == chapter.Id);
+                break;
+            case "ncert":
+                // An NCERT chapter: questions from every course that teaches it and the student can open.
+                var linked = await db.Chapters.AsNoTracking().Where(c => c.NcertChapterId == req.NcertChapterId && req.NcertChapterId != null)
+                    .Select(c => new { c.Id, c.Subject!.CourseId }).ToListAsync(ct);
+                if (linked.Count == 0) throw AppException.NotFound("Chapter");
+                var open = await entitlements.ActiveCourseIdsAsync(userId, ct);
+                open.UnionWith(await db.Courses.Where(c => c.IsFree).Select(c => c.Id).ToListAsync(ct));
+                var openChapters = linked.Where(c => open.Contains(c.CourseId)).Select(c => c.Id).ToList();
+                if (openChapters.Count == 0) throw AppException.PaymentRequired();
+                q = q.Where(x => openChapters.Contains(x.Topic!.ChapterId));
                 break;
             case "incorrect":
                 // Latest outcome per question in practice or tests was wrong.
