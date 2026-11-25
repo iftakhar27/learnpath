@@ -8,8 +8,10 @@ import 'package:go_router/go_router.dart';
 import 'package:learnpath/core/api/api_client.dart';
 import 'package:learnpath/core/api/models.g.dart';
 import 'package:learnpath/core/api/token_store.dart';
+import 'package:learnpath/core/config.dart';
 import 'package:learnpath/core/providers.dart';
 import 'package:learnpath/features/learn/subjects.dart';
+import 'package:learnpath/features/payments/buy_on_website.dart';
 import 'package:learnpath/l10n/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -86,6 +88,26 @@ class LibraryApi implements HttpClientAdapter {
           },
         ],
       }),
+      '/resources/r2/playback' => _json({
+        'resourceId': 'r2',
+        'type': 'Document',
+        'url': '/api/v1/resources/r2/file?expires=99&sig=abc',
+        'streamUrl': null,
+        'expiresAt': '2030-01-01T00:00:00Z',
+        'resumeAtSeconds': 0,
+        'title': 'Summary notes',
+        'topicId': 't1',
+        'topic': 'Dimensional Analysis',
+        'durationSeconds': null,
+        'completed': false,
+      }),
+      '/learning/progress' => _json({
+        'resourceId': 'r2',
+        'positionSeconds': 0,
+        'completed': true,
+        'topicCompleted': false,
+        'quiz': null,
+      }),
       '/library/chapters/n1' => _json({
         'id': 'n1',
         'number': 1,
@@ -149,6 +171,7 @@ void main() {
     final store = MemoryTokenStore()
       ..tokens = const StoredTokens(accessToken: 'a.eyJleHAiOjk5OTk5OTk5OTl9.s', refreshToken: 'r');
     final practice = <CreatePracticeRequest>[];
+    final opened = <Uri>[];
     final router = GoRouter(
       routes: [
         GoRoute(
@@ -176,6 +199,10 @@ void main() {
       ProviderScope(
         retry: (_, _) => null,
         overrides: [
+          openUrlProvider.overrideWithValue((uri) async {
+            opened.add(uri);
+            return true;
+          }),
           tokenStoreProvider.overrideWithValue(store),
           apiClientProvider.overrideWith(
             (ref) => ApiClient(baseUrl: 'https://api.test', store: store, language: () => 'en', adapter: LibraryApi()),
@@ -211,6 +238,10 @@ void main() {
     await tester.tap(find.text('Notes'));
     await tester.pumpAndSettle();
     expect(find.text('Summary notes'), findsOneWidget);
+    // Uploaded notes come back as a link on the API itself; the app adds the API's address.
+    await tester.tap(find.text('Summary notes'));
+    await tester.pumpAndSettle();
+    expect(opened.single.toString(), '${AppConfig.apiBaseUrl}/api/v1/resources/r2/file?expires=99&sig=abc');
 
     await tester.tap(find.text('Practice'));
     await tester.pumpAndSettle();

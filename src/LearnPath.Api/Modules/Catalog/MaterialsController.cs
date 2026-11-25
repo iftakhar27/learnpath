@@ -4,7 +4,6 @@ using LearnPath.Api.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Net.Http.Headers;
 
 namespace LearnPath.Api.Modules.Catalog;
 
@@ -19,12 +18,11 @@ public record MaterialDownloadDto(string Url, bool External, string? FileName, D
 /// </summary>
 [ApiController]
 [Route("api/v1/materials")]
-public class MaterialsController(AppDbContext db, IFileStore files, IConfiguration config, RequestLanguage lang, TimeProvider clock) : ControllerBase
+public class MaterialsController(AppDbContext db, IFileStore files, SignedFiles signed, RequestLanguage lang) : ControllerBase
 {
     public static readonly TimeSpan LinkLifetime = TimeSpan.FromMinutes(10);
 
-    private string Secret => config["Jwt:SigningKey"] ?? throw new InvalidOperationException("Jwt:SigningKey is not set.");
-    private static string Message(Guid id, long expires) => $"material:{id:N}:{expires}";
+    private const string Scope = "material";
 
     internal static string Format(StudyMaterial m) => m.ExternalUrl is not null ? "Link" : m.ContentType == "application/pdf" ? "PDF" : "Image";
 
@@ -52,10 +50,8 @@ public class MaterialsController(AppDbContext db, IFileStore files, IConfigurati
         if (m.ExternalUrl is not null) return new MaterialDownloadDto(m.ExternalUrl, true, null, null);
         if (m.FileId is null) throw AppException.NotFound("File");
 
-        var expires = clock.GetUtcNow().Add(LinkLifetime);
-        var unix = expires.ToUnixTimeSeconds();
-        var sig = Hashing.HmacSha256Hex(Secret, Message(id, unix));
-        return new MaterialDownloadDto($"/api/v1/materials/{id}/file?expires={unix}&sig={sig}", false, m.FileName, expires);
+        var (query, expires) = signed.Sign(Scope, id, LinkLifetime);
+        return new MaterialDownloadDto($"/api/v1/materials/{id}/file?{query}", false, m.FileName, expires);
     }
 
     /// <summary>The file itself, for a signed link from <see cref="Download"/>. Opens in the browser's viewer, with the right name for saving.</summary>
@@ -63,21 +59,12 @@ public class MaterialsController(AppDbContext db, IFileStore files, IConfigurati
     [AllowAnonymous]
     public async Task<IActionResult> File(Guid id, [FromQuery] long expires, [FromQuery] string? sig, CancellationToken ct)
     {
-        if (string.IsNullOrEmpty(sig) || expires < clock.GetUtcNow().ToUnixTimeSeconds() || !Hashing.FixedTimeEqualsHex(sig, Hashing.HmacSha256Hex(Secret, Message(id, expires))))
-            throw new AppException(403, "link_expired", "This download link has expired. Tap Download again.");
+        signed.EnsureValid(Scope, id, expires, sig);
         var m = await db.StudyMaterials.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id && x.Status == PublishStatus.Published, ct)
                 ?? throw AppException.NotFound("Material");
         var file = m.FileId is { } fid ? await files.GetAsync(fid, ct) : null;
         if (file is null) throw AppException.NotFound("File");
 
-        var name = m.FileName ?? file.FileName;
-        var disposition = new ContentDispositionHeaderValue("inline");
-        disposition.SetHttpFileName(name);
-        Response.Headers.ContentDisposition = disposition.ToString();
-        Response.Headers.CacheControl = $"private, max-age={(int)LinkLifetime.TotalSeconds}";
-        Response.Headers.ETag = $"\"{file.Sha256}\"";
-        Response.Headers.XContentTypeOptions = "nosniff";
-        Response.Headers.ContentLength = file.SizeBytes;
-        return new FileContentResult(file.Data, file.ContentType) { LastModified = file.CreatedAt };
+        return SignedFiles.Inline(Response, file, m.FileName ?? file.FileName, LinkLifetime);
     }
 }

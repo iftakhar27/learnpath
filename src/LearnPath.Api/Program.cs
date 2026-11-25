@@ -89,6 +89,7 @@ else builder.Services.AddSingleton<IEmailSender, DisabledEmailSender>();
 builder.Services.AddSingleton<IVideoUrlSigner, BunnyVideoUrlSigner>();
 builder.Services.AddSingleton<IDocumentUrlSigner, HmacDocumentUrlSigner>();
 builder.Services.AddScoped<IFileStore, DatabaseFileStore>();
+builder.Services.AddSingleton<SignedFiles>();
 
 // ---------- Module services ----------
 builder.Services.AddHttpContextAccessor();

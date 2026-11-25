@@ -141,10 +141,10 @@ Profile) appear once these are set. Sharing on WhatsApp works without them.
 3. **Save and deploy.** The apps pick the links up within a few minutes (no new app release needed). A value that isn't
    a phone number or a WhatsApp link is ignored and logged as a warning.
 
-## Free study material (uploads)
+## Uploads (free material and lesson notes)
 
-Files uploaded in the admin portal's **Free material** page are stored in the database, so nothing else needs setting
-up. Uploads are limited to 20 MB each (`Materials__MaxUploadMegabytes` in Render to change it, up to 50). The page shows
+Files uploaded in the admin portal (the **Free material** page, and notes in the course editor) are stored in the
+database, so nothing else needs setting up. Uploads are limited to 20 MB each (`Materials__MaxUploadMegabytes` in Render to change it, up to 50). The page shows
 how much storage files use; Render's free database holds 1 GB in total, so for big files (full past papers, scanned
 books) upload them to Google Drive and add the share link instead.
 

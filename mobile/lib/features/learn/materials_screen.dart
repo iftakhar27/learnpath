@@ -128,7 +128,7 @@ class _MaterialCard extends ConsumerWidget {
 
   Future<void> _open(BuildContext context, WidgetRef ref) async {
     final link = await ref.read(apiProvider).materialDownload(material.id);
-    final uri = Uri.parse(link.external ? link.url : '${AppConfig.apiBaseUrl}${link.url}');
+    final uri = AppConfig.apiLink(link.url);
     final opened = await ref.read(openUrlProvider)(uri);
     if (!opened && context.mounted) showSnack(context, context.l10n.errorGeneric, error: true);
   }

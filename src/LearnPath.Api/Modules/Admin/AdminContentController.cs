@@ -36,7 +36,7 @@ public record IdDto(Guid Id);
 [ApiController]
 [Authorize(Policy = Policies.ContentEdit)]
 [Route("api/v1/admin")]
-public class AdminContentController(AppDbContext db, AuditService audit, TimeProvider clock) : ControllerBase
+public class AdminContentController(AppDbContext db, AuditService audit, IFileStore files, IConfiguration config, TimeProvider clock) : ControllerBase
 {
     // ----- Exams -----
     [HttpGet("exams")]
@@ -80,12 +80,16 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
         var questionCounts = await db.Questions.Where(q => topicIds.Contains(q.TopicId)).GroupBy(q => q.TopicId)
             .Select(g => new { g.Key, Count = g.Count(), Published = g.Count(q => q.Status == PublishStatus.Published) }).ToDictionaryAsync(x => x.Key, ct);
         var enrollments = await db.Enrollments.CountAsync(e => e.CourseId == id, ct);
+        var fileIds = c.Subjects.SelectMany(s => s.Chapters).SelectMany(ch => ch.Topics).SelectMany(t => t.Resources)
+            .Where(r => r.FileId != null).Select(r => r.FileId!.Value).ToList();
+        var notes = await db.StoredFiles.AsNoTracking().Where(f => fileIds.Contains(f.Id))
+            .Select(f => new { f.Id, f.FileName, f.SizeBytes }).ToDictionaryAsync(f => f.Id, ct);
 
         return new AdminCourseTreeDto(ToDto(c, enrollments), c.Subjects.OrderBy(s => s.SortOrder).ThenBy(s => s.TitleEn).Select(s =>
             new AdminSubjectDto(s.Id, s.CourseId, s.TitleEn, s.TitleHi, s.SortOrder, s.Chapters.OrderBy(ch => ch.SortOrder).ThenBy(ch => ch.TitleEn).Select(ch =>
                 new AdminChapterDto(ch.Id, ch.SubjectId, ch.UnitTitleEn, ch.TitleEn, ch.TitleHi, ch.SortOrder, ch.Topics.OrderBy(t => t.SortOrder).ThenBy(t => t.TitleEn).Select(t =>
                     new AdminTopicDto(t.Id, t.ChapterId, t.TitleEn, t.TitleHi, t.ObjectivesEn, t.ObjectivesHi, t.EstimatedMinutes, t.SortOrder,
-                        questionCounts.GetValueOrDefault(t.Id)?.Count ?? 0, t.Resources.OrderBy(r => r.SortOrder).Select(ToDto).ToList(),
+                        questionCounts.GetValueOrDefault(t.Id)?.Count ?? 0, t.Resources.OrderBy(r => r.SortOrder).Select(r => r.FileId is { } fid && notes.TryGetValue(fid, out var n) ? ToDto(r) with { DocumentFileName = n.FileName, DocumentSizeBytes = n.SizeBytes } : ToDto(r)).ToList(),
                         questionCounts.GetValueOrDefault(t.Id)?.Published ?? 0, t.QuizQuestionCount, t.QuizPassPercent)).ToList(), ch.NcertChapterId)).ToList())).ToList());
     }
 
@@ -226,11 +230,53 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
         return await Save("resource.update", "LearningResource", id, req, ct);
     }
 
+    /// <summary>
+    /// Uploads the PDF (or image) for a notes resource. It replaces any earlier upload and is used instead of a storage
+    /// key; students open it through a short-lived link once they have access to the lesson.
+    /// </summary>
+    [HttpPost("resources/{id:guid}/document")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(52L * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 52L * 1024 * 1024)]
+    public async Task<AdminResourceDto> UploadDocument(Guid id, IFormFile file, CancellationToken ct)
+    {
+        var r = await db.LearningResources.FirstOrDefaultAsync(x => x.Id == id, ct) ?? throw AppException.NotFound("Resource");
+        if (r.Type != ResourceType.Document) throw AppException.BadRequest("not_a_document", "Only notes take a file. Videos use the streaming provider's ID.");
+        var (data, type) = await UploadRules.ReadAsync(file, UploadRules.MaxMegabytes(config), ct);
+        var name = UploadRules.SafeFileName(file.FileName, r.TitleEn, type);
+        var stored = await files.SaveAsync(name, type, data, ct);
+        var old = r.FileId;
+        r.FileId = stored.Id;
+        r.UpdatedAt = clock.GetUtcNow();
+        r.Version++;
+        audit.Record(User.UserId(), "resource.document", "LearningResource", id, new { name, data.LongLength });
+        await db.SaveChangesAsync(ct);
+        if (old is { } oldId) await files.DeleteAsync(oldId, ct);
+        return ToDto(r) with { DocumentFileName = name, DocumentSizeBytes = data.LongLength };
+    }
+
+    [HttpDelete("resources/{id:guid}/document")]
+    public async Task<IActionResult> RemoveDocument(Guid id, CancellationToken ct)
+    {
+        var r = await db.LearningResources.FirstOrDefaultAsync(x => x.Id == id, ct) ?? throw AppException.NotFound("Resource");
+        if (r.FileId is not { } fileId) return NoContent();
+        if (r.Status == PublishStatus.Published && string.IsNullOrWhiteSpace(r.DocumentStorageKey))
+            throw AppException.Conflict("document_in_use", "Students use these notes. Upload a replacement instead, or unpublish them first.");
+        r.FileId = null;
+        r.UpdatedAt = clock.GetUtcNow();
+        audit.Record(User.UserId(), "resource.document.remove", "LearningResource", id, null);
+        await db.SaveChangesAsync(ct);
+        await files.DeleteAsync(fileId, ct);
+        return NoContent();
+    }
+
     [HttpPost("resources/{id:guid}/status")]
     [Authorize(Policy = Policies.ContentPublish)]
     public async Task<IdDto> ResourceStatus(Guid id, StatusChange req, CancellationToken ct)
     {
         var r = await db.LearningResources.FindAsync([id], ct) ?? throw AppException.NotFound("Resource");
+        if (req.Status == PublishStatus.Published && r.Type == ResourceType.Document && r.FileId is null && string.IsNullOrWhiteSpace(r.DocumentStorageKey))
+            throw AppException.Conflict("document_missing", "Upload the notes file before publishing.");
         r.Status = req.Status;
         r.UpdatedAt = clock.GetUtcNow();
         return await Save("resource.status", "LearningResource", id, req, ct);
@@ -274,8 +320,10 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
         var r = await db.LearningResources.FindAsync([id], ct) ?? throw AppException.NotFound("Resource");
         if (r.Status != PublishStatus.Draft || await db.ResourceProgress.AnyAsync(p => p.ResourceId == id, ct))
             throw AppException.Conflict("in_use", "Only unused draft resources can be deleted. Archive it instead.");
+        var fileId = r.FileId;
         db.LearningResources.Remove(r);
         await Save("resource.delete", "LearningResource", id, new { r.TitleEn }, ct);
+        if (fileId is { } fid) await files.DeleteAsync(fid, ct);
         return NoContent();
     }
 
@@ -303,13 +351,11 @@ public class AdminContentController(AppDbContext db, AuditService audit, TimePro
     {
         if (r.Type == ResourceType.Video && (string.IsNullOrWhiteSpace(r.VideoProviderId) || r.DurationSeconds is null))
             throw AppException.BadRequest("invalid_resource", "Videos need a provider video ID and duration.");
-        if (r.Type == ResourceType.Document && string.IsNullOrWhiteSpace(r.DocumentStorageKey))
-            throw AppException.BadRequest("invalid_resource", "Documents need a storage key.");
     }
 
     private void ApplyResource(LearningResource x, ResourceUpsert r)
     {
         (x.TopicId, x.Type, x.TitleEn, x.TitleHi, x.Language, x.SortOrder, x.IsFreePreview) = (r.TopicId, r.Type, r.TitleEn, r.TitleHi, r.Language ?? "en", r.SortOrder, r.IsFreePreview);
-        (x.VideoProviderId, x.DurationSeconds, x.DocumentStorageKey, x.AllowDownload, x.UpdatedAt) = (r.VideoProviderId, r.DurationSeconds, r.DocumentStorageKey, r.AllowDownload, clock.GetUtcNow());
+        (x.VideoProviderId, x.DurationSeconds, x.DocumentStorageKey, x.AllowDownload, x.UpdatedAt) = (r.VideoProviderId, r.DurationSeconds, string.IsNullOrWhiteSpace(r.DocumentStorageKey) ? null : r.DocumentStorageKey.Trim(), r.AllowDownload, clock.GetUtcNow());
     }
 }

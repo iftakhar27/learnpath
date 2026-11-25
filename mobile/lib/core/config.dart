@@ -18,4 +18,7 @@ abstract final class AppConfig {
 
   static const privacyPolicyUrl = String.fromEnvironment('PRIVACY_URL', defaultValue: 'https://example.com/privacy');
   static const termsUrl = String.fromEnvironment('TERMS_URL', defaultValue: 'https://example.com/terms');
+
+  /// A link the API hands out: relative ones ("/api/v1/…/file?…", uploaded notes and material) are on the API itself.
+  static Uri apiLink(String url) => Uri.parse(url.startsWith('/') ? '$apiBaseUrl$url' : url);
 }

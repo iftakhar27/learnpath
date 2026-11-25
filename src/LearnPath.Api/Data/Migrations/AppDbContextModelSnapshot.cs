@@ -652,6 +652,9 @@ namespace LearnPath.Api.Data.Migrations
                     b.Property<int?>("DurationSeconds")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("FileId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("IsFreePreview")
                         .HasColumnType("boolean");
 
@@ -692,6 +695,8 @@ namespace LearnPath.Api.Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FileId");
 
                     b.HasIndex("TopicId");
 
@@ -2136,6 +2141,11 @@ namespace LearnPath.Api.Data.Migrations
 
             modelBuilder.Entity("LearnPath.Api.Domain.LearningResource", b =>
                 {
+                    b.HasOne("LearnPath.Api.Domain.StoredFile", null)
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("LearnPath.Api.Domain.Topic", "Topic")
                         .WithMany("Resources")
                         .HasForeignKey("TopicId")

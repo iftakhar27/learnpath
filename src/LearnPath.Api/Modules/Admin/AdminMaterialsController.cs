@@ -40,7 +40,7 @@ public class AdminMaterialsController(AppDbContext db, IFileStore files, AuditSe
 {
     /// <summary>The hard ceiling for a request; the configured limit (Materials:MaxUploadMegabytes) is checked below it.</summary>
     private const long RequestLimit = 52L * 1024 * 1024;
-    private int MaxMegabytes => Math.Clamp(config.GetValue("Materials:MaxUploadMegabytes", UploadRules.DefaultMaxMegabytes), 1, 50);
+    private int MaxMegabytes => UploadRules.MaxMegabytes(config);
 
     private static AdminMaterialDto ToDto(StudyMaterial m) => new(m.Id, m.TitleEn, m.TitleHi, m.DescriptionEn, m.DescriptionHi, m.Type, m.Subject, m.ClassLevel,
         MaterialsController.Format(m), m.ExternalUrl, m.FileName, m.SizeBytes, m.Status, m.SortOrder, m.Downloads, m.UpdatedAt);
@@ -121,14 +121,7 @@ public class AdminMaterialsController(AppDbContext db, IFileStore files, AuditSe
         var oldFile = m.FileId;
         if (f.File is { } upload)
         {
-            if (upload.Length == 0) throw AppException.BadRequest("empty_file", "The file is empty.");
-            if (upload.Length > MaxMegabytes * 1024L * 1024L)
-                throw AppException.BadRequest("file_too_large", $"Files can be up to {MaxMegabytes} MB. Compress the PDF, or upload it elsewhere and give a link.");
-            using var buffer = new MemoryStream((int)upload.Length);
-            await upload.CopyToAsync(buffer, ct);
-            var data = buffer.ToArray();
-            var type = UploadRules.DetectContentType(data.AsSpan(0, Math.Min(16, data.Length)))
-                       ?? throw AppException.BadRequest("unsupported_file", "Upload a PDF, PNG or JPEG file.");
+            var (data, type) = await UploadRules.ReadAsync(upload, MaxMegabytes, ct);
             var name = UploadRules.SafeFileName(upload.FileName, m.TitleEn, type);
             var stored = await files.SaveAsync(name, type, data, ct);
             (m.FileId, m.FileName, m.ContentType, m.SizeBytes, m.ExternalUrl) = (stored.Id, name, type, data.LongLength, null);

@@ -142,6 +142,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.TitleHi).HasMaxLength(200);
         });
         b.Entity<Topic>(e => e.HasMany(x => x.Resources).WithOne(x => x.Topic).HasForeignKey(x => x.TopicId).OnDelete(DeleteBehavior.Cascade));
+        b.Entity<LearningResource>(e => e.HasOne<StoredFile>().WithMany().HasForeignKey(x => x.FileId).OnDelete(DeleteBehavior.SetNull));
         b.Entity<TopicPrerequisite>(e =>
         {
             e.HasKey(x => new { x.TopicId, x.PrerequisiteTopicId });

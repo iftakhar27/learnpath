@@ -24,7 +24,7 @@ public record PlaybackDto(Guid ResourceId, string Type, string Url, string? Stre
 [ApiController]
 [Route("api/v1")]
 public class CatalogController(AppDbContext db, RequestLanguage lang, EntitlementService entitlements, TimeProvider clock,
-    IVideoUrlSigner videoSigner, IDocumentUrlSigner docSigner) : ControllerBase
+    IVideoUrlSigner videoSigner, IDocumentUrlSigner docSigner, SignedFiles signed, IFileStore files) : ControllerBase
 {
     [HttpGet("exams")]
     [AllowAnonymous]
@@ -145,14 +145,31 @@ public class CatalogController(AppDbContext db, RequestLanguage lang, Entitlemen
         await entitlements.EnsureResourceAccessAsync(userId, r, r.Topic!.Chapter!.Subject!.CourseId, ct);
 
         var validFor = TimeSpan.FromHours(2);
+        // Uploaded notes: a signed link relative to the API (the website serves it through its own server, the app adds
+        // the API's address). Otherwise the external file host's signed URL.
         var url = r.Type == ResourceType.Video
             ? videoSigner.GetPlaybackUrl(r.VideoProviderId ?? throw AppException.NotFound("Video"), userId, validFor)
-            : docSigner.GetDownloadUrl(r.DocumentStorageKey ?? throw AppException.NotFound("Document"), validFor);
+            : r.FileId is not null
+                ? $"/api/v1/resources/{r.Id}/file?{signed.Sign("resource", r.Id, validFor).Query}"
+                : docSigner.GetDownloadUrl(r.DocumentStorageKey ?? throw AppException.NotFound("Document"), validFor);
         var stream = r.Type == ResourceType.Video ? videoSigner.GetStreamUrl(r.VideoProviderId!, validFor) : null;
         var progress = await db.ResourceProgress.Where(p => p.UserId == userId && p.ResourceId == resourceId)
             .Select(p => new { p.PositionSeconds, p.Completed }).FirstOrDefaultAsync(ct);
         return new PlaybackDto(r.Id, r.Type.ToString(), url, stream, clock.GetUtcNow().Add(validFor), progress?.PositionSeconds ?? 0,
             lang.Pick(r.TitleEn, r.TitleHi), r.TopicId, lang.Pick(r.Topic.TitleEn, r.Topic.TitleHi), r.DurationSeconds, progress?.Completed ?? false);
+    }
+
+    /// <summary>Uploaded notes, for a signed link from <see cref="Playback"/> (access was checked there).</summary>
+    [HttpGet("resources/{resourceId:guid}/file")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResourceFile(Guid resourceId, [FromQuery] long expires, [FromQuery] string? sig, CancellationToken ct)
+    {
+        signed.EnsureValid("resource", resourceId, expires, sig);
+        var r = await db.LearningResources.AsNoTracking().FirstOrDefaultAsync(x => x.Id == resourceId && x.Status == PublishStatus.Published, ct)
+                ?? throw AppException.NotFound("Resource");
+        var file = r.FileId is { } fid ? await files.GetAsync(fid, ct) : null;
+        if (file is null) throw AppException.NotFound("File");
+        return SignedFiles.Inline(Response, file, file.FileName, TimeSpan.FromMinutes(10));
     }
 
     private CourseSummaryDto ToSummary(Course c, bool enrolled) =>

@@ -1049,6 +1049,8 @@ class AdminResourceDto {
     this.documentStorageKey,
     required this.allowDownload,
     required this.version,
+    this.documentFileName,
+    this.documentSizeBytes,
   });
 
   factory AdminResourceDto.fromJson(Map<String, dynamic> json) => AdminResourceDto(
@@ -1066,6 +1068,8 @@ class AdminResourceDto {
     documentStorageKey: json['documentStorageKey'] == null ? null : json['documentStorageKey'] as String,
     allowDownload: json['allowDownload'] as bool,
     version: (json['version'] as num).toInt(),
+    documentFileName: json['documentFileName'] == null ? null : json['documentFileName'] as String,
+    documentSizeBytes: json['documentSizeBytes'] == null ? null : (json['documentSizeBytes'] as num).toInt(),
   );
 
   final String id;
@@ -1082,6 +1086,8 @@ class AdminResourceDto {
   final String? documentStorageKey;
   final bool allowDownload;
   final int version;
+  final String? documentFileName;
+  final int? documentSizeBytes;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -1098,6 +1104,8 @@ class AdminResourceDto {
     'documentStorageKey': ?documentStorageKey,
     'allowDownload': allowDownload,
     'version': version,
+    'documentFileName': ?documentFileName,
+    'documentSizeBytes': ?documentSizeBytes,
   };
 }
 

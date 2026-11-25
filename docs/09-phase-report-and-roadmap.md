@@ -217,6 +217,28 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Lesson notes upload (25 Nov 2026)
+
+- **Before:** notes inside courses only pointed at a file host that was never set up, so students couldn't open them.
+- **Now (admin course editor):** "Notes (PDF)" resources take an uploaded file (PDF, or a PNG/JPEG image; up to
+  20 MB), kept in the same file store as free material.
+  - The editor shows the current file and its size. A new file replaces it.
+  - The outline marks notes without a file ("No file yet"), and publishing them is refused until there is one.
+  - An external file host key is still possible, under "Use a file on an external host instead".
+- **Students (website and app):** opening notes works as before (a new tab or the phone's browser). Access to the lesson
+  is checked first: paid notes stay locked until the course is owned, and free previews stay open. The notes then load
+  through a short-lived signed link that needs no sign-in token.
+- **Samples:** the two sample lessons' notes (Dimensional formulae summary, Friction formula sheet) now have real
+  one-page PDFs, so notes open on the live site.
+- **Verified:**
+  - 2 backend tests: sample notes open and paid ones are locked until enrolled; staff upload, replace and remove, with
+    the publish check.
+  - 2 browser tests: a student opens sample notes and gets a PDF; staff build a course with uploaded notes and a student
+    opens them.
+  - 1 app test: notes open at the API's address.
+  - All suites green: 130 backend, 49 browser, 39 app.
+  - Free material moved onto the same signed-link code.
+
 ### Free study material (25 Nov 2026)
 
 - **Students (website `/materials`, app menu, Learn tab, guest home):** "Free study material".

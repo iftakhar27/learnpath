@@ -127,6 +127,17 @@ when used or expired), then opens the course with Razorpay checkout started. Bac
 - Files are kept in the database for now (behind `IFileStore`), so they're backed up with it; an object store can
   replace it later.
 
+## Lesson notes
+
+- Staff upload a notes resource's file with `POST /admin/resources/{id}/document` (multipart `file`: PDF, PNG or JPEG, up
+  to `Materials:MaxUploadMegabytes`); a new upload replaces the old one. `DELETE /admin/resources/{id}/document` removes
+  it (not while the notes are published without another source: `409 document_in_use`). Notes can be created without a
+  file, but publishing them needs one (`409 document_missing`) or a storage key for an external host. The course tree
+  shows `documentFileName` and `documentSizeBytes`.
+- `GET /resources/{id}/playback` for uploaded notes returns `url` relative to the API
+  (`/api/v1/resources/{id}/file?expires=…&sig=…`, valid 2 hours, no token needed); access to the lesson is checked
+  there. Notes with only a storage key keep the external host's signed URL.
+
 ## App settings and WhatsApp
 
 - `GET /app-config` (public, cached 5 minutes) → `{whatsAppNumber, whatsAppChannelUrl, websiteUrl}`. Set on the server:
@@ -219,6 +230,8 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/admin/resources` |
 | `PUT` | `/api/v1/admin/resources/{id}` |
 | `DELETE` | `/api/v1/admin/resources/{id}` |
+| `POST` | `/api/v1/admin/resources/{id}/document` |
+| `DELETE` | `/api/v1/admin/resources/{id}/document` |
 | `POST` | `/api/v1/admin/resources/{id}/status` |
 | `POST` | `/api/v1/admin/subjects` |
 | `PUT` | `/api/v1/admin/subjects/{id}` |
@@ -298,6 +311,7 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `POST` | `/api/v1/practice/sessions/{sessionId}/answers` |
 | `POST` | `/api/v1/practice/sessions/{sessionId}/complete` |
 | `POST` | `/api/v1/questions/{questionId}/report` |
+| `GET` | `/api/v1/resources/{resourceId}/file` |
 | `GET` | `/api/v1/resources/{resourceId}/playback` |
 | `GET` | `/api/v1/search` |
 | `GET` | `/api/v1/student/analytics` |

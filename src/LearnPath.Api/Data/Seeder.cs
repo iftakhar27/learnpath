@@ -49,6 +49,8 @@ public static class Seeder
             if (cards > 0) logger.LogInformation("Seeded {Count} starter flash cards", cards);
             var materials = await MaterialSamples.SeedAsync(db, new DatabaseFileStore(db, clock), now);
             if (materials > 0) logger.LogInformation("Seeded {Count} sample study materials", materials);
+            var notes = await MaterialSamples.AttachSampleLessonNotesAsync(db, new DatabaseFileStore(db, clock), now);
+            if (notes > 0) logger.LogInformation("Attached PDFs to {Count} sample lesson notes", notes);
         }
 
         // Sample lessons have placeholder video IDs; point them at a public demo stream so playback can be tried

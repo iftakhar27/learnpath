@@ -125,7 +125,9 @@ public class LearningResource
     public PublishStatus Status { get; set; } = PublishStatus.Draft;
     public string? VideoProviderId { get; set; }   // ID at the streaming provider; never a file in the DB
     public int? DurationSeconds { get; set; }
-    public string? DocumentStorageKey { get; set; } // object-storage key for PDFs
+    public string? DocumentStorageKey { get; set; } // object-storage key for PDFs on an external host (Storage:CdnBaseUrl)
+    /// <summary>Notes uploaded in the admin portal (kept in the file store); used instead of the storage key when set.</summary>
+    public Guid? FileId { get; set; }
     public bool AllowDownload { get; set; }
     public int Version { get; set; } = 1;
     public DateTimeOffset UpdatedAt { get; set; }

@@ -85,6 +85,55 @@ public static class MaterialSamples
         return Pdfs.Length + 1;
     }
 
+    private static readonly Dictionary<string, (string Title, string[] Lines)> LessonNotes = new()
+    {
+        ["samples/dimensions-notes.pdf"] = ("Dimensional formulae - summary notes",
+        [
+            "A dimensional formula shows how a quantity depends on mass [M], length [L] and time [T].",
+            "Velocity [L T^-1]    Acceleration [L T^-2]    Momentum [M L T^-1]",
+            "Force [M L T^-2]    Work, energy [M L^2 T^-2]    Power [M L^2 T^-3]",
+            "Pressure, stress [M L^-1 T^-2]    Frequency [T^-1]    Angular velocity [T^-1]",
+            "Strain, angle, refractive index: dimensionless.",
+            "Uses: check that an equation is consistent (every term has the same dimensions),",
+            "convert a value between unit systems, and guess how a quantity depends on others.",
+            "Example: the period of a pendulum depends on l and g only, so T is proportional to sqrt(l/g).",
+            "Limits: no numerical constants (the 2 pi in T = 2 pi sqrt(l/g) is not found),",
+            "and no trigonometric, exponential or logarithmic relations.",
+        ]),
+        ["samples/friction-formulas.pdf"] = ("Friction - formula sheet",
+        [
+            "Static friction adjusts up to a limit: f_s <= mu_s N; limiting friction = mu_s N.",
+            "Kinetic (sliding) friction: f_k = mu_k N, with mu_k < mu_s.",
+            "Rolling friction is much smaller than sliding friction.",
+            "Block on a horizontal surface pulled by F: it moves once F > mu_s m g.",
+            "Block on an incline of angle theta: N = m g cos(theta).",
+            "It stays at rest while tan(theta) <= mu_s (angle of repose: tan(theta) = mu_s).",
+            "Sliding down with friction: a = g (sin(theta) - mu_k cos(theta)).",
+            "Level circular road: maximum safe speed v = sqrt(mu_s r g).",
+            "Friction acts along the surface, opposing relative motion (or its tendency).",
+        ]),
+    };
+
+    /// <summary>
+    /// Gives the sample lessons' notes (seeded with placeholder storage keys) real one-page PDFs, once, so notes open
+    /// on demo and staging servers. Returns how many were attached.
+    /// </summary>
+    public static async Task<int> AttachSampleLessonNotesAsync(AppDbContext db, IFileStore files, DateTimeOffset now)
+    {
+        var keys = LessonNotes.Keys.ToList();
+        var pending = await db.LearningResources.Where(r => r.Type == ResourceType.Document && r.FileId == null && keys.Contains(r.DocumentStorageKey!)).ToListAsync();
+        foreach (var r in pending)
+        {
+            var (title, lines) = LessonNotes[r.DocumentStorageKey!];
+            var data = OnePagePdf(title, lines);
+            var name = UploadRules.SafeFileName(null, title, "application/pdf");
+            r.FileId = (await files.SaveAsync(name, "application/pdf", data, default)).Id;
+            r.UpdatedAt = now;
+        }
+        if (pending.Count > 0) await db.SaveChangesAsync();
+        return pending.Count;
+    }
+
     /// <summary>A minimal one-page A4 PDF: a bold title and lines of text in Helvetica (ASCII only).</summary>
     public static byte[] OnePagePdf(string title, IEnumerable<string> lines)
     {

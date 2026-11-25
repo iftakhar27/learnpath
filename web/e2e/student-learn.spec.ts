@@ -38,7 +38,10 @@ test("catalog filters by price and search, and a free course can be joined and s
   await expect(page.getByRole("heading", { name: "Dimensional Analysis", level: 1 })).toBeVisible();
   const notes = page.getByRole("button", { name: /summary notes/ });
   const popup = page.waitForEvent("popup");
+  // The sample notes are a real PDF, served through a short-lived link.
+  const pdf = page.context().waitForEvent("response", (r) => r.url().includes("/file?expires="));
   await notes.click();
+  expect((await pdf).headers()["content-type"]).toBe("application/pdf");
   await (await popup).close();
   await expect(notes).toContainText("Completed");
 

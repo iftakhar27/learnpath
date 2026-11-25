@@ -41,6 +41,22 @@ public static class UploadRules
 {
     public const int DefaultMaxMegabytes = 20;
 
+    /// <summary>The upload limit for every file staff upload (free material, lesson notes): Materials:MaxUploadMegabytes, 1 to 50.</summary>
+    public static int MaxMegabytes(IConfiguration config) => Math.Clamp(config.GetValue("Materials:MaxUploadMegabytes", DefaultMaxMegabytes), 1, 50);
+
+    /// <summary>Reads an upload and checks it's a PDF, PNG or JPEG within the limit.</summary>
+    public static async Task<(byte[] Data, string ContentType)> ReadAsync(IFormFile upload, int maxMegabytes, CancellationToken ct)
+    {
+        if (upload.Length == 0) throw AppException.BadRequest("empty_file", "The file is empty.");
+        if (upload.Length > maxMegabytes * 1024L * 1024L)
+            throw AppException.BadRequest("file_too_large", $"Files can be up to {maxMegabytes} MB. Compress the PDF, or upload it elsewhere and give a link.");
+        using var buffer = new MemoryStream((int)upload.Length);
+        await upload.CopyToAsync(buffer, ct);
+        var data = buffer.ToArray();
+        var type = DetectContentType(data.AsSpan(0, Math.Min(16, data.Length))) ?? throw AppException.BadRequest("unsupported_file", "Upload a PDF, PNG or JPEG file.");
+        return (data, type);
+    }
+
     public static string? DetectContentType(ReadOnlySpan<byte> head)
     {
         if (head.StartsWith("%PDF-"u8)) return "application/pdf";

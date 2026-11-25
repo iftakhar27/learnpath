@@ -1,14 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
 import '../../core/api/models.g.dart';
+import '../../core/config.dart';
 import '../../core/format.dart';
 import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../home/guest_screens.dart' show JoinButtons;
+import '../payments/buy_on_website.dart' show openUrlProvider;
 
 final libraryProvider = FutureProvider.autoDispose<LibraryDto>((ref) => ref.watch(apiProvider).library());
 final bookProvider = FutureProvider.autoDispose.family<LibrarySubjectDto, (String, String)>(
@@ -323,7 +324,7 @@ class NcertChapterScreen extends ConsumerWidget {
     } else {
       try {
         final playback = await ref.read(apiProvider).playback(r.id);
-        await launchUrl(Uri.parse(playback.url), mode: LaunchMode.externalApplication);
+        await ref.read(openUrlProvider)(AppConfig.apiLink(playback.url));
         await ref.read(apiProvider).saveProgress(r.id, 0, markCompleted: true);
       } catch (e) {
         if (context.mounted) showSnack(context, errorText(context, e), error: true);

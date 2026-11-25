@@ -773,6 +773,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/resources/{id}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminResourceDto"];
+                        "application/json": components["schemas"]["AdminResourceDto"];
+                        "text/json": components["schemas"]["AdminResourceDto"];
+                    };
+                };
+            };
+        };
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/resources/{id}/status": {
         parameters: {
             query?: never;
@@ -3064,6 +3129,44 @@ export interface paths {
                         "application/json": components["schemas"]["PlaybackDto"];
                         "text/json": components["schemas"]["PlaybackDto"];
                     };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/resources/{resourceId}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    expires?: number;
+                    sig?: string;
+                };
+                header?: never;
+                path: {
+                    resourceId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
                 };
             };
         };
@@ -5799,6 +5902,9 @@ export interface components {
             allowDownload: boolean;
             /** Format: int32 */
             version: number;
+            documentFileName?: string | null;
+            /** Format: int64 */
+            documentSizeBytes?: number | null;
         };
         AdminSubjectDto: {
             /** Format: uuid */

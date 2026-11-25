@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { api, unwrap } from "@/lib/api/client";
+import { api, rawFetch, unwrap } from "@/lib/api/client";
 import type { AdminChapter, AdminCourseTree, AdminResource, AdminSubject, AdminTopic, NodeUpsert, PublishStatus, ResourceType, ResourceUpsert } from "@/lib/api/types";
 import { blankToNull } from "@/lib/format";
 import { can, useSession } from "@/lib/session";
@@ -207,6 +207,15 @@ export function SyllabusEditor({ tree }: { tree: AdminCourseTree }) {
                                 <Badge tone={r.type === "Video" ? "primary" : "neutral"}>{r.type === "Video" ? "Video" : "Notes"}</Badge>
                                 <span className="truncate">{r.titleEn}</span>
                                 {r.type === "Video" && r.durationSeconds != null && <span className="text-xs text-fg-muted">{formatDuration(r.durationSeconds)}</span>}
+                                {r.type === "Document" &&
+                                  (r.documentFileName ? (
+                                    <span className="text-xs text-fg-muted">
+                                      {r.documentFileName}
+                                      {r.documentSizeBytes ? ` · ${formatBytes(r.documentSizeBytes)}` : ""}
+                                    </span>
+                                  ) : !r.documentStorageKey ? (
+                                    <Badge tone="warning">No file yet</Badge>
+                                  ) : null)}
                                 {r.isFreePreview && <Badge tone="success">Free preview</Badge>}
                                 {r.language === "hi" && <Badge>Hindi</Badge>}
                                 <StatusBadge status={r.status} />
@@ -458,6 +467,8 @@ function NodeModal({ state, treeKey, onClose }: { state: Extract<ModalState, { t
   );
 }
 
+const formatBytes = (bytes: number) => (bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
+
 type ResourceValues = {
   type: ResourceType;
   titleEn: string;
@@ -487,8 +498,19 @@ function ResourceModal({ state, treeKey, onClose }: { state: Extract<ModalState,
   });
   const type = watch("type");
   const errors = formState.errors;
+  // Notes: the PDF uploaded here (stored with the course), or a key on an external file host for advanced setups.
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const save = useAction(
-    (body: ResourceUpsert) => (r ? unwrap(api.PUT("/api/v1/admin/resources/{id}", { params: { path: { id: r.id } }, body })) : unwrap(api.POST("/api/v1/admin/resources", { body }))),
+    async (body: ResourceUpsert) => {
+      const saved = r ? await unwrap(api.PUT("/api/v1/admin/resources/{id}", { params: { path: { id: r.id } }, body })) : await unwrap(api.POST("/api/v1/admin/resources", { body }));
+      if (body.type === "Document" && file) {
+        const form = new FormData();
+        form.append("file", file);
+        await rawFetch(`/api/v1/admin/resources/${r?.id ?? saved.id}/document`, { method: "POST", body: form });
+      }
+      return saved;
+    },
     { invalidate: [treeKey], success: r ? "Resource saved" : "Resource added as draft", onSuccess: onClose },
   );
 
@@ -497,7 +519,11 @@ function ResourceModal({ state, treeKey, onClose }: { state: Extract<ModalState,
       <form
         noValidate
         className="space-y-4"
-        onSubmit={handleSubmit((v) =>
+        onSubmit={handleSubmit((v) => {
+          if (v.type === "Document" && !file && !r?.documentFileName && !v.documentStorageKey.trim()) {
+            setFileError("Choose the notes file (PDF).");
+            return;
+          }
           save.mutate({
             topicId: state.topicId,
             type: v.type,
@@ -509,9 +535,9 @@ function ResourceModal({ state, treeKey, onClose }: { state: Extract<ModalState,
             allowDownload: v.type === "Document" && v.allowDownload,
             videoProviderId: v.type === "Video" ? v.videoProviderId.trim() : null,
             durationSeconds: v.type === "Video" ? parseDuration(v.duration) : null,
-            documentStorageKey: v.type === "Document" ? v.documentStorageKey.trim() : null,
-          }),
-        )}
+            documentStorageKey: v.type === "Document" ? blankToNull(v.documentStorageKey) : null,
+          });
+        })}
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Type" htmlFor="res-type">
@@ -546,9 +572,36 @@ function ResourceModal({ state, treeKey, onClose }: { state: Extract<ModalState,
           </div>
         ) : (
           <>
-            <Field label="Storage key" htmlFor="res-doc" required error={errors.documentStorageKey?.message} hint="Path of the PDF in object storage, e.g. neet/physics/friction-notes.pdf">
-              <Input id="res-doc" {...register("documentStorageKey", { validate: (v, all) => all.type !== "Document" || !!v.trim() || "Storage key is required" })} />
+            <Field
+              label="Notes file"
+              htmlFor="res-file"
+              required={!r?.documentFileName}
+              error={fileError ?? undefined}
+              hint={
+                r?.documentFileName
+                  ? `Current file: ${r.documentFileName}${r.documentSizeBytes ? ` (${formatBytes(r.documentSizeBytes)})` : ""}. Choose a new file to replace it.`
+                  : "PDF (or a PNG/JPEG image), up to 20 MB. Students open it in their browser."
+              }
+            >
+              <input
+                id="res-file"
+                type="file"
+                accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+                onChange={(e) => {
+                  setFile(e.target.files?.[0] ?? null);
+                  setFileError(null);
+                }}
+                className="block w-full text-sm file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface-muted file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-surface"
+              />
             </Field>
+            <details className="text-sm">
+              <summary className="cursor-pointer text-fg-muted">Use a file on an external host instead</summary>
+              <div className="mt-2">
+                <Field label="Storage key" htmlFor="res-doc" error={errors.documentStorageKey?.message} hint="Path of the PDF on the file host set up as Storage:CdnBaseUrl, e.g. neet/physics/friction-notes.pdf. Ignored once a file is uploaded.">
+                  <Input id="res-doc" {...register("documentStorageKey")} />
+                </Field>
+              </div>
+            </details>
             <Checkbox label="Allow download" hint="Otherwise students can only view it in the app." {...register("allowDownload")} />
           </>
         )}
