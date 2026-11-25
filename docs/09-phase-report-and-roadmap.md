@@ -247,13 +247,14 @@ a browser test (the badge updates without reloading).
 - **Verified:**
   - 5 backend tests: options, privacy and unseen-first selection, errors and the daily limit, spaced repetition,
     admin writing and pasting.
-  - 3 browser tests and 2 app tests.
+  - 4 browser tests (the last checks every student page needs sign-in) and 2 app tests.
   - Screenshots in light and dark on phone, plus the admin editor.
   - Found and fixed along the way:
     - A "Hard only" request in a free chapter wrongly said "buy a course".
     - Deck tiles in the app were announced as progress bars to screen readers.
     - "Add card" and "Add cards" were too alike in the admin editor.
-  - All suites green: 121 backend, 44 browser, 36 app.
+    - After the deploy, `/flashcards` didn't send signed-out visitors to sign in (the gate's path list missed it).
+  - All suites green: 121 backend, 45 browser, 36 app.
 
 ### Intro slides, side menu and night mode (25 Nov 2026)
 

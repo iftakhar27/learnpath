@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { STUDENT_AREAS, config } from "../src/proxy";
 import { onboardStudent, registerStudent, signIn, studentSignIn, unique } from "./helpers";
 
 test("a student builds a custom test from chosen chapters and takes it in the exam player", async ({ page, request }) => {
@@ -115,4 +116,13 @@ test("staff write, paste, edit and delete flash cards", async ({ page }) => {
   await page.getByRole("dialog").getByRole("button", { name: "Delete" }).click();
   await expect(page.getByText("Card deleted")).toBeVisible();
   await expect(list.getByText(pasted)).toHaveCount(0);
+});
+
+test("the sign-in gate runs on every student area, flash cards and custom tests included", async ({ page }) => {
+  // The gate only runs where its matcher says; the two lists must stay in step.
+  for (const area of STUDENT_AREAS) expect(config.matcher, area).toContain(`${area}/:path*`);
+  await page.goto("/flashcards");
+  await page.waitForURL("**/login?next=%2Fflashcards");
+  await page.goto("/tests/custom");
+  await page.waitForURL("**/login?next=%2Ftests%2Fcustom");
 });
