@@ -9,6 +9,7 @@ import '../../core/providers.dart';
 import '../../widgets/common.dart';
 import '../auth/auth_screens.dart' show LanguageToggle, ThemeModeToggle;
 import '../learn/learn_screens.dart' show CatalogQuery, PriceFilter, catalogProvider;
+import '../learn/materials_screen.dart' show FreeMaterialCard;
 import '../learn/subjects.dart' show SubjectGrid, libraryProvider;
 import '../support/whatsapp.dart';
 import 'app_drawer.dart' show MenuButton;
@@ -95,6 +96,7 @@ class GuestHomeScreen extends ConsumerWidget {
             ),
           ),
           const SubjectGrid(),
+          const FreeMaterialCard(),
           SectionHeader(
             l.coursesToExplore,
             action: TextButton(onPressed: () => context.go('/learn'), child: Text(l.browseCourses)),

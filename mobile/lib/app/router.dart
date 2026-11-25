@@ -11,6 +11,7 @@ import '../features/home/guest_screens.dart';
 import '../features/home/home_screen.dart';
 import '../features/intro/intro_screen.dart';
 import '../features/learn/learn_screens.dart';
+import '../features/learn/materials_screen.dart';
 import '../features/learn/quiz_screen.dart';
 import '../features/learn/subjects.dart';
 import '../features/learn/video_screen.dart';
@@ -30,6 +31,7 @@ const _publicRoutes = {'/welcome', '/login', '/register', '/otp', '/forgot-passw
 bool _guestCanOpen(String loc) =>
     _publicRoutes.contains(loc) ||
     const {'/home', '/learn', '/practice', '/tests', '/profile', '/search'}.contains(loc) ||
+    loc == '/materials' ||
     loc.startsWith('/course/') ||
     loc.startsWith('/subject/') ||
     loc.startsWith('/ncert/');
@@ -164,6 +166,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(parentNavigatorKey: _rootKey, path: '/tests/custom', builder: (_, _) => const CustomTestScreen()),
+      GoRoute(parentNavigatorKey: _rootKey, path: '/materials', builder: (_, _) => const MaterialsScreen()),
       GoRoute(parentNavigatorKey: _rootKey, path: '/flashcards', builder: (_, _) => const FlashcardDecksScreen()),
       GoRoute(
         parentNavigatorKey: _rootKey,

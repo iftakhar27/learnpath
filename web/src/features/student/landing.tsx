@@ -41,11 +41,18 @@ export function Landing() {
             {t("signIn")}
           </Link>
         </div>
-        <Link href="/learn" className="mt-4 inline-flex w-fit items-center gap-1.5 font-medium text-primary hover:underline">
-          <Icon name="book" size={18} />
-          {t("exploreAsGuest")}
-          <Icon name="chevronRight" size={16} />
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+          <Link href="/learn" className="inline-flex w-fit items-center gap-1.5 font-medium text-primary hover:underline">
+            <Icon name="book" size={18} />
+            {t("exploreAsGuest")}
+            <Icon name="chevronRight" size={16} />
+          </Link>
+          <Link href="/materials" className="inline-flex w-fit items-center gap-1.5 font-medium text-primary hover:underline">
+            <Icon name="doc" size={18} />
+            {t("freeMaterialTitle")}
+            <Icon name="chevronRight" size={16} />
+          </Link>
+        </div>
         <ul className="mt-12 grid gap-4 sm:grid-cols-3">
           {features.map((f) => (
             <li key={f.icon} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">

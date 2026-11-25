@@ -21,6 +21,7 @@ const STUDY: Item[] = [
   { href: "/learn", label: "menuSubjectsCourses", icon: "book" },
   { href: "/practice", label: "tabPractice", icon: "pencil" },
   { href: "/flashcards", label: "flashcardsTitle", icon: "doc" },
+  { href: "/materials", label: "freeMaterialTitle", icon: "bookmark" },
   { href: "/tests", label: "testsTitle", icon: "clipboard" },
   { href: "/tests/custom", label: "customTestTitle", icon: "target" },
   { href: "/plan", label: "planTitle", icon: "clock" },
@@ -200,7 +201,13 @@ export function GuestSideMenu({ open, onClose }: { open: boolean; onClose: () =>
         </div>
         {closeButton}
       </div>
-      {section("menuStudy", <ul>{link({ href: "/learn", label: "menuSubjectsCourses", icon: "book" })}</ul>)}
+      {section(
+        "menuStudy",
+        <ul>
+          {link({ href: "/learn", label: "menuSubjectsCourses", icon: "book" })}
+          {link({ href: "/materials", label: "freeMaterialTitle", icon: "bookmark" })}
+        </ul>,
+      )}
       {section("menuHelp", <WhatsAppMenuLinks onNavigate={onClose} />)}
       {section(
         "menuSettings",

@@ -58,7 +58,7 @@ src/app/admin/login              staff sign-in page
 src/app/admin/(portal)/...       admin pages (thin server components; each wraps a client feature in <Suspense>)
 src/app/api/session, api/v1      BFF route handlers
 src/features/student/...         student screens; tests/exam-session.ts is the exam engine (port of the app's)
-src/features/admin/...           screens: catalog, questions, flash cards, tests, students, ops (doubts, orders, support, announcements, audit)
+src/features/admin/...           screens: catalog, questions, flash cards, free material, tests, students, ops (doubts, orders, support, announcements, audit)
 src/lib/i18n                     English/Hindi: strings generated from the app's ARB files + web-messages.ts
 src/components/ui                design-system primitives (tokens in app/globals.css, light + dark)
 src/lib/theme.ts                 night mode: Auto / Light / Dark kept in localStorage, applied as <html data-theme>

@@ -2635,6 +2635,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Have a look at “{course}” on {brand}: {url}'**
   String shareCourseMessage(String course, String brand, String url);
+
+  /// No description provided for @freeMaterialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Free study material'**
+  String get freeMaterialTitle;
+
+  /// No description provided for @freeMaterialIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes, formula sheets, mind maps and past papers, free to download.'**
+  String get freeMaterialIntro;
+
+  /// No description provided for @materialTypeNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get materialTypeNotes;
+
+  /// No description provided for @materialTypeFormulaSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Formula sheet'**
+  String get materialTypeFormulaSheet;
+
+  /// No description provided for @materialTypeMindMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Mind map'**
+  String get materialTypeMindMap;
+
+  /// No description provided for @materialTypePreviousYearPaper.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous year paper'**
+  String get materialTypePreviousYearPaper;
+
+  /// No description provided for @materialTypeSamplePaper.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample paper'**
+  String get materialTypeSamplePaper;
+
+  /// No description provided for @materialTypeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get materialTypeOther;
+
+  /// No description provided for @allTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'All types'**
+  String get allTypes;
+
+  /// No description provided for @allSubjects.
+  ///
+  /// In en, this message translates to:
+  /// **'All subjects'**
+  String get allSubjects;
+
+  /// No description provided for @subjectGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get subjectGeneral;
+
+  /// No description provided for @bothClasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Class 11 & 12'**
+  String get bothClasses;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @openLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get openLink;
+
+  /// No description provided for @signUpToDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up free to download'**
+  String get signUpToDownload;
+
+  /// No description provided for @materialsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet. Try another filter, or check back soon.'**
+  String get materialsEmpty;
+
+  /// No description provided for @materialImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get materialImage;
+
+  /// No description provided for @materialLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens another website'**
+  String get materialLink;
+
+  /// No description provided for @downloadsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No downloads yet} =1{1 download} other{{count} downloads}}'**
+  String downloadsCount(int count);
 }
 
 class _AppLocalizationsDelegate

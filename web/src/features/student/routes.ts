@@ -25,6 +25,7 @@ export const routes = {
   notifications: "/notifications",
   doubts: "/doubts",
   flashcards: "/flashcards",
+  materials: "/materials",
   flashcardDeck: (ncertChapterId: string) => `/flashcards/${ncertChapterId}`,
   doubt: (id: string) => `/doubts/${id}`,
 };

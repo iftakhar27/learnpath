@@ -1698,6 +1698,323 @@
         }
       }
     },
+    "/api/v1/admin/materials": {
+      "get": {
+        "tags": [
+          "AdminMaterials"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialsDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AdminMaterials"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "TitleEn",
+                  "Type"
+                ],
+                "type": "object",
+                "properties": {
+                  "TitleEn": {
+                    "maxLength": 200,
+                    "type": "string"
+                  },
+                  "TitleHi": {
+                    "maxLength": 200,
+                    "type": "string"
+                  },
+                  "DescriptionEn": {
+                    "maxLength": 1000,
+                    "type": "string"
+                  },
+                  "DescriptionHi": {
+                    "maxLength": 1000,
+                    "type": "string"
+                  },
+                  "Type": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MaterialType"
+                      }
+                    ]
+                  },
+                  "Subject": {
+                    "pattern": "^(Physics|Chemistry|Biology)?$",
+                    "type": "string"
+                  },
+                  "ClassLevel": {
+                    "pattern": "^(11|12)?$",
+                    "type": "string"
+                  },
+                  "Status": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/PublishStatus"
+                      }
+                    ]
+                  },
+                  "SortOrder": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "ExternalUrl": {
+                    "maxLength": 1000,
+                    "type": "string"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "TitleEn": {
+                  "style": "form"
+                },
+                "TitleHi": {
+                  "style": "form"
+                },
+                "DescriptionEn": {
+                  "style": "form"
+                },
+                "DescriptionHi": {
+                  "style": "form"
+                },
+                "Type": {
+                  "style": "form"
+                },
+                "Subject": {
+                  "style": "form"
+                },
+                "ClassLevel": {
+                  "style": "form"
+                },
+                "Status": {
+                  "style": "form"
+                },
+                "SortOrder": {
+                  "style": "form"
+                },
+                "ExternalUrl": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/materials/{id}": {
+      "put": {
+        "tags": [
+          "AdminMaterials"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "TitleEn",
+                  "Type"
+                ],
+                "type": "object",
+                "properties": {
+                  "TitleEn": {
+                    "maxLength": 200,
+                    "type": "string"
+                  },
+                  "TitleHi": {
+                    "maxLength": 200,
+                    "type": "string"
+                  },
+                  "DescriptionEn": {
+                    "maxLength": 1000,
+                    "type": "string"
+                  },
+                  "DescriptionHi": {
+                    "maxLength": 1000,
+                    "type": "string"
+                  },
+                  "Type": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MaterialType"
+                      }
+                    ]
+                  },
+                  "Subject": {
+                    "pattern": "^(Physics|Chemistry|Biology)?$",
+                    "type": "string"
+                  },
+                  "ClassLevel": {
+                    "pattern": "^(11|12)?$",
+                    "type": "string"
+                  },
+                  "Status": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/PublishStatus"
+                      }
+                    ]
+                  },
+                  "SortOrder": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "ExternalUrl": {
+                    "maxLength": 1000,
+                    "type": "string"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "TitleEn": {
+                  "style": "form"
+                },
+                "TitleHi": {
+                  "style": "form"
+                },
+                "DescriptionEn": {
+                  "style": "form"
+                },
+                "DescriptionHi": {
+                  "style": "form"
+                },
+                "Type": {
+                  "style": "form"
+                },
+                "Subject": {
+                  "style": "form"
+                },
+                "ClassLevel": {
+                  "style": "form"
+                },
+                "Status": {
+                  "style": "form"
+                },
+                "SortOrder": {
+                  "style": "form"
+                },
+                "ExternalUrl": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMaterialDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AdminMaterials"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/admin/dashboard": {
       "get": {
         "tags": [
@@ -4842,6 +5159,149 @@
         }
       }
     },
+    "/api/v1/materials": {
+      "get": {
+        "tags": [
+          "Materials"
+        ],
+        "parameters": [
+          {
+            "name": "subject",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "classLevel",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/MaterialType"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MaterialDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MaterialDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MaterialDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/materials/{id}/download": {
+      "post": {
+        "tags": [
+          "Materials"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaterialDownloadDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaterialDownloadDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaterialDownloadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/materials/{id}/file": {
+      "get": {
+        "tags": [
+          "Materials"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expires",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "sig",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/notifications": {
       "get": {
         "tags": [
@@ -7165,6 +7625,116 @@
             "items": {
               "$ref": "#/components/schemas/ImportErrorDto"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminMaterialDto": {
+        "required": [
+          "downloads",
+          "format",
+          "id",
+          "sizeBytes",
+          "sortOrder",
+          "status",
+          "titleEn",
+          "type",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "titleEn": {
+            "type": "string"
+          },
+          "titleHi": {
+            "type": "string",
+            "nullable": true
+          },
+          "descriptionEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "descriptionHi": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MaterialType"
+              }
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "nullable": true
+          },
+          "classLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "format": {
+            "type": "string"
+          },
+          "externalUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublishStatus"
+              }
+            ]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "downloads": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminMaterialsDto": {
+        "required": [
+          "items",
+          "maxUploadMegabytes",
+          "storedBytes"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminMaterialDto"
+            }
+          },
+          "storedBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maxUploadMegabytes": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -10121,6 +10691,89 @@
           }
         },
         "additionalProperties": false
+      },
+      "MaterialDownloadDto": {
+        "required": [
+          "external",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MaterialDto": {
+        "required": [
+          "downloads",
+          "format",
+          "id",
+          "sizeBytes",
+          "title",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string",
+            "nullable": true
+          },
+          "classLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "format": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "downloads": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MaterialType": {
+        "enum": [
+          "Notes",
+          "FormulaSheet",
+          "MindMap",
+          "PreviousYearPaper",
+          "SamplePaper",
+          "Other"
+        ],
+        "type": "string"
       },
       "NodeUpsert": {
         "required": [

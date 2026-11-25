@@ -593,6 +593,104 @@ class AdminImportJobDto {
 }
 
 @immutable
+class AdminMaterialDto {
+  const AdminMaterialDto({
+    required this.id,
+    required this.titleEn,
+    this.titleHi,
+    this.descriptionEn,
+    this.descriptionHi,
+    required this.type,
+    this.subject,
+    this.classLevel,
+    required this.format,
+    this.externalUrl,
+    this.fileName,
+    required this.sizeBytes,
+    required this.status,
+    required this.sortOrder,
+    required this.downloads,
+    required this.updatedAt,
+  });
+
+  factory AdminMaterialDto.fromJson(Map<String, dynamic> json) => AdminMaterialDto(
+    id: json['id'] as String,
+    titleEn: json['titleEn'] as String,
+    titleHi: json['titleHi'] == null ? null : json['titleHi'] as String,
+    descriptionEn: json['descriptionEn'] == null ? null : json['descriptionEn'] as String,
+    descriptionHi: json['descriptionHi'] == null ? null : json['descriptionHi'] as String,
+    type: MaterialType.fromJson(json['type'] as String),
+    subject: json['subject'] == null ? null : json['subject'] as String,
+    classLevel: json['classLevel'] == null ? null : json['classLevel'] as String,
+    format: json['format'] as String,
+    externalUrl: json['externalUrl'] == null ? null : json['externalUrl'] as String,
+    fileName: json['fileName'] == null ? null : json['fileName'] as String,
+    sizeBytes: (json['sizeBytes'] as num).toInt(),
+    status: PublishStatus.fromJson(json['status'] as String),
+    sortOrder: (json['sortOrder'] as num).toInt(),
+    downloads: (json['downloads'] as num).toInt(),
+    updatedAt: DateTime.parse(json['updatedAt'] as String),
+  );
+
+  final String id;
+  final String titleEn;
+  final String? titleHi;
+  final String? descriptionEn;
+  final String? descriptionHi;
+  final MaterialType type;
+  final String? subject;
+  final String? classLevel;
+  final String format;
+  final String? externalUrl;
+  final String? fileName;
+  final int sizeBytes;
+  final PublishStatus status;
+  final int sortOrder;
+  final int downloads;
+  final DateTime updatedAt;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'titleEn': titleEn,
+    'titleHi': ?titleHi,
+    'descriptionEn': ?descriptionEn,
+    'descriptionHi': ?descriptionHi,
+    'type': type.toJson(),
+    'subject': ?subject,
+    'classLevel': ?classLevel,
+    'format': format,
+    'externalUrl': ?externalUrl,
+    'fileName': ?fileName,
+    'sizeBytes': sizeBytes,
+    'status': status.toJson(),
+    'sortOrder': sortOrder,
+    'downloads': downloads,
+    'updatedAt': updatedAt.toIso8601String(),
+  };
+}
+
+@immutable
+class AdminMaterialsDto {
+  const AdminMaterialsDto({required this.items, required this.storedBytes, required this.maxUploadMegabytes});
+
+  factory AdminMaterialsDto.fromJson(Map<String, dynamic> json) => AdminMaterialsDto(
+    items: (json['items'] as List<dynamic>).map((x) => AdminMaterialDto.fromJson(x as Map<String, dynamic>)).toList(),
+    storedBytes: (json['storedBytes'] as num).toInt(),
+    maxUploadMegabytes: (json['maxUploadMegabytes'] as num).toInt(),
+  );
+
+  final List<AdminMaterialDto> items;
+  final int storedBytes;
+  final int maxUploadMegabytes;
+
+  Map<String, dynamic> toJson() => {
+    'items': items.map((x) => x.toJson()).toList(),
+    'storedBytes': storedBytes,
+    'maxUploadMegabytes': maxUploadMegabytes,
+  };
+}
+
+@immutable
 class AdminNcertChapterDto {
   const AdminNcertChapterDto({
     required this.id,
@@ -3394,6 +3492,96 @@ class LoginRequest {
     'deviceId': ?deviceId,
     'takeOver': ?takeOver,
   };
+}
+
+@immutable
+class MaterialDownloadDto {
+  const MaterialDownloadDto({required this.url, required this.external, this.fileName, this.expiresAt});
+
+  factory MaterialDownloadDto.fromJson(Map<String, dynamic> json) => MaterialDownloadDto(
+    url: json['url'] as String,
+    external: json['external'] as bool,
+    fileName: json['fileName'] == null ? null : json['fileName'] as String,
+    expiresAt: json['expiresAt'] == null ? null : DateTime.parse(json['expiresAt'] as String),
+  );
+
+  final String url;
+  final bool external;
+  final String? fileName;
+  final DateTime? expiresAt;
+
+  Map<String, dynamic> toJson() => {
+    'url': url,
+    'external': external,
+    'fileName': ?fileName,
+    'expiresAt': ?expiresAt?.toIso8601String(),
+  };
+}
+
+@immutable
+class MaterialDto {
+  const MaterialDto({
+    required this.id,
+    required this.title,
+    this.description,
+    required this.type,
+    this.subject,
+    this.classLevel,
+    required this.format,
+    required this.sizeBytes,
+    required this.downloads,
+  });
+
+  factory MaterialDto.fromJson(Map<String, dynamic> json) => MaterialDto(
+    id: json['id'] as String,
+    title: json['title'] as String,
+    description: json['description'] == null ? null : json['description'] as String,
+    type: json['type'] as String,
+    subject: json['subject'] == null ? null : json['subject'] as String,
+    classLevel: json['classLevel'] == null ? null : json['classLevel'] as String,
+    format: json['format'] as String,
+    sizeBytes: (json['sizeBytes'] as num).toInt(),
+    downloads: (json['downloads'] as num).toInt(),
+  );
+
+  final String id;
+  final String title;
+  final String? description;
+  final String type;
+  final String? subject;
+  final String? classLevel;
+  final String format;
+  final int sizeBytes;
+  final int downloads;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'description': ?description,
+    'type': type,
+    'subject': ?subject,
+    'classLevel': ?classLevel,
+    'format': format,
+    'sizeBytes': sizeBytes,
+    'downloads': downloads,
+  };
+}
+
+enum MaterialType {
+  notes('Notes'),
+  formulaSheet('FormulaSheet'),
+  mindMap('MindMap'),
+  previousYearPaper('PreviousYearPaper'),
+  samplePaper('SamplePaper'),
+  other('Other');
+
+  const MaterialType(this.wire);
+  final String wire;
+
+  static MaterialType fromJson(String value) =>
+      values.firstWhere((e) => e.wire == value, orElse: () => throw FormatException('Unknown MaterialType: $value'));
+
+  String toJson() => wire;
 }
 
 @immutable

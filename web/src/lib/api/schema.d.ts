@@ -1194,6 +1194,158 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/materials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminMaterialsDto"];
+                        "application/json": components["schemas"]["AdminMaterialsDto"];
+                        "text/json": components["schemas"]["AdminMaterialsDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        TitleEn: string;
+                        TitleHi?: string;
+                        DescriptionEn?: string;
+                        DescriptionHi?: string;
+                        Type: components["schemas"]["MaterialType"];
+                        Subject?: string;
+                        ClassLevel?: string;
+                        Status?: components["schemas"]["PublishStatus"];
+                        /** Format: int32 */
+                        SortOrder?: number;
+                        ExternalUrl?: string;
+                        /** Format: binary */
+                        File?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminMaterialDto"];
+                        "application/json": components["schemas"]["AdminMaterialDto"];
+                        "text/json": components["schemas"]["AdminMaterialDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/materials/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        TitleEn: string;
+                        TitleHi?: string;
+                        DescriptionEn?: string;
+                        DescriptionHi?: string;
+                        Type: components["schemas"]["MaterialType"];
+                        Subject?: string;
+                        ClassLevel?: string;
+                        Status?: components["schemas"]["PublishStatus"];
+                        /** Format: int32 */
+                        SortOrder?: number;
+                        ExternalUrl?: string;
+                        /** Format: binary */
+                        File?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminMaterialDto"];
+                        "application/json": components["schemas"]["AdminMaterialDto"];
+                        "text/json": components["schemas"]["AdminMaterialDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/dashboard": {
         parameters: {
             query?: never;
@@ -3667,6 +3819,124 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/materials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    subject?: string;
+                    classLevel?: string;
+                    type?: components["schemas"]["MaterialType"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MaterialDto"][];
+                        "application/json": components["schemas"]["MaterialDto"][];
+                        "text/json": components["schemas"]["MaterialDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/materials/{id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MaterialDownloadDto"];
+                        "application/json": components["schemas"]["MaterialDownloadDto"];
+                        "text/json": components["schemas"]["MaterialDownloadDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/materials/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    expires?: number;
+                    sig?: string;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications": {
         parameters: {
             query?: never;
@@ -5371,6 +5641,36 @@ export interface components {
             createdAt: string;
             errors: components["schemas"]["ImportErrorDto"][];
         };
+        AdminMaterialDto: {
+            /** Format: uuid */
+            id: string;
+            titleEn: string;
+            titleHi?: string | null;
+            descriptionEn?: string | null;
+            descriptionHi?: string | null;
+            type: components["schemas"]["MaterialType"];
+            subject?: string | null;
+            classLevel?: string | null;
+            format: string;
+            externalUrl?: string | null;
+            fileName?: string | null;
+            /** Format: int64 */
+            sizeBytes: number;
+            status: components["schemas"]["PublishStatus"];
+            /** Format: int32 */
+            sortOrder: number;
+            /** Format: int32 */
+            downloads: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        AdminMaterialsDto: {
+            items: components["schemas"]["AdminMaterialDto"][];
+            /** Format: int64 */
+            storedBytes: number;
+            /** Format: int32 */
+            maxUploadMegabytes: number;
+        };
         AdminNcertChapterDto: {
             /** Format: uuid */
             id: string;
@@ -6224,6 +6524,29 @@ export interface components {
             deviceId?: string | null;
             takeOver?: boolean | null;
         };
+        MaterialDownloadDto: {
+            url: string;
+            external: boolean;
+            fileName?: string | null;
+            /** Format: date-time */
+            expiresAt?: string | null;
+        };
+        MaterialDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            description?: string | null;
+            type: string;
+            subject?: string | null;
+            classLevel?: string | null;
+            format: string;
+            /** Format: int64 */
+            sizeBytes: number;
+            /** Format: int32 */
+            downloads: number;
+        };
+        /** @enum {string} */
+        MaterialType: "Notes" | "FormulaSheet" | "MindMap" | "PreviousYearPaper" | "SamplePaper" | "Other";
         NodeUpsert: {
             /** Format: uuid */
             parentId: string;

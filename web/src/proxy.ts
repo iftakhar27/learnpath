@@ -6,7 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export const STUDENT_AREAS = ["/home", "/onboarding", "/topics", "/watch", "/practice", "/tests", "/exam", "/results", "/plan", "/progress", "/profile", "/notifications", "/bookmarks", "/purchases", "/support", "/search", "/doubts", "/flashcards"];
 /** Guests may browse these: the course catalogue, course pages and the NCERT subject pages (see (student)/layout.tsx). */
-export const GUEST_AREAS = ["/learn", "/library"];
+export const GUEST_AREAS = ["/learn", "/library", "/materials"];
 const STUDENT_PUBLIC = ["/", "/login", "/register"];
 
 export function proxy(request: NextRequest) {

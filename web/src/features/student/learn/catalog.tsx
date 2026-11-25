@@ -7,6 +7,7 @@ import { api, unwrap } from "@/lib/api/client";
 import { useT } from "@/lib/i18n";
 import { SkeletonRows } from "@/components/ui/feedback";
 import { Input, Select } from "@/components/ui/field";
+import { Icon } from "@/components/ui/icons";
 import { StudentError } from "../errors";
 import { useProfile } from "../profile";
 import { routes } from "../routes";
@@ -42,6 +43,16 @@ export function Catalog() {
       <div className="mb-8">
         <SubjectGrid />
       </div>
+      <Link href={routes.materials} className="mb-8 flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 hover:border-primary">
+        <span className="rounded-xl bg-primary-soft p-2 text-primary">
+          <Icon name="doc" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold">{t("freeMaterialTitle")}</span>
+          <span className="block text-sm text-fg-muted">{t("freeMaterialIntro")}</span>
+        </span>
+        <Icon name="chevronRight" className="text-fg-muted" />
+      </Link>
       <h2 className="mb-3 text-lg font-semibold">{t("coursesHeading")}</h2>
       <div role="search" aria-label={t("filterCourses")} className="mb-6 flex flex-wrap items-center gap-3">
         <Input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("searchHint")} aria-label={t("search")} className="w-full sm:w-72" />

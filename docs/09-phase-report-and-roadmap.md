@@ -217,6 +217,41 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Free study material (25 Nov 2026)
+
+- **Students (website `/materials`, app menu, Learn tab, guest home):** "Free study material".
+  - Notes, formula sheets, mind maps, previous year and sample papers, filtered by subject (or general), class and
+    type.
+  - Anyone can browse the list. Downloading needs a free account, so guests see "Sign up free to download"; it brings
+    in sign-ups.
+  - A download opens in the browser's PDF viewer (or downloads, on phones) through a signed link valid 10 minutes, so
+    it works without the app passing its sign-in token. Links to other sites (e.g. Google Drive) open directly.
+  - Downloads are counted.
+- **Admin ("Free material"):**
+  - Add material with English and optional Hindi title and description, type, subject, class and draft/published.
+  - The source is an uploaded file (PDF, PNG or JPEG, checked by its content rather than its name; up to 20 MB,
+    `Materials__MaxUploadMegabytes`) or an https link.
+  - Edit, replace the file and delete. The page shows how much file storage is used.
+- **Storage:** uploaded files are kept in the database for now (no extra service or account; backed up with it), behind
+  one interface (`IFileStore`) so an object store such as Cloudflare R2 can take over when the library grows. Render's
+  free database is 1 GB in total, so keep an eye on "Files stored" and prefer links for very large files.
+- **Samples:** three one-page PDFs (Units and Measurement formula sheet, Laws of Motion notes, Cell key points) and a
+  link to NCERT's official textbook site, added with the sample content.
+- **Verified:**
+  - 5 backend tests: list and filters, sign-in and signed links (altered or expired refused), well-formed sample PDFs,
+    admin upload checks and file cleanup, size limit.
+  - 1 browser test (upload, refuse a fake PDF, student download returns the PDF, guest prompt, download counted,
+    delete) and 2 app tests.
+  - The sample PDFs open in two PDF readers.
+  - Screenshots on phone in light and dark, and of the admin form.
+  - Found and fixed along the way:
+    - App cards merged their Download button into one screen-reader item.
+    - The guest button overflowed on narrow screens.
+  - All suites green: 128 backend, 48 browser, 39 app.
+- **Android APK:** a phone showed "There was a problem while parsing the package" when the APK was opened straight from
+  WhatsApp. The file was intact; some phones' installers can't read an APK handed over by WhatsApp. Saving it and
+  opening it from the Files app works. A smaller 64-bit-only build (21 MB instead of 61 MB) is now sent too.
+
 ### Guest browsing and WhatsApp links (25 Nov 2026)
 
 - **Guest browsing (app and website):** look around without an account.

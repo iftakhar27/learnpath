@@ -1577,4 +1577,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String shareCourseMessage(String course, String brand, String url) {
     return 'Have a look at “$course” on $brand: $url';
   }
+
+  @override
+  String get freeMaterialTitle => 'Free study material';
+
+  @override
+  String get freeMaterialIntro =>
+      'Notes, formula sheets, mind maps and past papers, free to download.';
+
+  @override
+  String get materialTypeNotes => 'Notes';
+
+  @override
+  String get materialTypeFormulaSheet => 'Formula sheet';
+
+  @override
+  String get materialTypeMindMap => 'Mind map';
+
+  @override
+  String get materialTypePreviousYearPaper => 'Previous year paper';
+
+  @override
+  String get materialTypeSamplePaper => 'Sample paper';
+
+  @override
+  String get materialTypeOther => 'Other';
+
+  @override
+  String get allTypes => 'All types';
+
+  @override
+  String get allSubjects => 'All subjects';
+
+  @override
+  String get subjectGeneral => 'General';
+
+  @override
+  String get bothClasses => 'Class 11 & 12';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get openLink => 'Open';
+
+  @override
+  String get signUpToDownload => 'Sign up free to download';
+
+  @override
+  String get materialsEmpty =>
+      'Nothing here yet. Try another filter, or check back soon.';
+
+  @override
+  String get materialImage => 'Image';
+
+  @override
+  String get materialLink => 'Opens another website';
+
+  @override
+  String downloadsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count downloads',
+      one: '1 download',
+      zero: 'No downloads yet',
+    );
+    return '$_temp0';
+  }
 }

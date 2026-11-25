@@ -107,6 +107,26 @@ when used or expired), then opens the course with Razorpay checkout started. Bac
   `front | back` (or tab-separated), optional `| front in Hindi | back in Hindi`, `#` comments; returns `{added,
   problems:[{line, reason}]}` (missing back, too long, already in the deck). Up to 500 lines.
 
+## Free study material
+
+- `GET /materials?subject=&classLevel=&type=` (public) → published material: `{id, title, description, type
+  (Notes, FormulaSheet, MindMap, PreviousYearPaper, SamplePaper, Other), subject (null = general), classLevel (null =
+  both), format (PDF, Image, Link), sizeBytes, downloads}`. `subject=general` lists material for no particular subject;
+  `classLevel=12` includes material for both classes.
+- `POST /materials/{id}/download` (signed in; counts the download) → `{url, external, fileName, expiresAt}`. For an
+  uploaded file, `url` is relative to the API host (`/api/v1/materials/{id}/file?expires=…&sig=…`), valid 10 minutes,
+  and needs no token, so a browser or PDF viewer can open it; for a link, it's the external page.
+- `GET /materials/{id}/file?expires&sig` serves the file inline with its download name (`403 link_expired` when the
+  link is old or altered).
+- Admin (content editors), multipart/form-data: `POST /admin/materials` and `PUT /admin/materials/{id}` with
+  `titleEn, titleHi?, descriptionEn?, descriptionHi?, type, subject?, classLevel?, status, sortOrder` and either
+  `file` (PDF, PNG or JPEG, recognised by content; up to `Materials:MaxUploadMegabytes`, default 20) or `externalUrl`
+  (https). On edit, a file or link replaces the source and sending neither keeps it. `GET /admin/materials` →
+  `{items, storedBytes, maxUploadMegabytes}`; `DELETE /admin/materials/{id}` removes the file too. Errors:
+  `file_or_link_required`, `unsupported_file`, `file_too_large`, `empty_file`, `invalid_link`.
+- Files are kept in the database for now (behind `IFileStore`), so they're backed up with it; an object store can
+  replace it later.
+
 ## App settings and WhatsApp
 
 - `GET /app-config` (public, cached 5 minutes) → `{whatsAppNumber, whatsAppChannelUrl, websiteUrl}`. Set on the server:
@@ -182,6 +202,10 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `PUT` | `/api/v1/admin/flashcards/{id}` |
 | `DELETE` | `/api/v1/admin/flashcards/{id}` |
 | `GET` | `/api/v1/admin/imports` |
+| `GET` | `/api/v1/admin/materials` |
+| `POST` | `/api/v1/admin/materials` |
+| `PUT` | `/api/v1/admin/materials/{id}` |
+| `DELETE` | `/api/v1/admin/materials/{id}` |
 | `GET` | `/api/v1/admin/ncert-chapters` |
 | `GET` | `/api/v1/admin/orders` |
 | `GET` | `/api/v1/admin/question-reports` |
@@ -257,6 +281,9 @@ Students ask teachers; teachers (Teacher, ContentAdmin, SuperAdmin) answer in th
 | `GET` | `/api/v1/library` |
 | `GET` | `/api/v1/library/chapters/{id}` |
 | `GET` | `/api/v1/library/{classLevel}/{subject}` |
+| `GET` | `/api/v1/materials` |
+| `POST` | `/api/v1/materials/{id}/download` |
+| `GET` | `/api/v1/materials/{id}/file` |
 | `GET` | `/api/v1/notifications` |
 | `POST` | `/api/v1/notifications/read-all` |
 | `GET` | `/api/v1/notifications/unread-count` |

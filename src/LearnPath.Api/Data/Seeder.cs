@@ -1,4 +1,5 @@
 using LearnPath.Api.Domain;
+using LearnPath.Api.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace LearnPath.Api.Data;
@@ -46,6 +47,8 @@ public static class Seeder
         {
             var cards = await FlashcardSamples.SeedAsync(db, now);
             if (cards > 0) logger.LogInformation("Seeded {Count} starter flash cards", cards);
+            var materials = await MaterialSamples.SeedAsync(db, new DatabaseFileStore(db, clock), now);
+            if (materials > 0) logger.LogInformation("Seeded {Count} sample study materials", materials);
         }
 
         // Sample lessons have placeholder video IDs; point them at a public demo stream so playback can be tried

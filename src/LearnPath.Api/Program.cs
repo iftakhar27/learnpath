@@ -88,6 +88,7 @@ else if (emailProvider == "log")
 else builder.Services.AddSingleton<IEmailSender, DisabledEmailSender>();
 builder.Services.AddSingleton<IVideoUrlSigner, BunnyVideoUrlSigner>();
 builder.Services.AddSingleton<IDocumentUrlSigner, HmacDocumentUrlSigner>();
+builder.Services.AddScoped<IFileStore, DatabaseFileStore>();
 
 // ---------- Module services ----------
 builder.Services.AddHttpContextAccessor();

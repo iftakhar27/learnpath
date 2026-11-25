@@ -1576,4 +1576,72 @@ class AppLocalizationsHi extends AppLocalizations {
   String shareCourseMessage(String course, String brand, String url) {
     return '$brand पर “$course” देखें: $url';
   }
+
+  @override
+  String get freeMaterialTitle => 'मुफ़्त अध्ययन सामग्री';
+
+  @override
+  String get freeMaterialIntro =>
+      'नोट्स, फ़ॉर्मूला शीट, माइंड मैप और पिछले प्रश्नपत्र, मुफ़्त डाउनलोड करें।';
+
+  @override
+  String get materialTypeNotes => 'नोट्स';
+
+  @override
+  String get materialTypeFormulaSheet => 'फ़ॉर्मूला शीट';
+
+  @override
+  String get materialTypeMindMap => 'माइंड मैप';
+
+  @override
+  String get materialTypePreviousYearPaper => 'पिछले वर्ष का प्रश्नपत्र';
+
+  @override
+  String get materialTypeSamplePaper => 'नमूना प्रश्नपत्र';
+
+  @override
+  String get materialTypeOther => 'अन्य';
+
+  @override
+  String get allTypes => 'सभी प्रकार';
+
+  @override
+  String get allSubjects => 'सभी विषय';
+
+  @override
+  String get subjectGeneral => 'सामान्य';
+
+  @override
+  String get bothClasses => 'कक्षा 11 और 12';
+
+  @override
+  String get download => 'डाउनलोड करें';
+
+  @override
+  String get openLink => 'खोलें';
+
+  @override
+  String get signUpToDownload => 'डाउनलोड के लिए मुफ़्त साइन अप करें';
+
+  @override
+  String get materialsEmpty =>
+      'अभी यहां कुछ नहीं है। कोई दूसरा फ़िल्टर आज़माएं या जल्द ही देखें।';
+
+  @override
+  String get materialImage => 'चित्र';
+
+  @override
+  String get materialLink => 'दूसरी वेबसाइट खुलेगी';
+
+  @override
+  String downloadsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count डाउनलोड',
+      one: '1 डाउनलोड',
+      zero: 'अभी कोई डाउनलोड नहीं',
+    );
+    return '$_temp0';
+  }
 }

@@ -14,6 +14,7 @@ import '../home/home_screen.dart';
 import '../payments/buy_on_website.dart';
 import '../support/whatsapp.dart' show shareCourseOnWhatsApp;
 import '../doubts/doubt_screens.dart';
+import 'materials_screen.dart';
 import 'quiz_screen.dart';
 import 'subjects.dart';
 
@@ -106,7 +107,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 },
                 padding: const EdgeInsets.only(bottom: 24),
                 children: [
-                  if (_q.isEmpty) const SubjectGrid(),
+                  if (_q.isEmpty) ...[const SubjectGrid(), const FreeMaterialCard()],
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Text(l.coursesHeading, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),

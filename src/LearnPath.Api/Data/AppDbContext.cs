@@ -38,6 +38,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<PracticeAnswer> PracticeAnswers => Set<PracticeAnswer>();
     public DbSet<QuestionReport> QuestionReports => Set<QuestionReport>();
     public DbSet<Flashcard> Flashcards => Set<Flashcard>();
+    public DbSet<StudyMaterial> StudyMaterials => Set<StudyMaterial>();
+    public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
     public DbSet<FlashcardReview> FlashcardReviews => Set<FlashcardReview>();
 
     public DbSet<ResourceProgress> ResourceProgress => Set<ResourceProgress>();
@@ -193,6 +195,28 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.BackHi).HasMaxLength(1000);
             e.Property(x => x.Status).HasConversion<string>().HasMaxLength(16);
             e.HasOne<NcertChapter>().WithMany().HasForeignKey(x => x.NcertChapterId).OnDelete(DeleteBehavior.Cascade);
+        });
+        b.Entity<StudyMaterial>(e =>
+        {
+            e.HasIndex(x => new { x.Status, x.SortOrder });
+            e.Property(x => x.TitleEn).HasMaxLength(200);
+            e.Property(x => x.TitleHi).HasMaxLength(200);
+            e.Property(x => x.DescriptionEn).HasMaxLength(1000);
+            e.Property(x => x.DescriptionHi).HasMaxLength(1000);
+            e.Property(x => x.Type).HasConversion<string>().HasMaxLength(24);
+            e.Property(x => x.Subject).HasMaxLength(16);
+            e.Property(x => x.ClassLevel).HasMaxLength(4);
+            e.Property(x => x.ExternalUrl).HasMaxLength(1000);
+            e.Property(x => x.FileName).HasMaxLength(120);
+            e.Property(x => x.ContentType).HasMaxLength(64);
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(16);
+            e.HasOne<StoredFile>().WithMany().HasForeignKey(x => x.FileId).OnDelete(DeleteBehavior.SetNull);
+        });
+        b.Entity<StoredFile>(e =>
+        {
+            e.Property(x => x.FileName).HasMaxLength(120);
+            e.Property(x => x.ContentType).HasMaxLength(64);
+            e.Property(x => x.Sha256).HasMaxLength(64);
         });
         b.Entity<FlashcardReview>(e =>
         {

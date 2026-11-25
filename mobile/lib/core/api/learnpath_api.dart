@@ -137,6 +137,12 @@ class LearnPathApi {
   Future<void> requestAccountDeletion() => _send(() => _dio.post('/student/profile/delete-request'));
 
   // ---- Catalog & learning ----
+  Future<List<MaterialDto>> materials({String? subject, String? classLevel, MaterialType? type}) => _call(
+    () => _dio.get('/materials', queryParameters: {'subject': ?subject, 'classLevel': ?classLevel, 'type': ?type?.wire}),
+    (d) => _list(d, MaterialDto.fromJson),
+  );
+  Future<MaterialDownloadDto> materialDownload(String id) =>
+      _call(() => _dio.post('/materials/$id/download'), (d) => MaterialDownloadDto.fromJson(_map(d)));
   Future<AppConfigDto> appConfig() => _call(() => _dio.get('/app-config'), (d) => AppConfigDto.fromJson(_map(d)));
   Future<List<ExamDto>> exams() => _call(() => _dio.get('/exams'), (d) => _list(d, ExamDto.fromJson));
 
