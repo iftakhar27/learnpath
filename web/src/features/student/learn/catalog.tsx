@@ -98,7 +98,7 @@ export function Catalog() {
                     <span className="rounded-full bg-primary-soft px-2 py-0.5 text-primary">{t("free")}</span>
                   ) : null}
                   {c.classLevel && <span className="rounded-full bg-surface-muted px-2 py-0.5 text-fg-muted">{t("classLabel", { level: c.classLevel })}</span>}
-                  {!c.isFree && c.lessonCount === 0 && !c.enrolled && <span className="rounded-full bg-warning-soft px-2 py-0.5 text-warning">{t("classesStartSoon")}</span>}
+                  {!c.isFree && c.lessonCount === 0 && c.testCount === 0 && !c.enrolled && <span className="rounded-full bg-warning-soft px-2 py-0.5 text-warning">{t("classesStartSoon")}</span>}
                 </span>
                 <span className="mt-3 text-lg font-semibold">{c.title}</span>
                 {c.description && <span className="mt-1 line-clamp-2 text-sm text-fg-muted">{c.description}</span>}

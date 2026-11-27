@@ -237,7 +237,8 @@ a browser test (the badge updates without reloading).
     admins edit, unpublish or archive them in the portal.
 - **Monthly fees:** price per month with 30 days' access. Buying again adds 30 days from the current end date.
   Yearly offers and "Test Series Only" (₹299 a month) are in the descriptions only; buying them isn't built yet.
-- **Classes start soon:** a paid course can't be bought until it has a published lesson.
+- **Classes start soon:** a paid course can't be bought until it has a published lesson or a published test (so test
+  series with no lessons still sell).
   - The API refuses with `409 course_not_ready`.
   - The website and app show the syllabus and fees, a "Classes start soon" note and "Ask about admission on WhatsApp"
     (when the number is set) instead of Buy.
@@ -246,8 +247,8 @@ a browser test (the badge updates without reloading).
 - **Also:** courses are listed by class. Class 8 is in onboarding. Course descriptions keep their line breaks on the
   website.
 - **Verified:**
-  - 4 backend tests: listing, fees, exams and Hindi; syllabi and NCERT links; the purchase guard; seeding twice changes
-    nothing.
+  - 4 backend tests: listing, fees, exams and Hindi; syllabi and NCERT links; the purchase guard (lessons, and tests for
+    a test series; drafts and students' own custom tests don't count); seeding twice changes nothing.
   - 1 browser test: guest catalog order and badges, the course page, and no Buy when signed in.
   - 1 app test: the course screen.
   - Existing tests updated: they now pick a sample course with lessons by name instead of the first paid one.

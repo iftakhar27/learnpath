@@ -35,6 +35,7 @@ class GuestApi implements HttpClientAdapter {
     'accessDays': null,
     'enrolled': false,
     'lessonCount': 2,
+    'testCount': 0,
   };
 
   @override

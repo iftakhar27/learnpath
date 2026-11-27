@@ -157,7 +157,7 @@ class CourseCard extends StatelessWidget {
                   if (course.enrolled) Pill(l.enrolled, color: scheme.success, background: scheme.successContainer),
                   if (course.isFree) Pill(l.free, color: scheme.primary, background: scheme.primaryContainer) else Pill(formatPaise(course.priceInPaise)),
                   if (!course.isFree) Pill(course.accessDays == null ? l.lifetimeAccess : l.accessDays(course.accessDays!)),
-                  if (!course.isFree && course.lessonCount == 0 && !course.enrolled)
+                  if (!course.isFree && course.lessonCount == 0 && course.testCount == 0 && !course.enrolled)
                     Pill(l.classesStartSoon, color: scheme.warning, background: scheme.warningContainer),
                 ],
               ),
@@ -205,7 +205,7 @@ class CourseScreen extends ConsumerWidget {
                   if (d.course.description != null) ...[const SizedBox(height: 8), Text(d.course.description!)],
                   const SizedBox(height: 16),
                   // A paid course whose classes haven't started: syllabus and fees, nothing to buy yet.
-                  if (!d.course.isFree && d.course.lessonCount == 0 && !d.hasAccess)
+                  if (!d.course.isFree && d.course.lessonCount == 0 && d.course.testCount == 0 && !d.hasAccess)
                     _ClassesStartSoon(course: d.course)
                   else if (d.hasAccess) ...[
                     Row(

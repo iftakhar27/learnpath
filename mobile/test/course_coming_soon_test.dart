@@ -50,6 +50,7 @@ class ComingSoonApi implements HttpClientAdapter {
           'accessDays': 30,
           'enrolled': false,
           'lessonCount': 0,
+          'testCount': 0,
         },
         'hasAccess': false,
         'completionPercent': 0,

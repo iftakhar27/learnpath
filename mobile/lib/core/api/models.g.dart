@@ -2139,6 +2139,7 @@ class CourseSummaryDto {
     this.accessDays,
     required this.enrolled,
     required this.lessonCount,
+    required this.testCount,
   });
 
   factory CourseSummaryDto.fromJson(Map<String, dynamic> json) => CourseSummaryDto(
@@ -2153,6 +2154,7 @@ class CourseSummaryDto {
     accessDays: json['accessDays'] == null ? null : (json['accessDays'] as num).toInt(),
     enrolled: json['enrolled'] as bool,
     lessonCount: (json['lessonCount'] as num).toInt(),
+    testCount: (json['testCount'] as num).toInt(),
   );
 
   final String id;
@@ -2166,6 +2168,7 @@ class CourseSummaryDto {
   final int? accessDays;
   final bool enrolled;
   final int lessonCount;
+  final int testCount;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -2179,6 +2182,7 @@ class CourseSummaryDto {
     'accessDays': ?accessDays,
     'enrolled': enrolled,
     'lessonCount': lessonCount,
+    'testCount': testCount,
   };
 }
 

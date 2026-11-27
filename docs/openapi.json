@@ -9406,6 +9406,7 @@
           "lessonCount",
           "priceInPaise",
           "slug",
+          "testCount",
           "title"
         ],
         "type": "object",
@@ -9448,6 +9449,10 @@
             "type": "boolean"
           },
           "lessonCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "testCount": {
             "type": "integer",
             "format": "int32"
           }

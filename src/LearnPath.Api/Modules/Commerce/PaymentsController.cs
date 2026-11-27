@@ -71,8 +71,8 @@ public class PaymentsController(AppDbContext db, IPaymentGateway gateway, Commer
         var now = clock.GetUtcNow();
         if (await db.Enrollments.AnyAsync(e => e.UserId == userId && e.CourseId == course.Id && e.Source != EnrollmentSource.Free && e.ExpiresAt == null, ct))
             throw AppException.Conflict("already_owned", "You already own this course.");
-        if ((await CatalogController.LessonCountsAsync(db, [course.Id], ct)).GetValueOrDefault(course.Id) == 0)
-            throw AppException.Conflict("course_not_ready", "Classes for this course haven't started yet. You can buy it once the first lesson is up.");
+        if (!await CatalogController.HasContentAsync(db, course.Id, ct))
+            throw AppException.Conflict("course_not_ready", "Classes for this course haven't started yet. You can buy it once the first lesson or test is up.");
 
         var receipt = "rcpt_" + Guid.NewGuid().ToString("N")[..20];
         var go = await gateway.CreateOrderAsync(course.PriceInPaise, receipt, ct);

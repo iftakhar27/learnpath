@@ -6236,6 +6236,8 @@ export interface components {
             enrolled: boolean;
             /** Format: int32 */
             lessonCount: number;
+            /** Format: int32 */
+            testCount: number;
         };
         CourseUpsert: {
             /** Format: uuid */

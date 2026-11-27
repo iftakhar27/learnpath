@@ -27,6 +27,7 @@ public class CareerPathCoursesTests(ApiFactory api)
             Assert.False(c.GetProperty("isFree").GetBoolean());
             Assert.Equal(30, c.GetProperty("accessDays").GetInt32());
             Assert.Equal(0, c.GetProperty("lessonCount").GetInt32());
+            Assert.Equal(0, c.GetProperty("testCount").GetInt32());
         });
         Assert.Equal(999_00, ours[0].GetProperty("priceInPaise").GetInt64());
         Assert.Equal(1499_00, ours[^1].GetProperty("priceInPaise").GetInt64());
@@ -106,6 +107,22 @@ public class CareerPathCoursesTests(ApiFactory api)
         Assert.Equal(1, (await s.GetAsync($"/api/v1/courses/{course}/syllabus").Ok()).GetProperty("course").GetProperty("lessonCount").GetInt32());
         var order = await s.PostAsJsonAsync("/api/v1/payments/orders", new { courseId = course }).Ok();
         Assert.Equal(999_00, order.GetProperty("amountInPaise").GetInt64());
+
+        // A test series (tests, no lessons) is on sale once a test is published; a student's own custom test doesn't count.
+        var series = (await a.PostAsJsonAsync("/api/v1/admin/courses", new { examId = exam, slug = "series-" + Guid.NewGuid().ToString("N")[..8], titleEn = "Test series", isFree = false, priceInPaise = 299_00, accessDays = 30 }).Ok()).Id("id");
+        await a.PostAsJsonAsync($"/api/v1/admin/courses/{series}/status", new { status = "Published" }).Ok();
+        async Task AddTestAsync(PublishStatus status, Guid? owner) => await api.WithDb(async db =>
+        {
+            db.Tests.Add(new Test { CourseId = series, Type = TestType.Mock, TitleEn = "Mock " + status, DurationMinutes = 60, Status = status, OwnerUserId = owner, CreatedAt = DateTimeOffset.UtcNow });
+            return await db.SaveChangesAsync();
+        });
+        await AddTestAsync(PublishStatus.Draft, null);
+        await AddTestAsync(PublishStatus.Published, (await s.GetAsync("/api/v1/student/profile").Ok()).Id("userId"));
+        Assert.Equal(HttpStatusCode.Conflict, (await s.PostAsJsonAsync("/api/v1/payments/orders", new { courseId = series })).StatusCode);
+        await AddTestAsync(PublishStatus.Published, null);
+        var summary = (await s.GetAsync($"/api/v1/courses/{series}/syllabus").Ok()).GetProperty("course");
+        Assert.Equal((0, 1), (summary.GetProperty("lessonCount").GetInt32(), summary.GetProperty("testCount").GetInt32()));
+        await s.PostAsJsonAsync("/api/v1/payments/orders", new { courseId = series }).Ok();
     }
 
     [Fact]

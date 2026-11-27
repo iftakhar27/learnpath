@@ -57,9 +57,9 @@ clear a response with `"response": null`.
    `X-Razorpay-Signature` and de-duplicated by `X-Razorpay-Event-Id`. Whichever arrives first grants access; the other is a no-op.
    Configure the webhook URL and secret in the Razorpay dashboard.
 
-A paid course can be bought only once it has a published lesson: `POST /payments/orders` returns
-`409 course_not_ready` before that. `GET /courses` and `/courses/{id}/syllabus` include `lessonCount`, so clients show
-"Classes start soon" instead of Buy. `GET /courses` lists by class (8, 9, 10, 11, 12, then batches without a class),
+A paid course can be bought only once it has a published lesson or a published test (a test series):
+`POST /payments/orders` returns `409 course_not_ready` before that. `GET /courses` and `/courses/{id}/syllabus` include
+`lessonCount` and `testCount`, so clients show "Classes start soon" instead of Buy when both are 0. `GET /courses` lists by class (8, 9, 10, 11, 12, then batches without a class),
 then title, unless `sort` says otherwise. Monthly fees are a course with `accessDays: 30`. Buying again before the end
 adds 30 days from the current end date.
 

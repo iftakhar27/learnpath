@@ -42,7 +42,7 @@ export function CoursePage() {
   if (q.isError) return <StudentError error={q.error} onRetry={() => q.refetch()} />;
   const { course, hasAccess, completionPercent, subjects } = q.data;
   // A paid course whose classes haven't started: show the syllabus and fees, but nothing to buy yet.
-  const notReady = !course.isFree && course.lessonCount === 0 && !hasAccess;
+  const notReady = !course.isFree && course.lessonCount === 0 && course.testCount === 0 && !hasAccess;
 
   return (
     <div className="space-y-6">
