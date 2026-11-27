@@ -1645,4 +1645,22 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get classesStartSoon => 'Classes start soon';
+
+  @override
+  String get classesStartSoonBody =>
+      'Lessons are being added. You can buy this course as soon as the first class is up.';
+
+  @override
+  String get askAboutAdmission => 'Ask about admission on WhatsApp';
+
+  @override
+  String admissionMessage(String course) {
+    return 'Hi! I\'d like to know about admission to “$course”.';
+  }
+
+  @override
+  String get lessonsComingSoon => 'Lessons coming soon';
 }

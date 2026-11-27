@@ -98,8 +98,9 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         return c;
     }
 
+    /// <summary>The seeded sample courses (they have lessons): the free Physics starter or the paid Mechanics course.</summary>
     public async Task<Guid> CourseIdAsync(bool free) =>
-        await WithDb(db => db.Courses.Where(c => c.IsFree == free).Select(c => c.Id).FirstAsync());
+        await WithDb(db => db.Courses.Where(c => c.Slug == (free ? "neet-physics-starter-sample" : "neet-physics-mechanics-sample")).Select(c => c.Id).FirstAsync());
 
     /// <summary>The seeded sample tests: the free Dimensional Analysis quiz or the paid Laws of Motion chapter test.</summary>
     public async Task<Guid> TestIdAsync(bool free) =>

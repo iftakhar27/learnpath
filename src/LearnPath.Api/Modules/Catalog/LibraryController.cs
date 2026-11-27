@@ -171,10 +171,10 @@ public class LibraryController(AppDbContext db, EntitlementService entitlements,
 
         var practiceTopicIds = ordered.Where(ch => access.Contains(ch.Subject!.CourseId)).SelectMany(ch => ch.Topics).Select(t => t.Id).ToList();
         var practice = practiceTopicIds.Count == 0 ? 0 : await db.Questions.CountAsync(q => practiceTopicIds.Contains(q.TopicId) && q.Status == PublishStatus.Published, ct);
-        // Nothing open yet: point to the cheapest course that teaches it.
-        var buy = practiceTopicIds.Count == 0 && ordered.Count > 0
-            ? ordered.Select(ch => courses[ch.Subject!.CourseId]).OrderBy(c => c.PriceInPaise).First().Id
-            : (Guid?)null;
+        // Nothing open yet: point to the cheapest course with lessons for it (one whose classes haven't started can't be bought).
+        var buy = practiceTopicIds.Count == 0
+            ? ordered.Where(ch => ch.Topics.Any(t => t.Resources.Count > 0)).Select(ch => courses[ch.Subject!.CourseId]).OrderBy(c => c.PriceInPaise).FirstOrDefault()?.Id
+            : null;
 
         var flashcards = await db.Flashcards.CountAsync(f => f.NcertChapterId == id && f.Status == PublishStatus.Published, ct);
         return new LibraryChapterDetailDto(n.Id, n.Number, lang.Pick(n.TitleEn, n.TitleHi), n.ClassLevel, n.Subject, SubjectTitle(n.Subject),

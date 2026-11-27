@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../app/theme.dart';
 import '../../core/api/models.g.dart';
 import '../../core/config.dart';
 import '../../core/providers.dart';
@@ -102,6 +103,25 @@ class WhatsAppTiles extends ConsumerWidget {
             },
           ),
       ],
+    );
+  }
+}
+
+/// "Ask about admission on WhatsApp" for a course whose classes haven't started; nothing when no number is set.
+class AskAboutAdmissionButton extends ConsumerWidget {
+  const AskAboutAdmissionButton({super.key, required this.course});
+  final CourseSummaryDto course;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final number = ref.watch(appConfigProvider).value?.whatsAppNumber;
+    if (number == null) return const SizedBox.shrink();
+    final l = context.l10n;
+    return FilledButton.icon(
+      style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.success),
+      icon: const Icon(Icons.chat_outlined),
+      label: Text(l.askAboutAdmission),
+      onPressed: () => openWhatsApp(context, ref, whatsAppChatUri(number, l.admissionMessage(course.title))),
     );
   }
 }

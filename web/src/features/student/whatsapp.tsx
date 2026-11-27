@@ -113,3 +113,21 @@ export function ShareCourseOnWhatsApp({ courseId, title }: { courseId: string; t
     </a>
   );
 }
+
+/** "Ask about admission on WhatsApp" for a course whose classes haven't started; nothing when no number is set. */
+export function AskAboutAdmission({ title }: { title: string }) {
+  const t = useT();
+  const number = useAppConfig().data?.whatsAppNumber;
+  if (!number) return null;
+  return (
+    <a
+      href={whatsAppChatHref(number, t("admissionMessage", { course: title }))}
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex items-center gap-2 rounded-lg bg-success px-4 py-2 text-sm font-medium text-bg hover:brightness-110"
+    >
+      <Icon name="chat" size={16} />
+      {t("askAboutAdmission")}
+    </a>
+  );
+}

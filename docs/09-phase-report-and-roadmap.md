@@ -217,6 +217,42 @@ website every 30 seconds while the tab is visible and on focus; reading notifica
 the app is closed need push notifications (FCM), not built yet. Verified by an app test (polling, pause and resume) and
 a browser test (the badge updates without reloading).
 
+### Courses from the syllabus brochure (27 Nov 2026)
+
+- **Added (owner's "Career Path" course-wise syllabus PDF):** 9 courses, published, each with its subjects and chapters,
+  monthly fee and description (goal, duration, number of tests, yearly offer, what each subject's tests and notes are,
+  the extras, and the features every course has). Titles and descriptions are in English and Hindi.
+  - **Foundation:** Class 8 and Class 9 (new exam "Foundation (Olympiad / NTSE)"), and Class 10 Foundation + Board
+    (CBSE Class 10). ₹999 a month. The chapters are the ones the brochure names, plus Class 10's "Board Special"
+    (5 years' papers, answer writing, pre-board mocks).
+  - **Class 11 and 12 NEET and JEE:** ₹1,499 a month. The complete NCERT chapter list, grouped into units. The
+    brochure's names are short forms, e.g. "Human Physiology" is 6 chapters. JEE gets NCERT Maths. Class 12 NEET
+    Chemistry also has Solid State and the p-Block, as the brochure lists. Class 12 JEE also has a Class 11 revision
+    chapter.
+  - **Dropper batch:** a course can belong to only one exam, so there are two: **NEET Dropper Batch** (PCB) and
+    **JEE Dropper Batch** (PCM). Both are ₹1,499 a month and follow the brochure's phases: Class 11 revision
+    (months 1–3), Class 12 revision (months 4–6), then full mocks + PYQ marathon (months 7–10).
+  - Class 11–12 science chapters link to the NCERT subject pages, so their lessons appear there once added.
+  - Added once by `Seed:Courses` (on by default), matched by slug. After that they are never changed by the seeder, so
+    admins edit, unpublish or archive them in the portal.
+- **Monthly fees:** price per month with 30 days' access. Buying again adds 30 days from the current end date.
+  Yearly offers and "Test Series Only" (₹299 a month) are in the descriptions only; buying them isn't built yet.
+- **Classes start soon:** a paid course can't be bought until it has a published lesson.
+  - The API refuses with `409 course_not_ready`.
+  - The website and app show the syllabus and fees, a "Classes start soon" note and "Ask about admission on WhatsApp"
+    (when the number is set) instead of Buy.
+  - The catalog marks these courses, and chapters without lessons say "Lessons coming soon".
+  - NCERT chapter pages only offer courses that have lessons for that chapter.
+- **Also:** courses are listed by class. Class 8 is in onboarding. Course descriptions keep their line breaks on the
+  website.
+- **Verified:**
+  - 4 backend tests: listing, fees, exams and Hindi; syllabi and NCERT links; the purchase guard; seeding twice changes
+    nothing.
+  - 1 browser test: guest catalog order and badges, the course page, and no Buy when signed in.
+  - 1 app test: the course screen.
+  - Existing tests updated: they now pick a sample course with lessons by name instead of the first paid one.
+  - All suites green: 134 backend, 50 browser, 40 app.
+
 ### Lesson notes upload (25 Nov 2026)
 
 - **Before:** notes inside courses only pointed at a file host that was never set up, so students couldn't open them.

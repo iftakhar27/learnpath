@@ -9403,6 +9403,7 @@
           "examId",
           "id",
           "isFree",
+          "lessonCount",
           "priceInPaise",
           "slug",
           "title"
@@ -9445,6 +9446,10 @@
           },
           "enrolled": {
             "type": "boolean"
+          },
+          "lessonCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

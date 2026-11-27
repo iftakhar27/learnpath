@@ -9,7 +9,7 @@ import '../auth/auth_screens.dart';
 
 final examsProvider = FutureProvider.autoDispose<List<ExamDto>>((ref) => ref.watch(apiProvider).exams());
 
-const _classes = ['9', '10', '11', '12', 'Dropper'];
+const _classes = ['8', '9', '10', '11', '12', 'Dropper'];
 const _boards = ['CBSE', 'ICSE', 'State'];
 
 /// First-run setup, also reused from Profile → Study preferences (`editing: true`).

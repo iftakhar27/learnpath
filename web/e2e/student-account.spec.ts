@@ -105,7 +105,7 @@ test("saved items, support tickets with replies, and purchases", async ({ page, 
   await expect(page.getByText("Please try another browser while we fix it.")).toBeVisible();
 
   // Starting a purchase on a test server leaves a pending order.
-  const paid = (await apiGet(request, "/api/v1/courses?free=false", s.token)).items[0];
+  const paid = (await apiGet(request, "/api/v1/courses?free=false", s.token)).items.find((c: { lessonCount: number }) => c.lessonCount > 0);
   await apiPost(request, "/api/v1/payments/orders", s.token, { courseId: paid.id });
   await page.goto("/purchases");
   await expect(page.getByText(paid.title)).toBeVisible();

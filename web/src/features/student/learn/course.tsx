@@ -14,7 +14,7 @@ import { StudentError } from "../errors";
 import { useIsGuest } from "../guest";
 import { routes } from "../routes";
 import { ProgressBar, useFormat } from "../ui";
-import { ShareCourseOnWhatsApp } from "../whatsapp";
+import { AskAboutAdmission, ShareCourseOnWhatsApp } from "../whatsapp";
 
 export const courseKey = (id: string) => ["student", "course", id] as const;
 
@@ -41,6 +41,8 @@ export function CoursePage() {
   if (q.isPending) return <PageLoading />;
   if (q.isError) return <StudentError error={q.error} onRetry={() => q.refetch()} />;
   const { course, hasAccess, completionPercent, subjects } = q.data;
+  // A paid course whose classes haven't started: show the syllabus and fees, but nothing to buy yet.
+  const notReady = !course.isFree && course.lessonCount === 0 && !hasAccess;
 
   return (
     <div className="space-y-6">
@@ -53,9 +55,21 @@ export function CoursePage() {
           <h1 className="text-2xl font-semibold">{course.title}</h1>
           <ShareCourseOnWhatsApp courseId={course.id} title={course.title} />
         </div>
-        {course.description && <p className="mt-2 max-w-3xl text-fg-muted">{course.description}</p>}
+        {course.description && <p className="mt-2 max-w-3xl whitespace-pre-line text-fg-muted">{course.description}</p>}
         <div className="mt-5">
-          {guest ? (
+          {notReady ? (
+            <div className="max-w-xl space-y-3 rounded-xl bg-surface-muted p-4">
+              <p className="flex items-center gap-2 font-semibold">
+                <Icon name="clock" size={18} className="text-primary" />
+                {t("classesStartSoon")}
+              </p>
+              <p className="text-sm text-fg-muted">
+                {f.rupees(course.priceInPaise)} · {course.accessDays ? t("accessDays", { days: course.accessDays }) : t("lifetimeAccess")}
+              </p>
+              <p className="text-sm text-fg-muted">{t("classesStartSoonBody")}</p>
+              <AskAboutAdmission title={course.title} />
+            </div>
+          ) : guest ? (
             // Guests: free courses need a (free) account to join; paid ones open checkout once signed in.
             <div className="space-y-2">
               {!course.isFree && <p className="text-sm text-fg-muted">{course.accessDays ? t("accessDays", { days: course.accessDays }) : t("lifetimeAccess")}</p>}
@@ -113,34 +127,45 @@ export function CoursePage() {
               <ul className="divide-y divide-border">
                 {s.chapters.map((ch, i) => (
                   <li key={ch.id}>
-                    <details open={i === 0} className="group">
-                      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 hover:bg-surface-muted">
+                    {ch.topics.length === 0 ? (
+                      // Nothing to open yet.
+                      <div className="flex items-center justify-between gap-3 px-5 py-3">
                         <span>
                           {ch.unit && <span className="block text-xs text-fg-muted">{ch.unit}</span>}
                           <span className="font-medium">{ch.title}</span>
                         </span>
-                        <span className="flex items-center gap-3 text-sm text-fg-muted">
-                          {t("topicsCount", { count: ch.topics.length })}
-                          <Icon name="chevronRight" size={16} className="transition-transform group-open:rotate-90" />
-                        </span>
-                      </summary>
-                      <ul className="pb-2">
-                        {ch.topics.map((tp) => (
-                          <li key={tp.id}>
-                            <Link href={routes.topic(tp.id)} className="flex items-center gap-3 px-5 py-2.5 pl-8 hover:bg-surface-muted">
-                              <span className={`flex size-6 shrink-0 items-center justify-center rounded-full ${tp.completed ? "bg-success text-white" : "border border-border text-fg-muted"}`}>
-                                {tp.completed ? <Icon name="check" size={14} aria-label={t("completed")} role="img" /> : null}
-                              </span>
-                              <span className="min-w-0 flex-1 truncate">{tp.title}</span>
-                              <span className="shrink-0 text-sm text-fg-muted">
-                                {tp.resourceCount > 0 && hasAccess ? `${t("lessonsDone", { done: tp.completedResources, total: tp.resourceCount })} · ` : ""}
-                                {t("minutesShort", { minutes: tp.estimatedMinutes })}
-                              </span>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
+                        <span className="shrink-0 text-sm text-fg-muted">{t("lessonsComingSoon")}</span>
+                      </div>
+                    ) : (
+                      <details open={i === 0} className="group">
+                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 hover:bg-surface-muted">
+                          <span>
+                            {ch.unit && <span className="block text-xs text-fg-muted">{ch.unit}</span>}
+                            <span className="font-medium">{ch.title}</span>
+                          </span>
+                          <span className="flex items-center gap-3 text-sm text-fg-muted">
+                            {t("topicsCount", { count: ch.topics.length })}
+                            <Icon name="chevronRight" size={16} className="transition-transform group-open:rotate-90" />
+                          </span>
+                        </summary>
+                        <ul className="pb-2">
+                          {ch.topics.map((tp) => (
+                            <li key={tp.id}>
+                              <Link href={routes.topic(tp.id)} className="flex items-center gap-3 px-5 py-2.5 pl-8 hover:bg-surface-muted">
+                                <span className={`flex size-6 shrink-0 items-center justify-center rounded-full ${tp.completed ? "bg-success text-white" : "border border-border text-fg-muted"}`}>
+                                  {tp.completed ? <Icon name="check" size={14} aria-label={t("completed")} role="img" /> : null}
+                                </span>
+                                <span className="min-w-0 flex-1 truncate">{tp.title}</span>
+                                <span className="shrink-0 text-sm text-fg-muted">
+                                  {tp.resourceCount > 0 && hasAccess ? `${t("lessonsDone", { done: tp.completedResources, total: tp.resourceCount })} · ` : ""}
+                                  {t("minutesShort", { minutes: tp.estimatedMinutes })}
+                                </span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </details>
+                    )}
                   </li>
                 ))}
               </ul>

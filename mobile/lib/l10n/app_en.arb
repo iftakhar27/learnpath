@@ -881,5 +881,17 @@
         "type": "int"
       }
     }
-  }
+  },
+  "classesStartSoon": "Classes start soon",
+  "classesStartSoonBody": "Lessons are being added. You can buy this course as soon as the first class is up.",
+  "askAboutAdmission": "Ask about admission on WhatsApp",
+  "admissionMessage": "Hi! I'd like to know about admission to “{course}”.",
+  "@admissionMessage": {
+    "placeholders": {
+      "course": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonsComingSoon": "Lessons coming soon"
 }

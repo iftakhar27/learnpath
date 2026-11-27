@@ -43,6 +43,11 @@ public static class Seeder
 
         var linked = await NcertSyllabus.SeedAsync(db);
         if (linked > 0) logger.LogInformation("Linked {Count} course chapters to the NCERT syllabus", linked);
+        if (config.GetValue("Seed:Courses", true))
+        {
+            var courses = await CareerPathCourses.SeedAsync(db, now);
+            if (courses > 0) logger.LogInformation("Added {Count} courses from the syllabus brochure", courses);
+        }
         if (config.GetValue<bool>("Seed:SampleContent"))
         {
             var cards = await FlashcardSamples.SeedAsync(db, now);

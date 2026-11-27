@@ -6234,6 +6234,8 @@ export interface components {
             /** Format: int32 */
             accessDays?: number | null;
             enrolled: boolean;
+            /** Format: int32 */
+            lessonCount: number;
         };
         CourseUpsert: {
             /** Format: uuid */

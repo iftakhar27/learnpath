@@ -24,7 +24,7 @@ npx @openapitools/openapi-generator-cli generate -i docs/openapi.json -g dart-di
 ### Error codes clients should handle
 `invalid_credentials`, `email_taken`, `terms_required`, `otp_invalid`, `otp_too_soon` (429), `invalid_refresh_token` (401),
 `entitlement_required` (402 → show paywall), `attempt_closed`, `attempt_expired`, `max_attempts_reached`, `test_not_open`,
-`test_closed`, `invalid_answer`, `no_questions`, `signature_invalid`, `already_owned`, `exam_required`,
+`test_closed`, `invalid_answer`, `no_questions`, `signature_invalid`, `already_owned`, `course_not_ready`, `exam_required`,
 `guardian_consent_required`, `no_quiz`, `quiz_session`, `doubt_limit` (429), `custom_test_limit` (429), `invalid_chapter`,
 `too_many_lines`, `internal_error` (500).
 
@@ -57,6 +57,12 @@ clear a response with `"response": null`.
    `X-Razorpay-Signature` and de-duplicated by `X-Razorpay-Event-Id`. Whichever arrives first grants access; the other is a no-op.
    Configure the webhook URL and secret in the Razorpay dashboard.
 
+A paid course can be bought only once it has a published lesson: `POST /payments/orders` returns
+`409 course_not_ready` before that. `GET /courses` and `/courses/{id}/syllabus` include `lessonCount`, so clients show
+"Classes start soon" instead of Buy. `GET /courses` lists by class (8, 9, 10, 11, 12, then batches without a class),
+then title, unless `sort` says otherwise. Monthly fees are a course with `accessDays: 30`. Buying again before the end
+adds 30 days from the current end date.
+
 ## Buying from the app ("Buy on website")
 
 The apps take no payments. On a paid course the app calls `POST /auth/handoff` (signed in) → `{code, expiresAt}` (valid
@@ -72,7 +78,8 @@ when used or expired), then opens the course with Razorpay checkout started. Bac
 - `GET /library/{classLevel}/{subject}` (e.g. `/library/11/physics`) → the book's chapters with topic/video/note counts,
   `ready` (some published course teaches it), `locked` (only in courses the student doesn't own) and progress.
 - `GET /library/chapters/{id}` → the chapter's topics and lessons from every published course that teaches it (owned and
-  free courses first), `canPractise`, `practiceQuestionCount`, `buyCourseId` when nothing is open, previous/next chapter.
+  free courses first), `canPractise`, `practiceQuestionCount`, `buyCourseId` (the cheapest course with lessons for it)
+  when nothing is open, previous/next chapter.
 - `POST /practice/sessions {mode:"ncert", ncertChapterId}` practises it. Admins link course chapters with
   `ncertChapterId` on `/admin/chapters` (omit to keep or, on create, to match by title; an empty GUID unlinks);
   `GET /admin/ncert-chapters` lists them.

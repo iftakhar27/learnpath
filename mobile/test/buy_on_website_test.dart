@@ -43,6 +43,7 @@ class CourseApi implements HttpClientAdapter {
           'priceInPaise': 199900,
           'accessDays': 365,
           'enrolled': owned,
+          'lessonCount': 4,
         },
         'hasAccess': owned,
         'completionPercent': 0,

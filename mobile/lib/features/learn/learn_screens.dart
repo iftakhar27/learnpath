@@ -11,7 +11,7 @@ import '../../core/config.dart';
 import '../home/app_drawer.dart';
 import '../home/home_screen.dart';
 import '../payments/buy_on_website.dart';
-import '../support/whatsapp.dart' show shareCourseOnWhatsApp;
+import '../support/whatsapp.dart' show AskAboutAdmissionButton, shareCourseOnWhatsApp;
 import '../doubts/doubt_screens.dart';
 import 'materials_screen.dart';
 import 'quiz_screen.dart';
@@ -157,6 +157,8 @@ class CourseCard extends StatelessWidget {
                   if (course.enrolled) Pill(l.enrolled, color: scheme.success, background: scheme.successContainer),
                   if (course.isFree) Pill(l.free, color: scheme.primary, background: scheme.primaryContainer) else Pill(formatPaise(course.priceInPaise)),
                   if (!course.isFree) Pill(course.accessDays == null ? l.lifetimeAccess : l.accessDays(course.accessDays!)),
+                  if (!course.isFree && course.lessonCount == 0 && !course.enrolled)
+                    Pill(l.classesStartSoon, color: scheme.warning, background: scheme.warningContainer),
                 ],
               ),
             ],
@@ -202,7 +204,10 @@ class CourseScreen extends ConsumerWidget {
                   Text(d.course.title, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
                   if (d.course.description != null) ...[const SizedBox(height: 8), Text(d.course.description!)],
                   const SizedBox(height: 16),
-                  if (d.hasAccess) ...[
+                  // A paid course whose classes haven't started: syllabus and fees, nothing to buy yet.
+                  if (!d.course.isFree && d.course.lessonCount == 0 && !d.hasAccess)
+                    _ClassesStartSoon(course: d.course)
+                  else if (d.hasAccess) ...[
                     Row(
                       children: [
                         Icon(Icons.verified_rounded, color: Theme.of(context).colorScheme.success),
@@ -246,26 +251,73 @@ class CourseScreen extends ConsumerWidget {
             SectionHeader(l.syllabus),
             for (final s in d.subjects)
               for (final ch in s.chapters)
-                ExpansionTile(
-                  title: Text(ch.title),
-                  subtitle: Text('${s.title} · ${l.topicsCount(ch.topics.length)} · ${l.percentComplete(ch.completionPercent)}'),
-                  initiallyExpanded: d.subjects.length == 1 && s.chapters.length == 1,
-                  children: [
-                    for (final t in ch.topics)
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 32, right: 16),
-                        leading: Icon(
-                          t.completed ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                          color: t.completed ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.outline,
-                          semanticLabel: t.completed ? l.completed : null,
+                if (ch.topics.isEmpty)
+                  ListTile(
+                    title: Text(ch.title),
+                    subtitle: Text('${s.title} · ${l.lessonsComingSoon}'),
+                  )
+                else
+                  ExpansionTile(
+                    title: Text(ch.title),
+                    subtitle: Text('${s.title} · ${l.topicsCount(ch.topics.length)} · ${l.percentComplete(ch.completionPercent)}'),
+                    initiallyExpanded: d.subjects.length == 1 && s.chapters.length == 1,
+                    children: [
+                      for (final t in ch.topics)
+                        ListTile(
+                          contentPadding: const EdgeInsets.only(left: 32, right: 16),
+                          leading: Icon(
+                            t.completed ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                            color: t.completed ? Theme.of(context).colorScheme.success : Theme.of(context).colorScheme.outline,
+                            semanticLabel: t.completed ? l.completed : null,
+                          ),
+                          title: Text(t.title),
+                          subtitle: t.estimatedMinutes > 0 ? Text(l.minutesShort(t.estimatedMinutes)) : null,
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                          onTap: () => context.push('/topic/${t.id}'),
                         ),
-                        title: Text(t.title),
-                        subtitle: t.estimatedMinutes > 0 ? Text(l.minutesShort(t.estimatedMinutes)) : null,
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                        onTap: () => context.push('/topic/${t.id}'),
-                      ),
-                  ],
+                    ],
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ClassesStartSoon extends StatelessWidget {
+  const _ClassesStartSoon({required this.course});
+  final CourseSummaryDto course;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final theme = Theme.of(context);
+    return Card(
+      color: theme.colorScheme.surfaceContainerHighest,
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.schedule_rounded, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(l.classesStartSoon, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                 ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${formatPaise(course.priceInPaise)} · ${course.accessDays == null ? l.lifetimeAccess : l.accessDays(course.accessDays!)}',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 4),
+            Text(l.classesStartSoonBody),
+            const SizedBox(height: 12),
+            AskAboutAdmissionButton(course: course),
           ],
         ),
       ),

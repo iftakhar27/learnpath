@@ -442,7 +442,12 @@ export const appMessages = {
     "materialsEmpty": "Nothing here yet. Try another filter, or check back soon.",
     "materialImage": "Image",
     "materialLink": "Opens another website",
-    "downloadsCount": "{count, plural, =0{No downloads yet} =1{1 download} other{{count} downloads}}"
+    "downloadsCount": "{count, plural, =0{No downloads yet} =1{1 download} other{{count} downloads}}",
+    "classesStartSoon": "Classes start soon",
+    "classesStartSoonBody": "Lessons are being added. You can buy this course as soon as the first class is up.",
+    "askAboutAdmission": "Ask about admission on WhatsApp",
+    "admissionMessage": "Hi! I'd like to know about admission to “{course}”.",
+    "lessonsComingSoon": "Lessons coming soon"
   },
   "hi": {
     "appTagline": "NEET, JEE और बोर्ड परीक्षाओं की तैयारी करें",
@@ -886,6 +891,11 @@ export const appMessages = {
     "materialsEmpty": "अभी यहां कुछ नहीं है। कोई दूसरा फ़िल्टर आज़माएं या जल्द ही देखें।",
     "materialImage": "चित्र",
     "materialLink": "दूसरी वेबसाइट खुलेगी",
-    "downloadsCount": "{count, plural, =0{अभी कोई डाउनलोड नहीं} =1{1 डाउनलोड} other{{count} डाउनलोड}}"
+    "downloadsCount": "{count, plural, =0{अभी कोई डाउनलोड नहीं} =1{1 डाउनलोड} other{{count} डाउनलोड}}",
+    "classesStartSoon": "क्लासेज़ जल्द शुरू होंगी",
+    "classesStartSoonBody": "लेसन जोड़े जा रहे हैं। पहली क्लास आते ही आप यह कोर्स खरीद सकेंगे।",
+    "askAboutAdmission": "एडमिशन के बारे में WhatsApp पर पूछें",
+    "admissionMessage": "नमस्ते! मुझे “{course}” में एडमिशन की जानकारी चाहिए।",
+    "lessonsComingSoon": "लेसन जल्द आ रहे हैं"
   }
 } as const;

@@ -34,6 +34,7 @@ class GuestApi implements HttpClientAdapter {
     'priceInPaise': free ? 0 : 199900,
     'accessDays': null,
     'enrolled': false,
+    'lessonCount': 2,
   };
 
   @override

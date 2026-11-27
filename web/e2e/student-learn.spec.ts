@@ -58,6 +58,7 @@ test("paid course: locked lessons explain how to unlock; buying on a test server
   await signedInStudent(page, request);
   await page.goto("/learn");
   await page.getByRole("link", { name: /Mechanics \(Sample\)/ }).click();
+  await expect(page.getByRole("heading", { name: PAID, level: 1 })).toBeVisible();
   await expect(page.getByText(/days access|Lifetime access/).filter({ visible: true })).toBeVisible();
   await page.getByRole("button", { name: /^Buy for ₹/ }).click();
   await expect(page.getByRole("status").filter({ hasText: "Payments are simulated on this test server" })).toBeVisible();

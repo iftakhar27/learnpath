@@ -441,5 +441,10 @@
   "materialsEmpty": "अभी यहां कुछ नहीं है। कोई दूसरा फ़िल्टर आज़माएं या जल्द ही देखें।",
   "materialImage": "चित्र",
   "materialLink": "दूसरी वेबसाइट खुलेगी",
-  "downloadsCount": "{count, plural, =0{अभी कोई डाउनलोड नहीं} =1{1 डाउनलोड} other{{count} डाउनलोड}}"
+  "downloadsCount": "{count, plural, =0{अभी कोई डाउनलोड नहीं} =1{1 डाउनलोड} other{{count} डाउनलोड}}",
+  "classesStartSoon": "क्लासेज़ जल्द शुरू होंगी",
+  "classesStartSoonBody": "लेसन जोड़े जा रहे हैं। पहली क्लास आते ही आप यह कोर्स खरीद सकेंगे।",
+  "askAboutAdmission": "एडमिशन के बारे में WhatsApp पर पूछें",
+  "admissionMessage": "नमस्ते! मुझे “{course}” में एडमिशन की जानकारी चाहिए।",
+  "lessonsComingSoon": "लेसन जल्द आ रहे हैं"
 }

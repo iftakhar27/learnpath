@@ -9,7 +9,9 @@ using Microsoft.EntityFrameworkCore;
 namespace LearnPath.Api.Modules.Catalog;
 
 public record ExamDto(Guid Id, string Code, string Name, DateOnly? NextExamDate);
-public record CourseSummaryDto(Guid Id, string Slug, Guid ExamId, string Title, string? Description, string? ClassLevel, bool IsFree, long PriceInPaise, int? AccessDays, bool Enrolled);
+/// <summary><c>LessonCount</c> is the course's published lessons; a paid course with none can't be bought yet ("classes start soon").</summary>
+public record CourseSummaryDto(Guid Id, string Slug, Guid ExamId, string Title, string? Description, string? ClassLevel, bool IsFree, long PriceInPaise, int? AccessDays, bool Enrolled,
+    int LessonCount);
 public record ResourceDto(Guid Id, string Type, string Title, string Language, int? DurationSeconds, bool IsFreePreview, bool Locked, bool Completed, int PositionSeconds);
 public record TopicDto(Guid Id, string Title, int EstimatedMinutes, bool Completed, int ResourceCount, int CompletedResources);
 public record ChapterDto(Guid Id, string? Unit, string Title, List<TopicDto> Topics, int CompletionPercent);
@@ -48,12 +50,14 @@ public class CatalogController(AppDbContext db, RequestLanguage lang, Entitlemen
             "price_asc" => query.OrderBy(c => c.PriceInPaise),
             "price_desc" => query.OrderByDescending(c => c.PriceInPaise),
             "newest" => query.OrderByDescending(c => c.CreatedAt),
-            _ => query.OrderBy(c => c.TitleEn),
+            // By class (8, 9, 10, 11, 12, then batches without one), then title.
+            _ => query.OrderBy(c => c.ClassLevel == null).ThenBy(c => c.ClassLevel!.Length).ThenBy(c => c.ClassLevel).ThenBy(c => c.TitleEn),
         };
         var total = await query.CountAsync(ct);
         var items = await query.Skip((p - 1) * size).Take(size).ToListAsync(ct);
         var enrolled = User.Identity?.IsAuthenticated == true ? await entitlements.ActiveCourseIdsAsync(User.UserId(), ct) : [];
-        return new(items.Select(c => ToSummary(c, enrolled.Contains(c.Id))).ToList(), p, size, total);
+        var lessons = await LessonCountsAsync(db, items.Select(c => c.Id).ToList(), ct);
+        return new(items.Select(c => ToSummary(c, enrolled.Contains(c.Id), lessons.GetValueOrDefault(c.Id))).ToList(), p, size, total);
     }
 
     [HttpGet("courses/{courseId:guid}/syllabus")]
@@ -87,7 +91,8 @@ public class CatalogController(AppDbContext db, RequestLanguage lang, Entitlemen
             return new SubjectDto(s.Id, lang.Pick(s.TitleEn, s.TitleHi), chapters, Pct(all.Sum(t => t.CompletedResources), all.Sum(t => t.ResourceCount)));
         }).ToList();
         var allTopics = subjects.SelectMany(s => s.Chapters).SelectMany(c => c.Topics).ToList();
-        return new CourseDetailDto(ToSummary(course, enrolled), hasAccess, Pct(allTopics.Sum(t => t.CompletedResources), allTopics.Sum(t => t.ResourceCount)), subjects);
+        var lessonCount = course.Subjects.SelectMany(s => s.Chapters).SelectMany(ch => ch.Topics).Sum(t => t.Resources.Count);
+        return new CourseDetailDto(ToSummary(course, enrolled, lessonCount), hasAccess, Pct(allTopics.Sum(t => t.CompletedResources), allTopics.Sum(t => t.ResourceCount)), subjects);
     }
 
     [HttpPost("courses/{courseId:guid}/enroll")]
@@ -172,6 +177,16 @@ public class CatalogController(AppDbContext db, RequestLanguage lang, Entitlemen
         return SignedFiles.Inline(Response, file, file.FileName, TimeSpan.FromMinutes(10));
     }
 
-    private CourseSummaryDto ToSummary(Course c, bool enrolled) =>
-        new(c.Id, c.Slug, c.ExamId, lang.Pick(c.TitleEn, c.TitleHi), lang.PickOpt(c.DescriptionEn, c.DescriptionHi), c.ClassLevel, c.IsFree, c.PriceInPaise, c.AccessDays, enrolled);
+    private CourseSummaryDto ToSummary(Course c, bool enrolled, int lessons) =>
+        new(c.Id, c.Slug, c.ExamId, lang.Pick(c.TitleEn, c.TitleHi), lang.PickOpt(c.DescriptionEn, c.DescriptionHi), c.ClassLevel, c.IsFree, c.PriceInPaise, c.AccessDays, enrolled, lessons);
+
+    /// <summary>Published lessons per course (courses without any are left out).</summary>
+    public static async Task<Dictionary<Guid, int>> LessonCountsAsync(AppDbContext db, List<Guid> courseIds, CancellationToken ct) =>
+        await (from r in db.LearningResources
+               join t in db.Topics on r.TopicId equals t.Id
+               join ch in db.Chapters on t.ChapterId equals ch.Id
+               join s in db.Subjects on ch.SubjectId equals s.Id
+               where r.Status == PublishStatus.Published && courseIds.Contains(s.CourseId)
+               group r by s.CourseId into g
+               select new { g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Key, x => x.Count, ct);
 }

@@ -2749,6 +2749,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{No downloads yet} =1{1 download} other{{count} downloads}}'**
   String downloadsCount(int count);
+
+  /// No description provided for @classesStartSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Classes start soon'**
+  String get classesStartSoon;
+
+  /// No description provided for @classesStartSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons are being added. You can buy this course as soon as the first class is up.'**
+  String get classesStartSoonBody;
+
+  /// No description provided for @askAboutAdmission.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about admission on WhatsApp'**
+  String get askAboutAdmission;
+
+  /// No description provided for @admissionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi! I\'d like to know about admission to “{course}”.'**
+  String admissionMessage(String course);
+
+  /// No description provided for @lessonsComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons coming soon'**
+  String get lessonsComingSoon;
 }
 
 class _AppLocalizationsDelegate

@@ -14,7 +14,7 @@ import { LanguageSwitch } from "./language-switch";
 import { StudentError } from "./errors";
 import { safeNext, useProfile, useUpdateProfile, type Profile } from "./profile";
 
-const CLASSES = ["9", "10", "11", "12", "Dropper"];
+const CLASSES = ["8", "9", "10", "11", "12", "Dropper"];
 const BOARDS = ["CBSE", "ICSE", "State"];
 const brand = process.env.NEXT_PUBLIC_BRAND_NAME ?? "LearnPath";
 
